@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Page Header -->
+<div class="mb-6">
+    <p class="text-gray-600 mt-1">Quản lý các danh mục sản phẩm của cửa hàng</p>
+</div>
+
+<!-- Action Buttons -->
+<div class="mb-6 flex justify-between items-center">
+    <button onclick="openCreateModal()" 
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Thêm danh mục
+    </button>
+</div>
+
+<!-- Catalogs Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="catalogsGrid">
+    <!-- Catalog cards will be loaded here -->
+</div>
+
+<!-- Empty State -->
+<div id="emptyState" class="hidden text-center py-12">
+    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">Chưa có danh mục</h3>
+    <p class="mt-1 text-sm text-gray-500">Bắt đầu bằng cách tạo danh mục mới.</p>
+</div>
+
+<!-- Create/Edit Modal -->
+<div id="catalogModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 id="modalTitle" class="text-lg font-bold text-gray-900">Thêm danh mục mới</h3>
+            <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="catalogForm" onsubmit="saveCatalog(event)">
+            <input type="hidden" id="catalogId">
+            
+            <!-- Catalog Name -->
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="catalogValue">
+                    Tên danh mục <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="catalogValue" name="value" required
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                       placeholder="Ví dụ: Hoa sinh nhật">
+            </div>
+            
+            <!-- Image URL -->
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="catalogImage">
+                    URL hình ảnh
+                </label>
+                <input type="text" id="catalogImage" name="image"
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                       placeholder="/images/catalogs/example.jpg"
+                       oninput="previewImage()">
+                <p class="text-xs text-gray-500 mt-1">Nhập đường dẫn hoặc URL của hình ảnh</p>
+            </div>
+            
+            <!-- Image Preview -->
+            <div id="imagePreviewContainer" class="mb-4 hidden">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Xem trước</label>
+                <img id="imagePreview" src="" alt="Preview" 
+                     class="w-full h-48 object-cover rounded-lg border-2 border-gray-300">
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex items-center justify-end gap-2">
+                <button type="button" onclick="closeModal()"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    Hủy
+                </button>
+                <button type="submit"
+                        class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <span id="submitBtnText">Lưu</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Update Image Modal -->
+<div id="imageModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-900">Cập nhật hình ảnh danh mục</h3>
+            <button onclick="closeImageModal()" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        
+        <form id="imageForm" onsubmit="saveCatalogImage(event)">
+            <input type="hidden" id="imageCatalogId">
+            
+            <!-- Catalog Name (Read-only) -->
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">
+                    Tên danh mục
+                </label>
+                <input type="text" id="imageCatalogName" readonly
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-500 bg-gray-100 cursor-not-allowed">
+            </div>
+            
+            <!-- Image URL -->
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="imageCatalogImage">
+                    URL hình ảnh <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="imageCatalogImage" name="image" required
+                       class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                       placeholder="/images/catalogs/example.jpg"
+                       oninput="previewImageModal()">
+                <p class="text-xs text-gray-500 mt-1">Nhập đường dẫn hoặc URL của hình ảnh</p>
+            </div>
+            
+            <!-- Image Preview -->
+            <div id="imagePreviewContainerModal" class="mb-4 hidden">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Xem trước</label>
+                <img id="imagePreviewModal" src="" alt="Preview" 
+                     class="w-full h-48 object-cover rounded-lg border-2 border-gray-300">
+            </div>
+            
+            <!-- Buttons -->
+            <div class="flex items-center justify-end gap-2">
+                <button type="button" onclick="closeImageModal()"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    Hủy
+                </button>
+                <button type="submit"
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                    <span id="imageSubmitBtnText">Cập nhật hình ảnh</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+    <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+        <div class="text-center">
+            <svg class="mx-auto mb-4 w-14 h-14 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <h3 class="mb-2 text-lg font-bold text-gray-900">Xác nhận xóa</h3>
+            <p class="text-gray-600 mb-4">Bạn có chắc chắn muốn xóa danh mục "<span id="deleteCatalogName" class="font-semibold"></span>"?</p>
+            <p class="text-sm text-red-600 mb-4">Hành động này không thể hoàn tác!</p>
+            
+            <div class="flex justify-center gap-2">
+                <button onclick="closeDeleteModal()"
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    Hủy
+                </button>
+                <button onclick="confirmDelete()"
+                        class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                    Xóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed top-4 right-4 z-[9999] bg-white rounded-lg shadow-xl p-4 max-w-sm border-l-4 border-green-500 transition-all duration-300" 
+     style="display: none; opacity: 0; transform: translateX(100%);">
+    <div class="flex items-center gap-3">
+        <div class="flex-shrink-0" id="toastIcon">
+            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <div class="flex-1">
+            <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+        </div>
+        <button onclick="closeToast()" class="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
+</div>
+
+<script>
+let currentCatalogId = null;
+
+// Load catalogs on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadCatalogs();
+});
+
+// Load all catalogs
+async function loadCatalogs() {
+    try {
+        const response = await fetch('/api/catalogs');
+        const catalogs = await response.json();
+        
+        const grid = document.getElementById('catalogsGrid');
+        const emptyState = document.getElementById('emptyState');
+        
+        if (catalogs.length === 0) {
+            grid.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            return;
+        }
+        
+        grid.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+        
+        grid.innerHTML = catalogs.map(catalog => `
+            <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                <div class="relative h-48 bg-gray-200">
+                    ${catalog.image ? 
+                        `<img src="${catalog.image}" alt="${catalog.value}" 
+                             class="w-full h-full object-cover"
+                             onerror="this.onerror=null; this.src='/images/placeholder-catalog.jpg';">` :
+                        `<div class="w-full h-full flex items-center justify-center text-gray-400">
+                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>`
+                    }
+                </div>
+                <div class="p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">${catalog.value}</h3>
+                    <div class="flex gap-2">
+                        <button onclick="editCatalog(${catalog.id}, '${catalog.value}', '${catalog.image || ''}')"
+                                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-sm py-2 px-3 rounded">
+                            Sửa
+                        </button>
+                        <button onclick="updateCatalogImage(${catalog.id}, '${catalog.value}', '${catalog.image || ''}')"
+                                class="flex-1 bg-green-600 hover:bg-green-700 text-white text-sm py-2 px-3 rounded">
+                            Hình ảnh
+                        </button>
+                        <button onclick="deleteCatalog(${catalog.id}, '${catalog.value}')"
+                                class="flex-1 bg-red-600 hover:bg-red-700 text-white text-sm py-2 px-3 rounded">
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading catalogs:', error);
+        showToast('Lỗi khi tải danh sách danh mục', 'error');
+    }
+}
+
+// Open create modal
+function openCreateModal() {
+    document.getElementById('modalTitle').textContent = 'Thêm danh mục mới';
+    document.getElementById('catalogForm').reset();
+    document.getElementById('catalogId').value = '';
+    document.getElementById('imagePreviewContainer').classList.add('hidden');
+    document.getElementById('catalogModal').classList.remove('hidden');
+    currentCatalogId = null;
+}
+
+// Edit catalog
+function editCatalog(id, value, image) {
+    document.getElementById('modalTitle').textContent = 'Chỉnh sửa danh mục';
+    document.getElementById('catalogId').value = id;
+    document.getElementById('catalogValue').value = value;
+    document.getElementById('catalogImage').value = image || '';
+    
+    if (image) {
+        document.getElementById('imagePreview').src = image;
+        document.getElementById('imagePreviewContainer').classList.remove('hidden');
+    } else {
+        document.getElementById('imagePreviewContainer').classList.add('hidden');
+    }
+    
+    document.getElementById('catalogModal').classList.remove('hidden');
+    currentCatalogId = id;
+}
+
+// Preview image
+function previewImage() {
+    const imageUrl = document.getElementById('catalogImage').value;
+    const preview = document.getElementById('imagePreview');
+    const container = document.getElementById('imagePreviewContainer');
+    
+    if (imageUrl) {
+        preview.src = imageUrl;
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+// Save catalog
+async function saveCatalog(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('catalogId').value;
+    const value = document.getElementById('catalogValue').value.trim();
+    const image = document.getElementById('catalogImage').value.trim() || null;
+    
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span>Đang lưu...</span>';
+    submitBtn.disabled = true;
+    
+    try {
+        const url = id ? `/api/catalogs/${id}` : '/api/catalogs';
+        const method = id ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ value, image })
+        });
+        
+        if (response.ok) {
+            showToast(id ? 'Cập nhật danh mục thành công' : 'Thêm danh mục thành công', 'success');
+            closeModal();
+            loadCatalogs();
+        } else {
+            const error = await response.text();
+            showToast('Lỗi: ' + error, 'error');
+        }
+    } catch (error) {
+        console.error('Error saving catalog:', error);
+        showToast('Lỗi khi lưu danh mục', 'error');
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Delete catalog
+function deleteCatalog(id, name) {
+    currentCatalogId = id;
+    document.getElementById('deleteCatalogName').textContent = name;
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+// Confirm delete
+async function confirmDelete() {
+    if (!currentCatalogId) return;
+    
+    try {
+        const response = await fetch(`/api/catalogs/${currentCatalogId}`, {
+            method: 'DELETE'
+        });
+        
+        if (response.ok) {
+            showToast('Xóa danh mục thành công', 'success');
+            closeDeleteModal();
+            loadCatalogs();
+        } else {
+            const error = await response.text();
+            showToast('Lỗi: ' + error, 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting catalog:', error);
+        showToast('Lỗi khi xóa danh mục', 'error');
+    }
+}
+
+// Update catalog image
+function updateCatalogImage(id, name, image) {
+    document.getElementById('imageCatalogId').value = id;
+    document.getElementById('imageCatalogName').value = name;
+    document.getElementById('imageCatalogImage').value = image || '';
+    
+    if (image) {
+        document.getElementById('imagePreviewModal').src = image;
+        document.getElementById('imagePreviewContainerModal').classList.remove('hidden');
+    } else {
+        document.getElementById('imagePreviewContainerModal').classList.add('hidden');
+    }
+    
+    document.getElementById('imageModal').classList.remove('hidden');
+    currentCatalogId = id;
+}
+
+// Preview image in modal
+function previewImageModal() {
+    const imageUrl = document.getElementById('imageCatalogImage').value;
+    const preview = document.getElementById('imagePreviewModal');
+    const container = document.getElementById('imagePreviewContainerModal');
+    
+    if (imageUrl) {
+        preview.src = imageUrl;
+        container.classList.remove('hidden');
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+// Save catalog image
+async function saveCatalogImage(event) {
+    event.preventDefault();
+    
+    const id = document.getElementById('imageCatalogId').value;
+    const image = document.getElementById('imageCatalogImage').value.trim();
+    
+    if (!image) {
+        showToast('Vui lòng nhập URL hình ảnh', 'error');
+        return;
+    }
+    
+    const submitBtn = event.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span>Đang cập nhật...</span>';
+    submitBtn.disabled = true;
+    
+    try {
+        const response = await fetch(`/api/catalogs/${id}/image`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ image })
+        });
+        
+        if (response.ok) {
+            showToast('Cập nhật hình ảnh thành công', 'success');
+            closeImageModal();
+            loadCatalogs();
+        } else {
+            const error = await response.text();
+            showToast('Lỗi: ' + error, 'error');
+        }
+    } catch (error) {
+        console.error('Error updating catalog image:', error);
+        showToast('Lỗi khi cập nhật hình ảnh', 'error');
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+
+// Close modals
+function closeModal() {
+    document.getElementById('catalogModal').classList.add('hidden');
+    currentCatalogId = null;
+}
+
+function closeImageModal() {
+    document.getElementById('imageModal').classList.add('hidden');
+    currentCatalogId = null;
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').classList.add('hidden');
+    currentCatalogId = null;
+}
+
+// Show toast notification
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const toastIcon = document.getElementById('toastIcon');
+    
+    // Set message
+    toastMessage.textContent = message;
+    
+    // Set icon and color based on type
+    if (type === 'error') {
+        toast.className = 'fixed top-4 right-4 z-[9999] bg-white rounded-lg shadow-xl p-4 max-w-sm border-l-4 border-red-500 transition-all duration-300';
+        toastIcon.innerHTML = `
+            <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        `;
+    } else {
+        toast.className = 'fixed top-4 right-4 z-[9999] bg-white rounded-lg shadow-xl p-4 max-w-sm border-l-4 border-green-500 transition-all duration-300';
+        toastIcon.innerHTML = `
+            <svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+        `;
+    }
+    
+    // Show toast with animation
+    toast.style.display = 'block';
+    setTimeout(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // Auto hide after 4 seconds
+    setTimeout(() => {
+        closeToast();
+    }, 4000);
+}
+
+// Close toast notification
+function closeToast() {
+    const toast = document.getElementById('toast');
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(100%)';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 300);
+}
+</script>
+
+</body>
+</html>

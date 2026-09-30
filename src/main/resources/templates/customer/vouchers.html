@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout('Vouchers - StarShop', 
+          'Khám phá các mã giảm giá đặc biệt dành cho bạn', 
+          ~{::link},
+          ~{::content})}">
+
+<head>
+    <th:block th:fragment="link">
+        <style>
+            .voucher-card {
+                transition: all 0.3s ease;
+            }
+            .voucher-card:hover {
+                transform: scale(1.01);
+            }
+            .progress-bar {
+                transition: width 0.5s ease-out;
+            }
+            .copy-button {
+                transition: all 0.3s ease;
+            }
+        </style>
+    </th:block>
+</head>
+
+<body>
+<th:block th:fragment="content">
+    <!-- Page Header -->
+    <section class="bg-gradient-to-br from-pink-50 via-white to-green-50 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    🎫 <span data-translate="vouchers-title">Mã Giảm Giá Đặc Biệt</span>
+                </h1>
+                <p class="text-lg text-gray-600 mb-8" data-translate="vouchers-subtitle">
+                    Chọn mã ưu đãi phù hợp nhất cho đơn hàng của bạn
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vouchers Content -->
+    <section class="py-12" x-data="voucherApp()">
+        <div class="container mx-auto px-4">
+            
+            <!-- Loading State -->
+            <div x-show="isLoading" class="text-center py-16">
+                <svg class="animate-spin h-8 w-8 text-primary mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="mt-4 text-primary font-medium" data-translate="loading-vouchers">Đang tải danh sách ưu đãi...</p>
+            </div>
+
+            <!-- Error State -->
+            <div x-show="isError" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-8" role="alert">
+                <p class="font-bold" data-translate="error-loading-data">Lỗi tải dữ liệu</p>
+                <p><span data-translate="cannot-connect-api">Không thể kết nối tới API Voucher</span>: <span x-text="errorText"></span></p>
+                <button @click="fetchVouchers()" class="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                    <span data-translate="try-again">Thử lại</span>
+                </button>
+            </div>
+
+            <!-- Voucher List -->
+            <div x-show="!isLoading && !isError" class="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+                
+                <template x-for="voucher in vouchersData" :key="voucher.code">
+                    <!-- Voucher Card -->
+                    <div class="voucher-card flex bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl">
+                        
+                        <!-- Left Section: Discount Value -->
+                        <div class="flex-shrink-0 w-2/5 md:w-1/3 bg-gradient-to-br from-pink-400 to-pink-600 text-white p-6 flex flex-col items-center justify-center relative">
+                            <!-- Decorative elements -->
+                            <div class="absolute inset-y-0 right-0 w-3 transform translate-x-1 bg-white opacity-10"></div>
+                            
+                            <div class="text-center">
+                                <span class="block text-3xl md:text-4xl font-extrabold" x-text="formatDiscount(voucher)"></span>
+                                <span class="block mt-1 text-xs font-semibold uppercase tracking-wider" 
+                                      x-text="voucher.discountType === 'PERCENTAGE' ? translations['discount-percent'] : translations['discount-amount']"></span>
+                            </div>
+                            
+                            <!-- Usage Progress (only if maxUses is set) -->
+                            <div x-show="voucher.maxUses" class="mt-4 w-full px-2">
+                                <div class="h-1 bg-white/30 rounded-full overflow-hidden">
+                                    <div class="progress-bar h-full bg-white" 
+                                         :style="`width: ${voucher.maxUses ? Math.min(100, ((voucher.uses || 0) / voucher.maxUses) * 100) : 0}%`"></div>
+                                </div>
+                                <p class="text-xs text-white/90 mt-1 text-center" 
+                                   x-text="`${voucher.uses || 0}/${voucher.maxUses} ${translations['times']}`"></p>
+                            </div>
+                            <!-- No usage limit -->
+                            <div x-show="!voucher.maxUses" class="mt-4 w-full px-2">
+                                <p class="text-xs text-white/90 text-center font-semibold" data-translate="unlimited">Không giới hạn</p>
+                            </div>
+                        </div>
+
+                        <!-- Right Section: Details & Action -->
+                        <div class="flex-1 p-6 flex flex-col justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800 mb-2">
+                                    <span data-translate="code">Mã</span>: <span class="text-pink-600" x-text="voucher.code"></span>
+                                </h2>
+                                
+                                <!-- Description (if available) -->
+                                <p x-show="voucher.description" class="text-sm text-gray-600 mb-3" x-text="voucher.description"></p>
+                                
+                                <!-- Conditions -->
+                                <div class="text-sm text-gray-600 space-y-2 mb-4">
+                                    <div x-show="voucher.minOrderValue" class="flex items-center">
+                                        <svg class="w-4 h-4 text-green-500 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span><span data-translate="min-order">Đơn tối thiểu</span>: <strong x-text="formatCurrency(voucher.minOrderValue)"></strong></span>
+                                    </div>
+                                    <div x-show="voucher.maxDiscountAmount" class="flex items-center">
+                                        <svg class="w-4 h-4 text-blue-500 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5v-2.5Z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span><span data-translate="max-discount">Giảm tối đa</span>: <strong x-text="formatCurrency(voucher.maxDiscountAmount)"></strong></span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <svg class="w-4 h-4 text-red-500 mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span><span data-translate="expiry-date">HSD</span>: <strong x-text="formatDate(voucher.expiryDate)"></strong></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Button -->
+                            <div class="mt-4">
+                                <div x-data="{ copied: false }" class="relative">
+                                    <button @click="copyCode(voucher.code); copied = true; setTimeout(() => { copied = false }, 2000);"
+                                            class="copy-button w-full px-4 py-2 text-sm font-semibold rounded-lg text-white transition-all duration-300"
+                                            :class="{
+                                                'bg-green-500 hover:bg-green-600': copied,
+                                                'bg-pink-500 hover:bg-pink-600': !copied
+                                            }">
+                                        <span x-show="!copied" class="flex items-center justify-center">
+                                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M13.887 3.182c.396-.037.79.081 1.085.376.295.296.413.69.376 1.085l-.838 9.2a2 2 0 0 1-1.98 1.777H4.18a2 2 0 0 1-1.98-1.777l-.838-9.2c-.037-.396.081-.79.376-1.085A1.5 1.5 0 0 1 2.823 3h10.354c.384 0 .756.146 1.035.425.28.28.425.651.425 1.035v.722ZM14 5.5a.5.5 0 0 0-.5-.5h-11a.5.5 0 0 0-.5.5v.722c0 .384.146.756.425 1.035.28.28.651.425 1.035.425h8.17c.384 0 .756-.146 1.035-.425.28-.28.425-.651.425-1.035V5.5Z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span data-translate="copy-code">Sao chép mã</span>
+                                        </span>
+                                        <span x-show="copied" class="flex items-center justify-center">
+                                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span data-translate="copied">Đã sao chép!</span>
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Voucher Card -->
+                </template>
+                
+                <!-- No Vouchers Found -->
+                <div x-show="vouchersData.length === 0 && !isLoading && !isError" class="lg:col-span-2 text-center py-16 text-gray-500">
+                    <span class="text-6xl block mb-4">🎫</span>
+                    <p class="text-xl font-medium" data-translate="no-vouchers">Hiện tại chưa có mã giảm giá nào</p>
+                    <p class="text-sm mt-2" data-translate="check-back-later">Vui lòng quay lại sau hoặc liên hệ hỗ trợ</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        function voucherApp() {
+            return {
+                isLoading: true,
+                isError: false,
+                errorText: '',
+                vouchersData: [],
+                
+                init() {
+                    this.fetchVouchers();
+                },
+
+                // Helper function to format currency (VND)
+                formatCurrency(value) {
+                    if (value == null) return '0đ';
+                    return new Intl.NumberFormat('vi-VN', { 
+                        style: 'currency', 
+                        currency: 'VND',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(value).replace('₫', 'đ');
+                },
+                
+                // Helper function to format date (DD/MM/YYYY)
+                formatDate(dateString) {
+                    if (!dateString) return 'N/A';
+                    const date = new Date(dateString);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    return `${day}/${month}/${year}`;
+                },
+
+                // Helper function to format discount value
+                formatDiscount(voucher) {
+                    if (voucher.discountType === 'PERCENTAGE') {
+                        return `${voucher.discountValue}%`;
+                    } else if (voucher.discountType === 'FIXED') {
+                        return this.formatCurrency(voucher.discountValue);
+                    }
+                    return 'N/A';
+                },
+
+                // Function to copy code to clipboard
+                copyCode(code) {
+                    try {
+                        // Modern approach first
+                        if (navigator.clipboard && window.isSecureContext) {
+                            navigator.clipboard.writeText(code);
+                        } else {
+                            // Fallback for older browsers or non-HTTPS
+                            const tempInput = document.createElement('textarea');
+                            tempInput.value = code;
+                            document.body.appendChild(tempInput);
+                            tempInput.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(tempInput);
+                        }
+                        console.log('Copied code:', code);
+                        
+                        // Show toast notification
+                        if (typeof showToast === 'function') {
+                            showToast(`Đã sao chép mã: ${code}`, 'success');
+                        }
+                    } catch (err) {
+                        console.error('Failed to copy text: ', err);
+                        if (typeof showToast === 'function') {
+                            showToast('Không thể sao chép mã', 'error');
+                        }
+                    }
+                },
+
+                // Function to fetch available vouchers from API
+                async fetchVouchers() {
+                    this.isLoading = true;
+                    this.isError = false;
+                    
+                    const apiUrl = '/api/vouchers/available';
+                    
+                    try {
+                        const response = await fetch(apiUrl);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        
+                        // Handle new API response format
+                        if (data && data.success && Array.isArray(data.vouchers)) {
+                            this.vouchersData = data.vouchers;
+                        } else if (data && data._embedded && data._embedded.vouchers) {
+                            // Fallback for old API format
+                            this.vouchersData = data._embedded.vouchers;
+                        } else if (data && Array.isArray(data)) {
+                            // Handle direct array response
+                            this.vouchersData = data;
+                        } else {
+                            this.vouchersData = [];
+                        }
+
+                    } catch (e) {
+                        this.isError = true;
+                        this.errorText = e.message;
+                        console.error("Fetch Error:", e);
+                    } finally {
+                        this.isLoading = false;
+                    }
+                }
+            }
+        }
+    </script>
+</th:block>
+</body>
+</html>

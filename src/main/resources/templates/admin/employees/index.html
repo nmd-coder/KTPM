@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Employee Management Content -->
+    <div class="space-y-6" x-data="employeeManager()">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="mt-1 text-sm text-gray-500">Quản lý thông tin nhân viên và phân quyền</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button onclick="exportEmployees()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Xuất danh sách
+                </button>
+                <button @click="openCreateModal" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg text-sm font-medium text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Thêm nhân viên
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-blue-100 text-sm font-medium">Tổng nhân viên</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.total">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-blue-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-blue-200 text-sm">Nhân viên & Quản trị</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-green-100 text-sm font-medium">Đang làm việc</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.active">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-green-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-green-200 text-sm">Hoạt động</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-purple-100 text-sm font-medium">Nhân viên</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.staff">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-purple-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                            </svg>
+                            <span class="text-purple-200 text-sm">Nhân viên bán hàng</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-orange-100 text-sm font-medium">Quản trị viên</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.admin">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-orange-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-orange-200 text-sm">Quyền cao nhất</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vai trò</label>
+                    <select x-model="filters.role" @change="fetchEmployees" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <option value="">Tất cả vai trò</option>
+                        <option value="STAFF">Nhân viên</option>
+                        <option value="ADMIN">Quản trị viên</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                    <select x-model="filters.status" @change="fetchEmployees" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="active">Hoạt động</option>
+                        <option value="inactive">Tạm khóa</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                    <div class="relative">
+                        <input type="text" x-model="filters.search" @input.debounce.300ms="fetchEmployees" placeholder="Tên, email, số điện thoại, mã nhân viên..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+                        <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div x-show="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+        
+        <!-- Employees Table -->
+        <div x-show="!loading" class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nhân viên</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quyền hạn</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chức vụ</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày vào làm</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <template x-for="employee in employees" :key="employee.id">
+                            <tr class="hover:bg-gray-50 transition-colors duration-150">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 flex-shrink-0">
+                                            <div x-show="!employee.avatar" class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                                <span class="text-white font-semibold text-sm" x-text="getInitials(employee.firstname, employee.lastname)"></span>
+                                            </div>
+                                            <img x-show="employee.avatar" :src="employee.avatar" class="h-10 w-10 rounded-full object-cover" alt="Avatar">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900" x-text="employee.firstname + ' ' + employee.lastname"></div>
+                                            <div class="text-sm text-gray-500" x-text="employee.email"></div>
+                                            <div class="text-xs text-gray-400" x-text="employee.phone"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span :class="employee.role.toUpperCase() === 'ADMIN' ? 'bg-orange-100 text-orange-800' : 'bg-purple-100 text-purple-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path x-show="employee.role.toUpperCase() === 'ADMIN'" fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                            <path x-show="employee.role.toUpperCase() === 'STAFF'" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
+                                        </svg>
+                                        <span x-text="employee.role.toUpperCase() === 'ADMIN' ? 'Quản trị viên' : 'Nhân viên'"></span>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="employee.position || '-'"></td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="formatDate(employee.hireDate)"></td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span :class="employee.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                        <div :class="employee.isActive ? 'bg-green-400' : 'bg-red-400'" class="w-1.5 h-1.5 rounded-full mr-1"></div>
+                                        <span x-text="employee.isActive ? 'Hoạt động' : 'Tạm khóa'"></span>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex space-x-2">
+                                        <button @click="viewEmployee(employee)" class="text-blue-600 hover:text-blue-900 transition-colors duration-150" title="Xem chi tiết">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                            </svg>
+                                        </button>
+                                        <button @click="editEmployee(employee)" class="text-green-600 hover:text-green-900 transition-colors duration-150" title="Chỉnh sửa">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
+                                        </button>
+                                        <button @click="toggleStatus(employee)" :class="employee.isActive ? 'text-yellow-600 hover:text-yellow-900' : 'text-green-600 hover:text-green-900'" class="transition-colors duration-150" :title="employee.isActive ? 'Khóa tài khoản' : 'Kích hoạt'">
+                                            <svg x-show="employee.isActive" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                                            </svg>
+                                            <svg x-show="!employee.isActive" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </button>
+                                        <button @click="deleteEmployee(employee)" class="text-red-600 hover:text-red-900 transition-colors duration-150" title="Xóa">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                        <tr x-show="employees.length === 0">
+                            <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                                <p class="mt-2">Không tìm thấy nhân viên nào</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="bg-gray-50 px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <button @click="prevPage" :disabled="pagination.currentPage === 0" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Trước
+                    </button>
+                    <button @click="nextPage" :disabled="pagination.currentPage >= pagination.totalPages - 1" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        Sau
+                    </button>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Hiển thị 
+                            <span class="font-medium" x-text="pagination.currentPage * pagination.size + 1"></span>
+                            đến 
+                            <span class="font-medium" x-text="Math.min((pagination.currentPage + 1) * pagination.size, pagination.totalItems)"></span>
+                            của 
+                            <span class="font-medium" x-text="pagination.totalItems"></span>
+                            nhân viên
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <button @click="prevPage" :disabled="pagination.currentPage === 0" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                            <template x-for="page in getVisiblePages()" :key="page">
+                                <button @click="goToPage(page)" :class="page === pagination.currentPage ? 'bg-blue-50 border-blue-500 text-blue-600 z-10' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium" x-text="page + 1">
+                                </button>
+                            </template>
+                            <button @click="nextPage" :disabled="pagination.currentPage >= pagination.totalPages - 1" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                                </svg>
+                            </button>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create/Edit Employee Modal -->
+    <div x-data="employeeModalManager()" x-show="showModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" x-cloak>
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="closeModal()"></div>
+            
+            <!-- Modal panel -->
+            <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900" x-text="modalMode === 'create' ? 'Thêm nhân viên mới' : (modalMode === 'edit' ? 'Chỉnh sửa nhân viên' : 'Chi tiết nhân viên')"></h3>
+                    <button @click="closeModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <form @submit.prevent="submitForm()" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Họ -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Họ <span class="text-red-500">*</span></label>
+                            <input type="text" x-model="formData.firstname" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="VD: Nguyễn" required>
+                        </div>
+                        
+                        <!-- Tên -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tên <span class="text-red-500">*</span></label>
+                            <input type="text" x-model="formData.lastname" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="VD: Văn A" required>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Email -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+                            <input type="email" x-model="formData.email" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="example@email.com" required>
+                        </div>
+                        
+                        <!-- Số điện thoại -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại <span class="text-red-500">*</span></label>
+                            <input type="tel" x-model="formData.phone" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0123456789" required>
+                        </div>
+                    </div>
+                    
+                    <div x-show="modalMode === 'create'">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu <span class="text-red-500">*</span></label>
+                        <input type="password" x-model="formData.password" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tối thiểu 8 ký tự" :required="modalMode === 'create'">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Vai trò -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Vai trò <span class="text-red-500">*</span></label>
+                            <select x-model="formData.role" :disabled="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                                <option value="">Chọn vai trò</option>
+                                <option value="STAFF">Nhân viên</option>
+                                <option value="ADMIN">Quản trị viên</option>
+                            </select>
+                            <p class="text-sm text-gray-500 mt-1">Chức vụ và phòng ban sẽ được tự động gán theo vai trò</p>
+                        </div>
+                        
+                        <!-- Lương/giờ -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Lương/giờ (VNĐ)</label>
+                            <input type="number" x-model="formData.salaryPerHour" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" step="1000" min="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="50000">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Ngày vào làm -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ngày vào làm</label>
+                            <div x-show="modalMode === 'view' && !formData.hireDate" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                                Chưa cập nhật
+                            </div>
+                            <input x-show="modalMode !== 'view' || formData.hireDate" type="date" x-model="formData.hireDate" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        </div>
+                        
+                        <!-- Avatar URL -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+                            <input type="url" x-model="formData.avatar" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://...">
+                        </div>
+                    </div>
+                    
+                    <!-- Trạng thái -->
+                    <div x-show="modalMode !== 'view'">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="formData.isActive" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="text-sm font-medium text-gray-700">Kích hoạt tài khoản</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Thông tin thêm (chỉ hiển thị khi xem) -->
+                    <div x-show="modalMode === 'view'" class="space-y-6 pt-4 border-t border-gray-200">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Mã nhân viên</label>
+                                <p class="text-lg font-semibold text-gray-900" x-text="formData.employeeCode || '-'"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500">Trạng thái</label>
+                                <span :class="formData.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                    <span x-text="formData.isActive ? 'Hoạt động' : 'Tạm khóa'"></span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                        <button type="button" @click="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            <span x-text="modalMode === 'view' ? 'Đóng' : 'Hủy'"></span>
+                        </button>
+                        <button x-show="modalMode !== 'view'" type="submit" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-lg text-sm font-medium text-white hover:from-blue-700 hover:to-blue-800">
+                            <span x-text="modalMode === 'create' ? 'Thêm nhân viên' : 'Cập nhật'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function exportEmployees() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams();
+            const role = url.searchParams.get('role');
+            const status = url.searchParams.get('status');
+            const search = url.searchParams.get('search');
+            if (role) params.append('role', role);
+            if (status) params.append('isActive', status === 'active');
+            if (search) params.append('search', search);
+            window.location.href = '/admin/api/employees/export' + (params.toString()? ('?' + params.toString()):'');
+        }
+        function employeeManager() {
+            return {
+                employees: [],
+                loading: false,
+                filters: {
+                    role: '',
+                    status: '',
+                    search: ''
+                },
+                pagination: {
+                    currentPage: 0,
+                    size: 20,
+                    totalPages: 0,
+                    totalItems: 0
+                },
+                stats: {
+                    total: 0,
+                    active: 0,
+                    staff: 0,
+                    admin: 0
+                },
+                
+                init() {
+                    this.fetchEmployees();
+                    this.fetchStats();
+                },
+                
+                async fetchEmployees() {
+                    this.loading = true;
+                    try {
+                        const params = new URLSearchParams({
+                            page: this.pagination.currentPage,
+                            size: this.pagination.size,
+                            sortBy: 'createdAt',
+                            sortDir: 'desc'
+                        });
+                        
+                        // Add filters to params
+                        if (this.filters.role) {
+                            params.append('role', this.filters.role);
+                        }
+                        if (this.filters.status) {
+                            params.append('status', this.filters.status);
+                        }
+                        if (this.filters.search) {
+                            params.append('search', this.filters.search);
+                        }
+                        
+                        const response = await fetch(`/admin/api/employees?${params}`);
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.employees = data.employees;
+                            this.pagination.totalPages = data.totalPages;
+                            this.pagination.totalItems = data.totalItems;
+                            this.pagination.currentPage = data.currentPage;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching employees:', error);
+                        if (typeof showError === 'function') {
+                            showError('Lỗi khi tải danh sách nhân viên');
+                        }
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                async fetchStats() {
+                    try {
+                        const response = await fetch('/admin/api/employees/stats');
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.stats.total = data.stats.total;
+                            this.stats.active = data.stats.active;
+                            this.stats.staff = data.stats.staff;
+                            this.stats.admin = data.stats.admin;
+                        }
+                    } catch (error) {
+                        console.error('Error fetching employee stats:', error);
+                    }
+                },
+                
+                getInitials(firstname, lastname) {
+                    return (firstname.charAt(0) + lastname.charAt(0)).toUpperCase();
+                },
+                
+                formatDate(date) {
+                    if (!date) return '-';
+                    return new Date(date).toLocaleDateString('vi-VN');
+                },
+                
+                openCreateModal() {
+                    window.dispatchEvent(new CustomEvent('open-employee-modal', { 
+                        detail: { mode: 'create' }
+                    }));
+                },
+                
+                viewEmployee(employee) {
+                    window.dispatchEvent(new CustomEvent('open-employee-modal', { 
+                        detail: { mode: 'view', employee: employee }
+                    }));
+                },
+                
+                editEmployee(employee) {
+                    window.dispatchEvent(new CustomEvent('open-employee-modal', { 
+                        detail: { mode: 'edit', employee: employee }
+                    }));
+                },
+                
+                async toggleStatus(employee) {
+                    let confirmed = false;
+                    if (typeof confirmAction === 'function') {
+                        confirmed = await confirmAction(`${employee.isActive ? 'Khóa' : 'Kích hoạt'} nhân viên?`, `Bạn có chắc muốn ${employee.isActive ? 'khóa' : 'kích hoạt'} nhân viên này?`);
+                    } else {
+                        confirmed = confirm(`Bạn có chắc muốn ${employee.isActive ? 'khóa' : 'kích hoạt'} nhân viên này?`);
+                    }
+                    if (!confirmed) {
+                        return;
+                    }
+                    
+                    try {
+                        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+                        
+                        const headers = {
+                            'Content-Type': 'application/json'
+                        };
+                        if (csrfToken && csrfHeader) {
+                            headers[csrfHeader] = csrfToken;
+                        }
+                        
+                        const response = await fetch(`/admin/api/employees/${employee.id}/toggle-status`, {
+                            method: 'PATCH',
+                            headers: headers
+                        });
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            await this.fetchEmployees();
+                            await this.fetchStats();
+                            if (typeof showSuccess === 'function') {
+                                showSuccess(data.message);
+                            }
+                        } else {
+                            if (typeof showError === 'function') {
+                                showError(data.message);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error toggling employee status:', error);
+                        if (typeof showError === 'function') {
+                            showError('Lỗi khi cập nhật trạng thái nhân viên');
+                        }
+                    }
+                },
+                
+                async deleteEmployee(employee) {
+                    let confirmed = false;
+                    if (typeof confirmDelete === 'function') {
+                        confirmed = await confirmDelete(`Xóa nhân viên ${employee.firstname} ${employee.lastname}?`, 'Hành động này không thể hoàn tác.');
+                    } else {
+                        confirmed = confirm(`Bạn có chắc muốn xóa nhân viên ${employee.firstname} ${employee.lastname}? Hành động này không thể hoàn tác.`);
+                    }
+                    if (!confirmed) {
+                        return;
+                    }
+                    
+                    try {
+                        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+                        
+                        const headers = {
+                            'Content-Type': 'application/json'
+                        };
+                        if (csrfToken && csrfHeader) {
+                            headers[csrfHeader] = csrfToken;
+                        }
+                        
+                        const response = await fetch(`/admin/api/employees/${employee.id}`, {
+                            method: 'DELETE',
+                            headers: headers
+                        });
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            await this.fetchEmployees();
+                            await this.fetchStats();
+                            if (typeof showSuccess === 'function') {
+                                showSuccess(data.message);
+                            }
+                        } else {
+                            if (typeof showError === 'function') {
+                                showError(data.message);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error deleting employee:', error);
+                        if (typeof showError === 'function') {
+                            showError('Lỗi khi xóa nhân viên');
+                        }
+                    }
+                },
+                
+                exportData() {
+                    if (typeof showInfo === 'function') {
+                        showInfo('Chức năng xuất dữ liệu đang được phát triển');
+                    }
+                },
+                
+                prevPage() {
+                    if (this.pagination.currentPage > 0) {
+                        this.pagination.currentPage--;
+                        this.fetchEmployees();
+                    }
+                },
+                
+                nextPage() {
+                    if (this.pagination.currentPage < this.pagination.totalPages - 1) {
+                        this.pagination.currentPage++;
+                        this.fetchEmployees();
+                    }
+                },
+                
+                goToPage(page) {
+                    this.pagination.currentPage = page;
+                    this.fetchEmployees();
+                },
+                
+                getVisiblePages() {
+                    const pages = [];
+                    const maxVisible = 5;
+                    let start = Math.max(0, this.pagination.currentPage - Math.floor(maxVisible / 2));
+                    let end = Math.min(this.pagination.totalPages, start + maxVisible);
+                    
+                    if (end - start < maxVisible) {
+                        start = Math.max(0, end - maxVisible);
+                    }
+                    
+                    for (let i = start; i < end; i++) {
+                        pages.push(i);
+                    }
+                    
+                    return pages;
+                }
+            };
+        }
+        
+        function employeeModalManager() {
+            return {
+                showModal: false,
+                modalMode: 'create', // 'create', 'edit', 'view'
+                formData: {
+                    id: null,
+                    employeeCode: '',
+                    firstname: '',
+                    lastname: '',
+                    email: '',
+                    phone: '',
+                    password: '',
+                    role: '',
+                    position: '',
+                    salaryPerHour: null,
+                    hireDate: '',
+                    avatar: '',
+                    isActive: true
+                },
+                // Timesheet and Salary data
+                timesheets: [],
+                totalHours: 0,
+                loadingTimesheets: false,
+                selectedTimesheetMonth: new Date().getMonth() + 1,
+                selectedTimesheetYear: new Date().getFullYear(),
+                salary: null,
+                loadingSalary: false,
+                selectedSalaryMonth: new Date().getMonth() + 1,
+                selectedSalaryYear: new Date().getFullYear(),
+                
+                init() {
+                    window.addEventListener('open-employee-modal', (e) => {
+                        this.openModal(e.detail.mode, e.detail.employee);
+                    });
+                },
+                
+                openModal(mode, employee = null) {
+                    this.modalMode = mode;
+                    
+                    console.log('Opening modal:', mode, employee); // Debug log
+                    
+                    if (mode === 'create') {
+                        this.resetForm();
+                    } else if (employee) {
+                        // Assign each field individually to ensure reactivity
+                        this.formData.id = employee.id;
+                        this.formData.employeeCode = employee.employeeCode || '';
+                        this.formData.firstname = employee.firstname || '';
+                        this.formData.lastname = employee.lastname || '';
+                        this.formData.email = employee.email || '';
+                        this.formData.phone = employee.phone || '';
+                        this.formData.password = '';
+                        
+                        // Handle role - convert enum to string if needed
+                        if (employee.role) {
+                            let roleValue = typeof employee.role === 'object' ? employee.role.name : employee.role;
+                            // Convert to uppercase to match dropdown options
+                            this.formData.role = roleValue.toUpperCase();
+                        } else {
+                            this.formData.role = '';
+                        }
+                        
+                        this.formData.position = employee.position || '';
+                        this.formData.salaryPerHour = employee.salaryPerHour || null;
+                        
+                        // Handle hireDate - convert to YYYY-MM-DD format for input type="date"
+                        if (employee.hireDate) {
+                            // If it's an array [year, month, day]
+                            if (Array.isArray(employee.hireDate)) {
+                                const [year, month, day] = employee.hireDate;
+                                this.formData.hireDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                            } 
+                            // If it's a string like "2024-01-15T00:00:00"
+                            else if (typeof employee.hireDate === 'string') {
+                                this.formData.hireDate = employee.hireDate.split('T')[0];
+                            }
+                            // Otherwise use as-is
+                            else {
+                                this.formData.hireDate = employee.hireDate;
+                            }
+                        } else {
+                            this.formData.hireDate = '';
+                        }
+                        
+                        this.formData.avatar = employee.avatar || '';
+                        this.formData.isActive = employee.isActive !== undefined ? employee.isActive : true;
+                        
+                        console.log('Form data after assignment:', this.formData); // Debug log
+                        console.log('Role value:', this.formData.role, 'Type:', typeof this.formData.role);
+                        console.log('HireDate value:', this.formData.hireDate, 'Type:', typeof this.formData.hireDate);
+                        
+                        // Load timesheets and salary if in view mode
+                        if (mode === 'view' && employee.id) {
+                            this.loadEmployeeTimesheets(employee.id);
+                            this.loadEmployeeSalary(employee.id);
+                        }
+                    }
+                    
+                    this.showModal = true;
+                },
+                
+                closeModal() {
+                    this.showModal = false;
+                    setTimeout(() => this.resetForm(), 300);
+                },
+                
+                resetForm() {
+                    this.formData = {
+                        id: null,
+                        employeeCode: '',
+                        firstname: '',
+                        lastname: '',
+                        email: '',
+                        phone: '',
+                        password: '',
+                        role: '',
+                        salaryPerHour: null,
+                        hireDate: '',
+                        avatar: '',
+                        isActive: true
+                    };
+                    // Reset timesheets and salary data
+                    this.timesheets = [];
+                    this.totalHours = 0;
+                    this.salary = null;
+                    this.loadingTimesheets = false;
+                    this.loadingSalary = false;
+                },
+                
+                async submitForm() {
+                    try {
+                        const url = this.modalMode === 'create' 
+                            ? '/admin/api/employees' 
+                            : `/admin/api/employees/${this.formData.id}`;
+                        
+                        const method = this.modalMode === 'create' ? 'POST' : 'PUT';
+                        
+                        const payload = {
+                            firstname: this.formData.firstname,
+                            lastname: this.formData.lastname,
+                            email: this.formData.email,
+                            phone: this.formData.phone,
+                            role: this.formData.role,
+                            position: this.formData.position,
+                            salaryPerHour: this.formData.salaryPerHour ? parseFloat(this.formData.salaryPerHour) : null,
+                            hireDate: this.formData.hireDate || null,
+                            avatar: this.formData.avatar || null,
+                            isActive: this.formData.isActive
+                        };
+                        
+                        if (this.modalMode === 'create' && this.formData.password) {
+                            payload.password = this.formData.password;
+                        }
+                        
+                        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+                        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+                        
+                        const headers = {
+                            'Content-Type': 'application/json'
+                        };
+                        if (csrfToken && csrfHeader) {
+                            headers[csrfHeader] = csrfToken;
+                        }
+                        
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: headers,
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            if (typeof showSuccess === 'function') {
+                                showSuccess(data.message);
+                            }
+                            this.closeModal();
+                            window.location.reload(); // Reload to refresh the list
+                        } else {
+                            if (typeof showError === 'function') {
+                                showError(data.message);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error submitting form:', error);
+                        if (typeof showError === 'function') {
+                            showError('Lỗi khi lưu nhân viên');
+                        }
+                    }
+                },
+                
+                async loadEmployeeTimesheets(employeeId) {
+                    this.loadingTimesheets = true;
+                    this.timesheets = [];
+                    this.totalHours = 0;
+                    
+                    try {
+                        const url = `/admin/api/employees/${employeeId}/timesheets?month=${this.selectedTimesheetMonth}&year=${this.selectedTimesheetYear}`;
+                        const response = await fetch(url);
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.timesheets = data.timesheets || [];
+                            this.totalHours = data.totalHours || 0;
+                        }
+                    } catch (error) {
+                        console.error('Error loading timesheets:', error);
+                    } finally {
+                        this.loadingTimesheets = false;
+                    }
+                },
+                
+                async loadEmployeeSalary(employeeId) {
+                    this.loadingSalary = true;
+                    this.salary = null;
+                    
+                    try {
+                        const url = `/admin/api/employees/${employeeId}/salary?month=${this.selectedSalaryMonth}&year=${this.selectedSalaryYear}`;
+                        const response = await fetch(url);
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.salary = data.salary;
+                        }
+                    } catch (error) {
+                        console.error('Error loading salary:', error);
+                    } finally {
+                        this.loadingSalary = false;
+                    }
+                },
+                
+                formatDate(date) {
+                    if (!date) return '-';
+                    if (Array.isArray(date)) {
+                        const [year, month, day] = date;
+                        return `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+                    }
+                    return new Date(date).toLocaleDateString('vi-VN');
+                },
+                
+                formatTime(datetime) {
+                    if (!datetime) return '-';
+                    if (Array.isArray(datetime)) {
+                        const [year, month, day, hour, minute] = datetime;
+                        return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                    }
+                    return new Date(datetime).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                },
+                
+                formatCurrency(value) {
+                    if (!value) return '0₫';
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                },
+                
+                getSalaryStatusClass(status) {
+                    const classes = {
+                        'PENDING': 'bg-yellow-100 text-yellow-800',
+                        'PAID': 'bg-green-100 text-green-800',
+                        'OVERDUE': 'bg-red-100 text-red-800'
+                    };
+                    return classes[status] || 'bg-gray-100 text-gray-800';
+                },
+                
+                getSalaryStatusText(status) {
+                    const texts = {
+                        'PENDING': 'Chờ thanh toán',
+                        'PAID': 'Đã thanh toán',
+                        'OVERDUE': 'Quá hạn'
+                    };
+                    return texts[status] || status;
+                }
+            };
+        }
+    </script>
+</body>
+</html>
+

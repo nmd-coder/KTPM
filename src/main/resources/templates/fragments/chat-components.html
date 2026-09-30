@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Message Bubble Component -->
+<div th:fragment="message-bubble(message, isOwn)" 
+     th:class="${isOwn} ? 'flex justify-end' : 'flex justify-start'">
+    <div th:class="${message.messageType == 'SYSTEM'} ? 'message-system' : (${isOwn} ? 'message-sent' : 'message-received')" 
+         class="message-bubble max-w-xs md:max-w-md">
+        <div th:if="${message.messageType != 'SYSTEM'}">
+            <p class="text-sm" th:text="${message.content}"></p>
+            <div class="message-time mt-1">
+                <span th:text="${#temporals.format(message.sentAt, 'HH:mm')}"></span>
+                <i th:if="${isOwn && message.isRead}" class="fas fa-check-double ml-1 text-blue-300"></i>
+                <i th:if="${isOwn && !message.isRead}" class="fas fa-check ml-1"></i>
+            </div>
+        </div>
+        <div th:if="${message.messageType == 'SYSTEM'}">
+            <p class="text-sm" th:text="${message.content}"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Conversation List Item Component -->
+<div th:fragment="conversation-item(conversation)" 
+     class="conversation-item p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors">
+    <div class="flex items-start space-x-3">
+        <!-- Avatar -->
+        <div class="flex-shrink-0 relative">
+            <img th:if="${conversation.customerAvatar != null}" 
+                 th:src="${conversation.customerAvatar}" 
+                 th:alt="${conversation.customerName}" 
+                 class="w-12 h-12 rounded-full object-cover">
+            <div th:if="${conversation.customerAvatar == null}" 
+                 class="w-12 h-12 rounded-full bg-primary-500 flex items-center justify-center">
+                <span class="text-white font-semibold text-lg" 
+                      th:text="${#strings.substring(conversation.customerName, 0, 1)}"></span>
+            </div>
+            <span th:if="${conversation.unreadCount != null && conversation.unreadCount > 0}" 
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+                  th:text="${conversation.unreadCount}"></span>
+        </div>
+        
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between mb-1">
+                <h4 class="font-semibold text-gray-900 truncate" th:text="${conversation.customerName}"></h4>
+                <span class="text-xs text-gray-500" 
+                      th:text="${#temporals.format(conversation.lastMessageAt, 'HH:mm')}"></span>
+            </div>
+            <p class="text-sm text-gray-600 truncate" th:text="${conversation.lastMessageContent}"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Customer Info Card Component -->
+<div th:fragment="customer-info-card(customer)" class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+        <i class="fas fa-user-circle mr-2 text-primary-600"></i>
+        Thông tin khách hàng
+    </h3>
+    
+    <div class="text-center mb-4">
+        <img th:if="${customer.avatar != null}" 
+             th:src="${customer.avatar}" 
+             th:alt="${customer.fullName}" 
+             class="w-20 h-20 rounded-full object-cover mx-auto mb-3">
+        <div th:if="${customer.avatar == null}" 
+             class="w-20 h-20 rounded-full bg-primary-500 flex items-center justify-center mx-auto mb-3">
+            <span class="text-white font-bold text-2xl" 
+                  th:text="${#strings.substring(customer.fullName, 0, 1)}"></span>
+        </div>
+        <h4 class="font-semibold text-gray-900" th:text="${customer.fullName}"></h4>
+    </div>
+    
+    <div class="space-y-2 text-sm">
+        <div class="flex items-center text-gray-600">
+            <i class="fas fa-envelope w-6"></i>
+            <span th:text="${customer.email}"></span>
+        </div>
+        <div th:if="${customer.phone != null}" class="flex items-center text-gray-600">
+            <i class="fas fa-phone w-6"></i>
+            <span th:text="${customer.phone}"></span>
+        </div>
+    </div>
+</div>
+
+<!-- Typing Indicator Component -->
+<div th:fragment="typing-indicator" class="flex justify-start">
+    <div class="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+</div>
+
+<!-- Empty State Component -->
+<div th:fragment="empty-state(icon, message)" class="chat-empty-state py-12">
+    <i th:class="'fas fa-' + ${icon} + ' text-gray-300 text-5xl mb-4'"></i>
+    <p class="text-gray-500" th:text="${message}"></p>
+</div>
+
+<!-- Priority Badge Component -->
+<span th:fragment="priority-badge(priority)" 
+      th:class="${priority == 'LOW'} ? 'priority-low' : (${priority == 'HIGH'} ? 'priority-high' : (${priority == 'URGENT'} ? 'priority-urgent' : 'priority-normal'))"
+      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium">
+    <i th:if="${priority == 'HIGH' || priority == 'URGENT'}" class="fas fa-exclamation-circle mr-1"></i>
+    <span th:text="${priority}"></span>
+</span>
+
+<!-- Status Badge Component -->
+<span th:fragment="status-badge(status)" 
+      th:class="${status == 'OPEN'} ? 'bg-yellow-100 text-yellow-800' : (${status == 'ASSIGNED'} ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800')"
+      class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium">
+    <i th:if="${status == 'OPEN'}" class="fas fa-clock mr-1"></i>
+    <i th:if="${status == 'ASSIGNED'}" class="fas fa-user-check mr-1"></i>
+    <i th:if="${status == 'CLOSED'}" class="fas fa-check-circle mr-1"></i>
+    <span th:switch="${status}">
+        <span th:case="'OPEN'">Chưa xử lý</span>
+        <span th:case="'ASSIGNED'">Đang xử lý</span>
+        <span th:case="'CLOSED'">Đã đóng</span>
+        <span th:case="*" th:text="${status}"></span>
+    </span>
+</span>
+
+<!-- Online Status Indicator -->
+<div th:fragment="online-status(isOnline)" 
+     th:class="${isOnline} ? 'online-status' : 'online-status offline'">
+</div>
+
+<!-- Message Input Component -->
+<div th:fragment="message-input" class="flex items-end space-x-3">
+    <div class="flex-1">
+        <textarea id="messageInput"
+                 placeholder="Nhập tin nhắn..."
+                 rows="2"
+                 class="message-input w-full"></textarea>
+    </div>
+    <button id="sendButton"
+            class="send-button px-6 py-3 rounded-full text-white font-medium">
+        <i class="fas fa-paper-plane"></i>
+    </button>
+</div>
+
+</body>
+</html>
+

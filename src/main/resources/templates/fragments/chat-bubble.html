@@ -1,0 +1,95 @@
+<!-- Customer Chat Bubble Widget -->
+<div id="chatWidget" class="chat-widget" th:fragment="chat-widget" style="display: block;">
+    <!-- Chat Bubble Button -->
+    <button id="chatBubbleButton" class="chat-bubble-button-modern pulsate" onclick="toggleChatWidget()">
+        <div class="chat-bubble-icon">
+            <svg class="chat-icon-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z" fill="currentColor"/>
+                <circle cx="8" cy="10" r="1" fill="currentColor"/>
+                <circle cx="12" cy="10" r="1" fill="currentColor"/>
+                <circle cx="16" cy="10" r="1" fill="currentColor"/>
+            </svg>
+        </div>
+        <span id="chatWidgetBadge" class="chat-widget-badge-modern" style="display: none;">0</span>
+        <div class="chat-bubble-ripple"></div>
+    </button>
+    
+    <!-- Chat Widget Window -->
+    <div id="chatWidgetWindow" class="chat-widget-window-modern" style="display: none;">
+        <!-- Header -->
+        <div class="chat-widget-header-modern">
+            <div class="flex items-center space-x-3">
+                <div class="chat-avatar-modern">
+                    <span class="text-2xl">🌸</span>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-bold text-white text-lg">StarShop Support</h3>
+                    <div class="flex items-center space-x-2">
+                        <span id="chatWidgetStatus" class="inline-block w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
+                        <p class="text-sm text-white opacity-90">Sẵn sàng hỗ trợ</p>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleChatWidget()" class="chat-close-button">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Messages -->
+        <div id="chatWidgetMessages" class="chat-widget-messages-modern chat-scrollbar">
+            <!-- Welcome message -->
+            <div class="flex justify-start mb-6">
+                <div class="flex items-end space-x-2 max-w-xs">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-purple-600 flex items-center justify-center text-white text-sm font-semibold">
+                        🌸
+                    </div>
+                    <div class="flex flex-col items-start">
+                        <div class="bg-white text-gray-800 px-4 py-3 rounded-2xl rounded-bl-md shadow-lg border border-gray-100">
+                            <p class="text-sm leading-relaxed">Xin chào! 👋 Chúng tôi có thể giúp gì cho bạn hôm nay?</p>
+                        </div>
+                        <span class="text-xs text-gray-500 mt-1 px-2">StarShop Support</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Input -->
+        <div class="chat-widget-input-modern">
+            <div class="flex items-end space-x-3">
+                <div class="flex-1 relative">
+                    <input type="text" 
+                           id="chatWidgetInput"
+                           placeholder="Nhập tin nhắn..."
+                           class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all duration-200 bg-gray-50 focus:bg-white text-sm"
+                           onkeypress="if(event.key === 'Enter') sendWidgetMessage()">
+                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                        </svg>
+                    </div>
+                </div>
+                <button onclick="sendWidgetMessage()" 
+                        class="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Ensure chat widget is visible on all breakpoints */
+@media (max-width: 640px) {
+    .chat-widget-window {
+        width: calc(100vw - 32px);
+        height: calc(100vh - 120px);
+        right: 16px;
+        left: 16px;
+        bottom: 90px;
+    }
+}
+</style>

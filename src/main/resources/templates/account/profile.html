@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout('Thông tin tài khoản', 
+          'Quản lý thông tin tài khoản StarShop của bạn. Cập nhật thông tin cá nhân, địa chỉ giao hàng và cài đặt bảo mật.',
+          ~{::extraCSS},
+          ~{::content})}">
+
+<head>
+    <th:block th:fragment="extraCSS">
+        <!-- No extra CSS needed - using Tailwind only -->
+    </th:block>
+    <link rel="stylesheet" th:href="@{/css/account.css}" />
+</head>
+
+<body>
+<th:block th:fragment="content">
+
+    <!-- Account Content -->
+    <div class="min-h-screen bg-gray-50 py-8">
+        <div class="container mx-auto px-4">
+            <!-- Success/Error Messages -->
+            <div th:if="${success}" class="max-w-7xl mx-auto mb-6 bg-white border border-green-200 rounded-lg p-4 shadow-sm" role="alert">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-green-600 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm text-gray-700" th:text="${success}"></p>
+                </div>
+            </div>
+            <div th:if="${error}" class="max-w-7xl mx-auto mb-6 bg-white border border-red-200 rounded-lg p-4 shadow-sm" role="alert">
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-red-600 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+                    </svg>
+                    <p class="text-sm text-gray-700" th:text="${error}"></p>
+                </div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto">
+                    <div class="space-y-6">
+                        <!-- Profile Header Card -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                            <div class="p-8">
+                                <div class="flex items-start gap-6">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-24 h-24 rounded-full border-2 border-gray-200 bg-gray-100 flex items-center justify-center overflow-hidden">
+                                            <img th:if="${userObject != null and userObject.avatar != null}" 
+                                                 th:src="${userObject.avatar}" 
+                                                 alt="Avatar" 
+                                                 class="w-full h-full object-cover">
+                                            <svg th:if="${userObject == null or userObject.avatar == null}" class="w-12 h-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <h1 class="text-2xl font-bold text-gray-900 mb-1" th:text="${userObject != null ? userObject.fullName : 'Người dùng'}">Người dùng</h1>
+                                        <p class="text-gray-600 text-sm mb-3" th:text="${userObject != null ? userObject.email : currentUser}">user@example.com</p>
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200">
+                                                <svg class="w-3 h-3 mr-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm3.857-9.809a.75.75 0 0 0-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 1 0-1.06 1.061l2.5 2.5a.75.75 0 0 0 1.137-.089l4-5.5Z" clip-rule="evenodd" />
+                                                </svg>
+                                                <span data-translate="verified">Đã xác thực</span>
+                                            </span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200" data-translate="customer">Khách hàng</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        <button type="button" data-bs-toggle="modal" data-bs-target="#editProfileModal" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-sm font-medium rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all">
+                                            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="m2.695 14.762-1.262 3.155a.5.5 0 0 0 .65.65l3.155-1.262a4 4 0 0 0 1.343-.886L17.5 5.501a2.121 2.121 0 0 0-3-3L3.58 13.42a4 4 0 0 0-.886 1.343Z" />
+                                            </svg>
+                                            <span data-translate="edit">Chỉnh sửa</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Profile Details -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4" data-translate="profile-details">Thông tin chi tiết</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1" data-translate="phone">Số điện thoại</label>
+                                    <p class="text-gray-900" th:text="${userObject != null and userObject.phone != null ? userObject.phone : 'Chưa cập nhật'}" data-translate-fallback="not-updated">Chưa cập nhật</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-1" data-translate="join-date">Ngày tham gia</label>
+                                    <p class="text-gray-900" th:text="${userObject != null and userObject.createdAt != null ? #temporals.format(userObject.createdAt, 'dd/MM/yyyy') : 'Không rõ'}" data-translate-fallback="unknown">Không rõ</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Account Statistics -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                            <h2 class="text-lg font-semibold text-gray-900 mb-4" data-translate="overview">Tổng quan</h2>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                                <a href="/account/orders" class="group block p-4 rounded-lg border border-gray-200 hover:border-pink-200 hover:shadow-sm transition-all">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M6 5v1H4.667a1.75 1.75 0 0 0-1.743 1.598l-.826 9.5A1.75 1.75 0 0 0 3.84 19h12.32a1.75 1.75 0 0 0 1.742-1.902l-.826-9.5A1.75 1.75 0 0 0 15.333 6H14V5a4 4 0 0 0-8 0Zm4-2.5A2.5 2.5 0 0 0 7.5 5v1h5V5A2.5 2.5 0 0 0 10 2.5Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-bold text-gray-900" th:text="${ordersCount ?: 0}">0</p>
+                                            <p class="text-sm text-gray-600" data-translate="orders">Đơn hàng</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                
+                                <a href="/account/wishlist" class="group block p-4 rounded-lg border border-gray-200 hover:border-pink-200 hover:shadow-sm transition-all">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-10 h-10 bg-pink-50 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-pink-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-bold text-gray-900" th:text="${wishlistCount ?: 0}">0</p>
+                                            <p class="text-sm text-gray-600" data-translate="favorites">Yêu thích</p>
+                                        </div>
+                                    </div>
+                                </a>
+                                
+                                <a href="/cart" class="group block p-4 rounded-lg border border-gray-200 hover:border-pink-200 hover:shadow-sm transition-all">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                                            <svg class="w-5 h-5 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M1 1.75A.75.75 0 0 1 1.75 1h1.628a1.75 1.75 0 0 1 1.734 1.51L5.18 3a65.25 65.25 0 0 1 13.36 1.412.75.75 0 0 1 .58.875 48.645 48.645 0 0 1-1.618 6.2.75.75 0 0 1-.712.513H6a2.503 2.503 0 0 0-2.292 1.5H17.25a.75.75 0 0 1 0 1.5H2.76a.75.75 0 0 1-.748-.807 4.002 4.002 0 0 1 2.716-3.486L3.626 2.716a.25.25 0 0 0-.248-.216H1.75A.75.75 0 0 1 1 1.75ZM6 17.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0ZM15.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-bold text-gray-900" th:text="${cartCount ?: 0}">0</p>
+                                            <p class="text-sm text-gray-600" data-translate="cart">Giỏ hàng</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Address Management -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+                            <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                                <h2 class="text-lg font-semibold text-gray-900" data-translate="shipping-address">Địa chỉ giao hàng</h2>
+                                <button type="button" data-bs-toggle="modal" data-bs-target="#addressModal" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-600 text-white text-sm font-medium rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all">
+                                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                                    </svg>
+                                    <span data-translate="add-address">Thêm địa chỉ</span>
+                                </button>
+                            </div>
+                            <div class="p-6">
+                                <div id="addressesList">
+                                    <div class="text-center py-8">
+                                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                                        <p class="mt-3 text-sm text-gray-500" data-translate="loading-addresses">Đang tải địa chỉ...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+    <!-- Edit Profile Modal -->
+    <div id="editProfileModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto transform transition-all">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                <h3 class="text-xl font-bold text-gray-900" data-translate="edit-profile">Chỉnh sửa thông tin cá nhân</h3>
+                <button type="button" onclick="closeEditProfileModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <form th:action="@{/account/profile/update}" method="post" class="p-6 space-y-6">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <div>
+                    <label for="editFirstName" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span data-translate="firstname">Họ</span> <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="editFirstName" name="firstName" th:value="${userObject?.firstname}" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                           data-translate-placeholder="enter-firstname" placeholder="Nhập họ của bạn">
+                </div>
+                
+                <div>
+                    <label for="editLastName" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span data-translate="lastname">Tên</span> <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="editLastName" name="lastName" th:value="${userObject?.lastname}" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                           data-translate-placeholder="enter-lastname" placeholder="Nhập tên của bạn">
+                </div>
+                
+                <div>
+                    <label for="editPhone" class="block text-sm font-medium text-gray-700 mb-2">
+                        <span data-translate="phone">Số điện thoại</span> <span class="text-red-500">*</span>
+                    </label>
+                    <input type="tel" id="editPhone" name="phone" th:value="${userObject?.phone}" required pattern="[0-9]{10}"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                           data-translate-placeholder="enter-phone" placeholder="Nhập số điện thoại (10 chữ số)">
+                    <p class="mt-1 text-sm text-gray-500" data-translate="phone-format">Định dạng: 10 chữ số (VD: 0912345678)</p>
+                </div>
+                
+                <div>
+                    <label for="editEmail" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input type="email" id="editEmail" th:value="${userObject?.email}" disabled
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed">
+                    <p class="mt-1 text-sm text-gray-500" data-translate="email-cannot-change">Email không thể thay đổi</p>
+                </div>
+                
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeEditProfileModal()"
+                            class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium" data-translate="cancel">Hủy</button>
+                    <button type="submit"
+                            class="px-6 py-2.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-medium shadow-lg shadow-pink-500/30" data-translate="save-changes">Lưu thay đổi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Address Modal -->
+    <div id="addressModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto transform transition-all">
+            <div class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-2xl">
+                <h3 class="text-xl font-bold text-gray-900" data-translate="add-address-title">Thêm địa chỉ giao hàng</h3>
+                <button type="button" onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="mb-6 p-4 bg-gradient-to-r from-pink-50 to-rose-50 rounded-lg border border-pink-200">
+                    <label class="block text-sm font-medium text-gray-700 mb-3" data-translate="choose-address-mode">Chọn cách nhập địa chỉ</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="addressMode" value="OLD" checked onchange="toggleAddressMode()"
+                                   class="w-4 h-4 text-pink-600 focus:ring-pink-500">
+                            <span class="ml-2 text-sm font-medium text-gray-700" data-translate="address-3-level">3 cấp (Tỉnh/Quận/Phường)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="addressMode" value="NEW" onchange="toggleAddressMode()"
+                                   class="w-4 h-4 text-pink-600 focus:ring-pink-500">
+                            <span class="ml-2 text-sm font-medium text-gray-700" data-translate="address-2-level">2 cấp (Tỉnh/Phường)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <form id="addressForm" onsubmit="submitAddress(event)" class="space-y-5">
+                    <div>
+                        <label for="province" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span data-translate="province">Tỉnh/Thành phố</span> <span class="text-red-500">*</span>
+                        </label>
+                        <select id="province" required onchange="loadDistricts()"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all">
+                            <option value="" data-translate="select-province">-- Chọn Tỉnh/Thành phố --</option>
+                        </select>
+                    </div>
+                    
+                    <div id="districtGroup">
+                        <label for="district" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span data-translate="district">Quận/Huyện</span> <span class="text-red-500">*</span>
+                        </label>
+                        <select id="district" required onchange="loadWards()" disabled
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all">
+                            <option value="" data-translate="select-district">-- Chọn Quận/Huyện --</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="ward" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span data-translate="ward">Phường/Xã</span> <span class="text-red-500">*</span>
+                        </label>
+                        <select id="ward" required disabled
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all">
+                            <option value="" data-translate="select-ward">-- Chọn Phường/Xã --</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="addressDetail" class="block text-sm font-medium text-gray-700 mb-2">
+                            <span data-translate="address-detail">Địa chỉ chi tiết</span> <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="addressDetail" required rows="3"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all resize-none"
+                                  data-translate-placeholder="enter-address-detail" placeholder="Số nhà, tên đường..."></textarea>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" id="isDefault" class="w-4 h-4 text-pink-600 focus:ring-pink-500 rounded">
+                        <label for="isDefault" class="ml-2 text-sm text-gray-700" data-translate="set-as-default">Đặt làm địa chỉ mặc định</label>
+                    </div>
+                    
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
+                        <button type="button" onclick="closeAddressModal()"
+                                class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-medium">
+                            <span data-translate="cancel">Hủy</span>
+                        </button>
+                        <button type="submit" id="submitAddressBtn"
+                                class="px-6 py-2.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white rounded-lg hover:from-pink-700 hover:to-rose-700 transition-all font-medium shadow-lg shadow-pink-500/30">
+                            <span data-translate="add-address">Thêm địa chỉ</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-2xl border border-gray-200 p-4 min-w-[300px] transform transition-all">
+            <div class="flex items-start">
+                <div id="toastIcon" class="flex-shrink-0"></div>
+                <div class="ml-3 flex-1">
+                    <p id="toastMessage" class="text-sm font-medium text-gray-900"></p>
+                </div>
+                <button onclick="hideToast()" class="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/profile-modals.js}"></script>
+
+</th:block>
+</body>
+</html>

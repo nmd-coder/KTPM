@@ -1,0 +1,111 @@
+<!-- Staff Order Detail -->
+<div xmlns:th="http://www.thymeleaf.org">
+    <div class="p-6 space-y-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900" th:text="'Đơn hàng #' + ${order.id}">Đơn hàng</h2>
+                <p class="text-sm text-gray-500" th:text="${#temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm')}">15/12/2024</p>
+            </div>
+            <div>
+                <div class="inline-flex items-center space-x-2">
+                    <span class="text-sm text-gray-600">Trạng thái:</span>
+                    <span th:class="${'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' +
+                                  (order.status != null ? 
+                                    (order.status.name() == 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                    (order.status.name() == 'PROCESSING' ? 'bg-blue-100 text-blue-800' :
+                                    (order.status.name() == 'SHIPPED' ? 'bg-purple-100 text-purple-800' :
+                                    (order.status.name() == 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                    (order.status.name() == 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')))))
+                                  : 'bg-gray-100 text-gray-800')}"
+                          th:text="${order.status != null ? order.status.displayName : 'N/A'}">PENDING</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Customer and Shipping Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-sm font-medium text-gray-900 mb-4">Khách hàng</h3>
+                <div class="space-y-1">
+                    <div class="text-gray-900" th:text="${order.userFullName}">Khách hàng</div>
+                    <div class="text-gray-600 text-sm" th:text="${order.userEmail}">email@example.com</div>
+                </div>
+            </div>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-sm font-medium text-gray-900 mb-4">Giao hàng</h3>
+                <div class="space-y-1">
+                    <div class="text-gray-900" th:text="${order.shippingAddress}">Địa chỉ</div>
+                    <div class="text-gray-600 text-sm" th:text="${order.shippingPhone}">SĐT</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Items -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-medium text-gray-900 mb-4">Sản phẩm</h3>
+            <div class="divide-y divide-gray-100">
+                <div class="py-3 grid grid-cols-12 text-xs font-medium text-gray-500">
+                    <div class="col-span-6">Sản phẩm</div>
+                    <div class="col-span-2 text-center">Giá</div>
+                    <div class="col-span-2 text-center">SL</div>
+                    <div class="col-span-2 text-right">Thành tiền</div>
+                </div>
+                <div class="py-3 grid grid-cols-12 items-center" th:each="item : ${order.items}">
+                    <div class="col-span-6">
+                        <div class="text-sm text-gray-900" th:text="${item.productName}">Tên SP</div>
+                        <div class="text-xs text-gray-500" th:text="${item.productSku}">SKU</div>
+                    </div>
+                    <div class="col-span-2 text-center text-sm" th:text="${#numbers.formatCurrency(item.price)}">0₫</div>
+                    <div class="col-span-2 text-center text-sm" th:text="${item.quantity}">1</div>
+                    <div class="col-span-2 text-right text-sm" th:text="${#numbers.formatCurrency(item.price * item.quantity)}">0₫</div>
+                </div>
+            </div>
+            <div class="pt-4 border-t mt-4 space-y-1 text-sm">
+                <div class="flex justify-between"><span class="text-gray-600">Tạm tính</span><span th:text="${#numbers.formatCurrency(order.subtotal)}">0₫</span></div>
+                <div class="flex justify-between"><span class="text-gray-600">Phí vận chuyển</span><span th:text="${#numbers.formatCurrency(order.shippingFee)}">0₫</span></div>
+                <div class="flex justify-between font-semibold"><span>Tổng</span><span class="text-primary-600" th:text="${#numbers.formatCurrency(order.totalAmount)}">0₫</span></div>
+            </div>
+        </div>
+
+        <!-- Status Update -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-sm font-medium text-gray-900 mb-4">Cập nhật trạng thái</h3>
+            <form id="statusForm" class="flex items-center space-x-3">
+                <select id="newStatus" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                    <option value="PENDING">Chờ xử lý</option>
+                    <option value="PROCESSING">Đang xử lý</option>
+                    <option value="SHIPPED">Đã giao</option>
+                    <option value="COMPLETED">Hoàn thành</option>
+                    <option value="CANCELLED">Đã hủy</option>
+                </select>
+                <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Cập nhật</button>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.getElementById('statusForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const orderId = /*[[${order.id}]]*/ '';
+            const status = document.getElementById('newStatus').value;
+            fetch(`/api/staff/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    showToast(data.error || 'Có lỗi xảy ra', 'error');
+                }
+            })
+            .catch(() => showToast('Có lỗi xảy ra khi cập nhật trạng thái', 'error'));
+        });
+        /*]]>*/
+    </script>
+</div>
+
+

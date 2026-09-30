@@ -1,0 +1,1612 @@
+<!-- Admin Orders Management Content -->
+<div xmlns:th="http://www.thymeleaf.org">
+    <!-- Orders Management Content -->
+    <div class="space-y-6 p-6">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="mt-1 text-sm text-gray-500">Quản lý tất cả đơn hàng trong hệ thống</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button onclick="exportOrdersExcel()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>
+                    Xuất Excel
+                </button>
+                <button onclick="openCreateOrderModal()" class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-primary-700 transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>
+                    Tạo đơn hàng
+                </button>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6" th:if="${orderStats}">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-shopping-cart text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Tổng đơn hàng</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${orderStats.totalOrders ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clock text-yellow-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Chờ xử lý</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${orderStats.pendingOrders ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Hoàn thành</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${orderStats.completedOrders ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-dollar-sign text-purple-600"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Doanh thu</p>
+                        <p class="text-2xl font-semibold text-gray-900" th:text="${orderStats.totalRevenue != null ? #numbers.formatCurrency(orderStats.totalRevenue) : '0₫'}">0₫</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <form method="get" th:action="@{/admin/orders}">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" th:value="${currentStatus}">
+                            <option value="">Tất cả trạng thái</option>
+                            <option th:each="status : ${orderStatuses}" 
+                                    th:value="${status.name()}" 
+                                    th:text="${status.displayName}"
+                                    th:selected="${status.name() == currentStatus}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp</label>
+                        <select name="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" th:value="${sortBy}">
+                            <option value="orderDate" th:selected="${sortBy == 'orderDate'}">Ngày đặt hàng</option>
+                            <option value="totalAmount" th:selected="${sortBy == 'totalAmount'}">Tổng tiền</option>
+                            <option value="status" th:selected="${sortBy == 'status'}">Trạng thái</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Thứ tự</label>
+                        <select name="sortDir" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" th:value="${sortDir}">
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Mới nhất</option>
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Cũ nhất</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                        <div class="flex space-x-2">
+                            <input type="text" name="search" th:value="${currentSearch}" placeholder="Mã đơn hàng, tên khách hàng..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Orders Table -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mã đơn hàng</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách hàng</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày đặt</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tổng tiền</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:if="${orders.empty}" class="hover:bg-gray-50">
+                            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                                <i class="fas fa-inbox text-4xl text-gray-300 mb-4"></i>
+                                <p class="text-lg font-medium">Không có đơn hàng nào</p>
+                                <p class="text-sm">Thử thay đổi bộ lọc hoặc tìm kiếm khác</p>
+                            </td>
+                        </tr>
+                        
+                        <tr th:each="order : ${orders.content}" class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900" th:text="'#' + ${order.id}">#001234</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center">
+                                        <span class="text-sm font-medium text-primary-600" 
+                                              th:text="${order.userFullName != null ? #strings.substring(order.userFullName, 0, 2).toUpperCase() : 'NA'}">NA</span>
+                                    </div>
+                                    <div class="ml-3">
+                                        <div class="text-sm font-medium text-gray-900" th:text="${order.userFullName ?: 'N/A'}">N/A</div>
+                                        <div class="text-sm text-gray-500" th:text="${order.userEmail ?: ''}"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" 
+                                th:text="${order.orderDate != null ? #temporals.format(order.orderDate, 'dd/MM/yyyy HH:mm') : 'N/A'}">
+                                15/12/2024
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" 
+                                th:text="${order.totalAmount != null ? #numbers.formatCurrency(order.totalAmount) : '0₫'}">
+                                1,250,000₫
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:class="${'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ' + 
+                                              (order.status != null ? 
+                                                (order.status.name() == 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                                (order.status.name() == 'PROCESSING' ? 'bg-blue-100 text-blue-800' :
+                                                (order.status.name() == 'SHIPPED' ? 'bg-purple-100 text-purple-800' :
+                                                (order.status.name() == 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                (order.status.name() == 'CANCELLED' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800')))))
+                                              : 'bg-gray-100 text-gray-800')}"
+                                      th:text="${order.status != null ? order.status.displayName : 'N/A'}">
+                                    Hoàn thành
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                <div class="flex space-x-3">
+                                    <button class="text-primary-600 hover:text-primary-900 transition-colors duration-200 view-order-btn"
+                                            th:data-order-id="${order.id}"
+                                            title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="text-blue-600 hover:text-blue-900 transition-colors duration-200 update-status-btn" 
+                                            th:data-order-id="${order.id}"
+                                            th:data-current-status="${order.status?.name()}"
+                                            th:if="${order.status?.name() != 'COMPLETED' && order.status?.name() != 'CANCELLED'}"
+                                            title="Cập nhật trạng thái">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="text-red-600 hover:text-red-900 transition-colors duration-200 cancel-order-btn" 
+                                            th:data-order-id="${order.id}"
+                                            th:if="${order.status?.name() != 'COMPLETED' && order.status?.name() != 'CANCELLED'}"
+                                            title="Hủy đơn hàng">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6" th:if="${orders != null && !orders.empty}">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <a th:if="${currentPage > 0}" 
+                       th:href="@{/admin/orders(page=${currentPage - 1}, size=20, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, search=${currentSearch})}"
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Trước
+                    </a>
+                    <a th:if="${currentPage < totalPages - 1}" 
+                       th:href="@{/admin/orders(page=${currentPage + 1}, size=20, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, search=${currentSearch})}"
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        Sau
+                    </a>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            Hiển thị 
+                            <span class="font-medium" th:text="${currentPage * 20 + 1}">1</span> 
+                            đến 
+                            <span class="font-medium" th:text="${#numbers.formatInteger((currentPage + 1) * 20 > totalElements ? totalElements : (currentPage + 1) * 20, 0)}">10</span> 
+                            của 
+                            <span class="font-medium" th:text="${totalElements}">97</span> 
+                            kết quả
+                        </p>
+                    </div>
+                    <div th:if="${totalPages > 1}">
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            <!-- Previous button -->
+                            <a th:if="${currentPage > 0}" 
+                               th:href="@{/admin/orders(page=${currentPage - 1}, size=20, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, search=${currentSearch})}"
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            
+                            <!-- Page numbers -->
+                            <span th:each="page : ${#numbers.sequence(0, totalPages - 1)}" th:if="${page >= currentPage - 2 && page <= currentPage + 2}">
+                                <a th:if="${page != currentPage}"
+                                   th:href="@{/admin/orders(page=${page}, size=20, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, search=${currentSearch})}"
+                                   th:text="${page + 1}"
+                                   class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                </a>
+                                <span th:if="${page == currentPage}"
+                                      th:text="${page + 1}"
+                                      class="bg-primary-50 border-primary-500 text-primary-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                                </span>
+                            </span>
+                            
+                            <!-- Next button -->
+                            <a th:if="${currentPage < totalPages - 1}" 
+                               th:href="@{/admin/orders(page=${currentPage + 1}, size=20, sortBy=${sortBy}, sortDir=${sortDir}, status=${currentStatus}, search=${currentSearch})}"
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Status Modal -->
+    <div id="updateStatusModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Cập nhật trạng thái đơn hàng</h3>
+                <form id="updateStatusForm">
+                    <input type="hidden" id="updateOrderId">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái mới</label>
+                        <select id="newStatus" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="PENDING">Chờ xử lý</option>
+                            <option value="PROCESSING">Đang xử lý</option>
+                            <option value="SHIPPED">Đang giao</option>
+                            <option value="COMPLETED">Hoàn thành</option>
+                        </select>
+                        <p class="mt-2 text-xs text-gray-500">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Để hủy đơn hàng, vui lòng sử dụng nút "Hủy đơn hàng" ở bảng danh sách
+                        </p>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeUpdateStatusModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                            Hủy
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200">
+                            Cập nhật
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Order Modal -->
+    <div id="viewOrderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-900">Chi tiết đơn hàng</h3>
+                <button onclick="closeViewOrderModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="orderDetailContent" class="space-y-4">
+                <div class="text-gray-500 text-sm">Đang tải...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Order Modal -->
+    <div id="createOrderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-medium text-gray-900">Tạo đơn hàng mới</h3>
+                    <button onclick="closeCreateOrderModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="createOrderForm" class="space-y-6">
+                    <!-- Customer Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Khách hàng</label>
+                        <div class="relative">
+                            <input type="text" id="customerSearch" placeholder="Tìm kiếm khách hàng theo email hoặc tên..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <div id="customerDropdown" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-48 overflow-y-auto">
+                                <!-- Customer search results will be populated here -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedCustomerId">
+                        <div id="selectedCustomer" class="mt-2 hidden">
+                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-sm font-medium text-primary-600" id="customerInitials"></span>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="text-sm font-medium text-gray-900" id="customerName"></div>
+                                    <div class="text-sm text-gray-500" id="customerEmail"></div>
+                                    <div id="customerAddressStatus" class="text-xs mt-1"></div>
+                                </div>
+                                <button type="button" onclick="clearSelectedCustomer()" class="ml-auto text-gray-400 hover:text-gray-600">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Warning for customers without address -->
+                            <div id="noAddressWarning" class="mt-2 hidden">
+                                <div class="flex items-center p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-exclamation-triangle text-orange-500"></i>
+                                    </div>
+                                    <div class="ml-3 flex-1">
+                                        <div class="text-sm font-medium text-orange-800">
+                                            Khách hàng chưa có địa chỉ giao hàng
+                                        </div>
+                                        <div class="text-sm text-orange-700">
+                                            Cần thêm địa chỉ cho khách hàng trước khi tạo đơn hàng
+                                        </div>
+                                    </div>
+                                    <div class="ml-3">
+                                        <button type="button" onclick="openAddAddressModal()" class="text-sm bg-orange-100 hover:bg-orange-200 text-orange-800 px-3 py-1 rounded-md transition-colors duration-200">
+                                            Thêm địa chỉ
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sản phẩm</label>
+                        <div class="relative">
+                            <input type="text" id="productSearch" placeholder="Tìm kiếm sản phẩm..." 
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <div id="productDropdown" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg hidden max-h-48 overflow-y-auto">
+                                <!-- Product search results will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Products -->
+                    <div id="selectedProducts" class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-sm font-medium text-gray-700">Sản phẩm đã chọn</h4>
+                            <div class="text-sm text-gray-500" id="productCount">0 sản phẩm</div>
+                        </div>
+                        <div id="productList" class="space-y-2 max-h-40 overflow-y-auto">
+                            <!-- Selected products will be displayed here -->
+                        </div>
+                    </div>
+
+                    <!-- Voucher Code -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mã giảm giá (Voucher)</label>
+                        <div class="flex space-x-2">
+                            <input type="text" id="voucherCode" placeholder="Nhập mã voucher..." 
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <button type="button" onclick="applyVoucher()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200">
+                                <i class="fas fa-check mr-1"></i>
+                                Áp dụng
+                            </button>
+                        </div>
+                        <div id="voucherMessage" class="mt-2 text-sm hidden"></div>
+                    </div>
+
+                    <!-- Order Summary -->
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">Tạm tính:</span>
+                            <span class="text-sm font-medium" id="subtotal">0₫</span>
+                        </div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm text-gray-600">Phí vận chuyển:</span>
+                            <span class="text-sm font-medium" id="shippingFee">0₫</span>
+                        </div>
+                        <div id="voucherDiscountRow" class="flex justify-between items-center mb-2 hidden">
+                            <span class="text-sm text-gray-600">Giảm giá:</span>
+                            <span class="text-sm font-medium text-green-600" id="voucherDiscount">-0₫</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg font-semibold border-t pt-2">
+                            <span>Tổng cộng:</span>
+                            <span class="text-primary-600" id="totalAmount">0₫</span>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phương thức thanh toán</label>
+                        <select id="paymentMethod" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                            <option value="BANK_TRANSFER">Chuyển khoản ngân hàng</option>
+                            <option value="MOMO">Ví MoMo</option>
+                        </select>
+                    </div>
+
+                    <!-- Notes -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ghi chú</label>
+                        <textarea id="orderNotes" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500" placeholder="Ghi chú cho đơn hàng..."></textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                        <button type="button" onclick="closeCreateOrderModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                            Hủy
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>
+                            Tạo đơn hàng
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Order Modal -->
+    <div id="cancelOrderModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-center w-12 h-12 mx-auto bg-red-100 rounded-full mb-4">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2 text-center">Xác nhận hủy đơn hàng</h3>
+                <p class="text-sm text-gray-500 mb-4 text-center">Hành động này sẽ hủy đơn hàng và khôi phục số lượng sản phẩm trong kho.</p>
+                <form id="cancelOrderForm">
+                    <input type="hidden" id="cancelOrderId">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Lý do hủy <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="cancelReason" rows="3" required 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500" 
+                                  placeholder="Vui lòng nhập lý do hủy đơn hàng (bắt buộc)..."></textarea>
+                        <p class="text-xs text-gray-500 mt-1">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Lý do này sẽ được lưu vào ghi chú đơn hàng
+                        </p>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeCancelOrderModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                            Đóng
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+                            <i class="fas fa-ban mr-2"></i>
+                            Xác nhận hủy
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Address Modal -->
+    <div id="addAddressModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-full max-w-lg shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-medium text-gray-900">Thêm địa chỉ cho khách hàng</h3>
+                    <button onclick="closeAddAddressModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addAddressForm" class="space-y-4">
+                    <input type="hidden" id="addressCustomerId">
+                    
+                    <!-- Customer Info Display -->
+                    <div id="addressCustomerInfo" class="p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-sm font-medium text-primary-600" id="addressCustomerInitials"></span>
+                            </div>
+                            <div>
+                                <div class="text-sm font-medium text-gray-900" id="addressCustomerName"></div>
+                                <div class="text-sm text-gray-500" id="addressCustomerEmail"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Full Name -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Họ và tên người nhận <span class="text-red-500">*</span>
+                        </label>
+                        <input type="text" id="addressFullName" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                               placeholder="Nhập họ và tên người nhận">
+                    </div>
+
+                    <!-- Phone -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Số điện thoại <span class="text-red-500">*</span>
+                        </label>
+                        <input type="tel" id="addressPhone" required 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                               placeholder="Nhập số điện thoại">
+                    </div>
+
+                    <!-- Address Mode Selection -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Chế độ địa chỉ</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center">
+                                <input type="radio" name="addressMode" value="OLD" checked onchange="toggleAddressMode()" 
+                                       class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                                <span class="ml-2 text-sm text-gray-900">Cũ (Tỉnh/Huyện/Xã)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="addressMode" value="NEW" onchange="toggleAddressMode()" 
+                                       class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300">
+                                <span class="ml-2 text-sm text-gray-900">Mới (Tỉnh/Xã)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Province/City -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Tỉnh/Thành phố <span class="text-red-500">*</span>
+                        </label>
+                        <select id="addressProvince" required onchange="loadAddressDistricts()"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">-- Chọn Tỉnh/Thành phố --</option>
+                        </select>
+                    </div>
+
+                    <!-- District -->
+                    <div id="addressDistrictGroup">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Quận/Huyện <span class="text-red-500">*</span>
+                        </label>
+                        <select id="addressDistrict" required onchange="loadAddressWards()" disabled
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">-- Chọn Quận/Huyện --</option>
+                        </select>
+                    </div>
+
+                    <!-- Ward -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Phường/Xã <span class="text-red-500">*</span>
+                        </label>
+                        <select id="addressWard" required disabled
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            <option value="">-- Chọn Phường/Xã --</option>
+                        </select>
+                    </div>
+
+                    <!-- Street Address -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Địa chỉ cụ thể <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="addressStreet" rows="2" required 
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                                  placeholder="Số nhà, tên đường..."></textarea>
+                    </div>
+
+                    <!-- Default Address -->
+                    <div class="flex items-center">
+                        <input type="checkbox" id="addressIsDefault" 
+                               class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                        <label for="addressIsDefault" class="ml-2 block text-sm text-gray-900">
+                            Đặt làm địa chỉ mặc định
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t">
+                        <button type="button" onclick="closeAddAddressModal()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors duration-200">
+                            Hủy
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200">
+                            <i class="fas fa-plus mr-2"></i>
+                            Thêm địa chỉ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function buildQuery(params) {
+            const usp = new URLSearchParams();
+            Object.entries(params).forEach(([k,v]) => { if (v) usp.append(k,v); });
+            return usp.toString();
+        }
+
+        function exportOrdersExcel() {
+            const url = new URL(window.location.href);
+            const q = buildQuery({
+                status: url.searchParams.get('status'),
+                search: url.searchParams.get('search'),
+                fromDate: url.searchParams.get('fromDate'),
+                toDate: url.searchParams.get('toDate')
+            });
+            window.location.href = '/admin/orders/api/export' + (q ? ('?' + q) : '');
+        }
+        // Update Status Modal Functions
+        function openUpdateStatusModal(orderId, currentStatus) {
+            document.getElementById('updateOrderId').value = orderId;
+            document.getElementById('newStatus').value = currentStatus;
+            document.getElementById('updateStatusModal').classList.remove('hidden');
+        }
+
+        function closeUpdateStatusModal() {
+            document.getElementById('updateStatusModal').classList.add('hidden');
+        }
+
+        // Cancel Order Modal Functions
+        function openCancelOrderModal(orderId) {
+            document.getElementById('cancelOrderId').value = orderId;
+            document.getElementById('cancelReason').value = '';
+            document.getElementById('cancelOrderModal').classList.remove('hidden');
+        }
+
+        function closeCancelOrderModal() {
+            document.getElementById('cancelOrderModal').classList.add('hidden');
+        }
+
+        // Show Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            let bgColor = 'bg-green-500 text-white';
+            
+            if (type === 'error') {
+                bgColor = 'bg-red-500 text-white';
+            } else if (type === 'info') {
+                bgColor = 'bg-blue-500 text-white';
+            } else if (type === 'warning') {
+                bgColor = 'bg-orange-500 text-white';
+            }
+            
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 ${bgColor}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Create Order Modal Functions
+        let selectedProducts = [];
+        let selectedCustomer = null;
+        let appliedVoucher = null;
+
+        function openCreateOrderModal() {
+            document.getElementById('createOrderModal').classList.remove('hidden');
+            resetCreateOrderForm();
+        }
+
+        function closeCreateOrderModal() {
+            document.getElementById('createOrderModal').classList.add('hidden');
+            resetCreateOrderForm();
+        }
+
+        function resetCreateOrderForm() {
+            document.getElementById('createOrderForm').reset();
+            selectedProducts = [];
+            selectedCustomer = null;
+            appliedVoucher = null;
+            document.getElementById('selectedCustomerId').value = '';
+            document.getElementById('selectedCustomer').classList.add('hidden');
+            document.getElementById('customerSearch').value = '';
+            document.getElementById('productSearch').value = '';
+            document.getElementById('customerDropdown').classList.add('hidden');
+            document.getElementById('productDropdown').classList.add('hidden');
+            document.getElementById('voucherCode').value = '';
+            document.getElementById('voucherMessage').classList.add('hidden');
+            document.getElementById('voucherDiscountRow').classList.add('hidden');
+            updateProductList();
+            updateOrderSummary();
+        }
+
+        function clearSelectedCustomer() {
+            selectedCustomer = null;
+            document.getElementById('selectedCustomerId').value = '';
+            document.getElementById('selectedCustomer').classList.add('hidden');
+            document.getElementById('customerSearch').value = '';
+            document.getElementById('noAddressWarning').classList.add('hidden');
+            updateOrderSummary();
+        }
+
+        function openAddAddressModal() {
+            if (selectedCustomer) {
+                // Populate customer info in the modal
+                document.getElementById('addressCustomerId').value = selectedCustomer.id;
+                
+                // Safe access to fullName
+                const fullName = selectedCustomer.fullName || selectedCustomer.name || 'N/A';
+                const initials = fullName.charAt(0).toUpperCase();
+                
+                document.getElementById('addressCustomerInitials').textContent = initials;
+                document.getElementById('addressCustomerName').textContent = fullName;
+                document.getElementById('addressCustomerEmail').textContent = selectedCustomer.email || '';
+                
+                // Pre-fill name and phone from customer data
+                document.getElementById('addressFullName').value = fullName;
+                document.getElementById('addressPhone').value = selectedCustomer.phoneNumber || selectedCustomer.phone || '';
+                
+                // Load provinces from API
+                loadAddressProvinces();
+                
+                // Show the modal
+                document.getElementById('addAddressModal').classList.remove('hidden');
+            } else {
+                showToast('Vui lòng chọn khách hàng trước', 'warning');
+            }
+        }
+
+        function closeAddAddressModal() {
+            document.getElementById('addAddressModal').classList.add('hidden');
+            resetAddAddressForm();
+        }
+
+        function resetAddAddressForm() {
+            document.getElementById('addAddressForm').reset();
+            document.getElementById('addressCustomerId').value = '';
+            
+            // Reset dropdowns
+            document.getElementById('addressProvince').innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+            document.getElementById('addressDistrict').innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+            document.getElementById('addressWard').innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+            document.getElementById('addressDistrict').disabled = true;
+            document.getElementById('addressWard').disabled = true;
+        }
+
+        // Address Mode Toggle
+        function toggleAddressMode() {
+            const mode = document.querySelector('input[name="addressMode"]:checked').value;
+            const districtGroup = document.getElementById('addressDistrictGroup');
+            const districtSelect = document.getElementById('addressDistrict');
+            
+            if (mode === 'NEW') {
+                districtGroup.classList.add('hidden');
+                districtSelect.required = false;
+                districtSelect.disabled = true;
+                loadAddressWards();
+            } else {
+                districtGroup.classList.remove('hidden');
+                districtSelect.required = true;
+                districtSelect.disabled = false;
+            }
+        }
+
+        // Load Provinces
+        async function loadAddressProvinces() {
+            try {
+                const response = await fetch('/api/locations/provinces');
+                const data = await response.json();
+                
+                const provinceSelect = document.getElementById('addressProvince');
+                provinceSelect.innerHTML = '<option value="">-- Chọn Tỉnh/Thành phố --</option>';
+                
+                if (data.data && !data.error) {
+                    data.data.forEach(province => {
+                        const option = document.createElement('option');
+                        option.value = province.id;
+                        option.textContent = province.name;
+                        provinceSelect.appendChild(option);
+                    });
+                } else {
+                    showToast(data.error || 'Không thể tải danh sách tỉnh/thành phố', 'error');
+                }
+            } catch (error) {
+                showToast('Không thể tải danh sách tỉnh/thành phố', 'error');
+            }
+        }
+
+        // Load Districts
+        async function loadAddressDistricts() {
+            const provinceId = document.getElementById('addressProvince').value;
+            const districtSelect = document.getElementById('addressDistrict');
+            const wardSelect = document.getElementById('addressWard');
+            
+            districtSelect.innerHTML = '<option value="">-- Chọn Quận/Huyện --</option>';
+            wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+            districtSelect.disabled = true;
+            wardSelect.disabled = true;
+            
+            if (!provinceId) return;
+            
+            const mode = document.querySelector('input[name="addressMode"]:checked').value;
+            
+            if (mode === 'NEW') {
+                loadAddressWards();
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/locations/districts?province_id=${provinceId}`);
+                const data = await response.json();
+                
+                if (data.data && !data.error) {
+                    data.data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.id;
+                        option.textContent = district.name;
+                        districtSelect.appendChild(option);
+                    });
+                    districtSelect.disabled = false;
+                } else {
+                    showToast(data.error || 'Không thể tải danh sách quận/huyện', 'error');
+                }
+            } catch (error) {
+                showToast('Không thể tải danh sách quận/huyện', 'error');
+            }
+        }
+
+        // Load Wards
+        async function loadAddressWards() {
+            const mode = document.querySelector('input[name="addressMode"]:checked').value;
+            const wardSelect = document.getElementById('addressWard');
+            wardSelect.innerHTML = '<option value="">-- Chọn Phường/Xã --</option>';
+            wardSelect.disabled = true;
+            
+            let url;
+            if (mode === 'NEW') {
+                const provinceId = document.getElementById('addressProvince').value;
+                if (!provinceId) return;
+                url = `/api/locations/wards-by-province?province_id=${provinceId}`;
+            } else {
+                const districtId = document.getElementById('addressDistrict').value;
+                if (!districtId) return;
+                url = `/api/locations/wards?district_id=${districtId}`;
+            }
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.data && !data.error) {
+                    data.data.forEach(ward => {
+                        const option = document.createElement('option');
+                        option.value = ward.code;
+                        option.textContent = ward.name;
+                        wardSelect.appendChild(option);
+                    });
+                    wardSelect.disabled = false;
+                } else {
+                    showToast(data.error || 'Không thể tải danh sách phường/xã', 'error');
+                }
+            } catch (error) {
+                showToast('Không thể tải danh sách phường/xã', 'error');
+            }
+        }
+
+        // Load customer addresses for order form (after adding new address)
+        async function loadCustomerAddressesForOrder(customerId) {
+            try {
+                const response = await fetch(`/admin/api/users/${customerId}/addresses`);
+                const data = await response.json();
+                
+                console.log('Address API response:', data); // Debug log
+                
+                if (data.success && data.addresses && data.addresses.length > 0) {
+                    // Customer now has addresses, ensure UI reflects this
+                    if (selectedCustomer && selectedCustomer.id == customerId) {
+                        selectedCustomer.addresses = data.addresses;
+                        selectedCustomer.defaultAddress = true; // Set to true since customer has addresses
+                        selectedCustomer.hasDefaultAddress = true;
+                        
+                        console.log('Customer addresses reloaded:', data.addresses.length, 'addresses found');
+                        console.log('Updated selectedCustomer:', selectedCustomer);
+                    }
+                } else {
+                    console.warn('No addresses found for customer', customerId);
+                    // Even if no default, customer still has addresses
+                    if (selectedCustomer && selectedCustomer.id == customerId) {
+                        selectedCustomer.defaultAddress = true; // Allow order creation
+                        selectedCustomer.hasDefaultAddress = true;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading customer addresses:', error);
+            }
+        }
+
+        function updateProductList() {
+            const productList = document.getElementById('productList');
+            const productCount = document.getElementById('productCount');
+            
+            productCount.textContent = `${selectedProducts.length} sản phẩm`;
+            
+            if (selectedProducts.length === 0) {
+                productList.innerHTML = '<div class="text-center text-gray-500 py-4">Chưa có sản phẩm nào được chọn</div>';
+                return;
+            }
+            
+            productList.innerHTML = selectedProducts.map(product => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center">
+                        <img src="${product.image || '/images/default-product.jpg'}" alt="${product.name}" class="w-10 h-10 object-cover rounded mr-3">
+                        <div>
+                            <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                            <div class="text-sm text-gray-500">${formatCurrency(product.price)}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="updateProductQuantity(${product.id}, -1)" class="w-6 h-6 bg-gray-200 rounded text-xs hover:bg-gray-300">-</button>
+                        <span class="w-8 text-center text-sm">${product.quantity}</span>
+                        <button type="button" onclick="updateProductQuantity(${product.id}, 1)" class="w-6 h-6 bg-gray-200 rounded text-xs hover:bg-gray-300">+</button>
+                        <button type="button" onclick="removeProduct(${product.id})" class="text-red-500 hover:text-red-700 ml-2">
+                            <i class="fas fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateProductQuantity(productId, change) {
+            const product = selectedProducts.find(p => p.id === productId);
+            if (product) {
+                product.quantity = Math.max(1, product.quantity + change);
+                updateProductList();
+                updateOrderSummary();
+            }
+        }
+
+        function removeProduct(productId) {
+            selectedProducts = selectedProducts.filter(p => p.id !== productId);
+            updateProductList();
+            updateOrderSummary();
+        }
+
+        function updateOrderSummary() {
+            const subtotal = selectedProducts.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+            let shippingFee = 0;
+            
+            // Only calculate shipping if customer is selected
+            if (selectedCustomer && selectedCustomer.defaultAddress) {
+                shippingFee = 30000; // Default shipping fee when address is available
+            }
+            
+            // Calculate discount from voucher
+            let discount = 0;
+            if (appliedVoucher) {
+                if (appliedVoucher.discountType === 'PERCENTAGE') {
+                    discount = (subtotal * appliedVoucher.discountValue) / 100;
+                    if (appliedVoucher.maxDiscountAmount && discount > appliedVoucher.maxDiscountAmount) {
+                        discount = appliedVoucher.maxDiscountAmount;
+                    }
+                } else if (appliedVoucher.discountType === 'FIXED') {
+                    discount = appliedVoucher.discountValue;
+                }
+            }
+            
+            const total = subtotal + shippingFee - discount;
+            
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('shippingFee').textContent = shippingFee > 0 ? formatCurrency(shippingFee) : 'Chưa tính';
+            
+            if (discount > 0) {
+                document.getElementById('voucherDiscountRow').classList.remove('hidden');
+                document.getElementById('voucherDiscount').textContent = '-' + formatCurrency(discount);
+            } else {
+                document.getElementById('voucherDiscountRow').classList.add('hidden');
+            }
+            
+            document.getElementById('totalAmount').textContent = formatCurrency(total);
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount).replace('₫', '₫');
+        }
+
+        // Apply voucher
+        function applyVoucher() {
+            const voucherCode = document.getElementById('voucherCode').value.trim();
+            const voucherMessage = document.getElementById('voucherMessage');
+            
+            if (!voucherCode) {
+                voucherMessage.textContent = 'Vui lòng nhập mã voucher';
+                voucherMessage.className = 'mt-2 text-sm text-red-600';
+                voucherMessage.classList.remove('hidden');
+                return;
+            }
+            
+            // Call API to validate voucher
+            fetch(`/api/vouchers/validate?code=${encodeURIComponent(voucherCode)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        appliedVoucher = data.data;
+                        voucherMessage.textContent = `✓ Áp dụng thành công: ${appliedVoucher.code} - ${appliedVoucher.description || 'Giảm giá'}`;
+                        voucherMessage.className = 'mt-2 text-sm text-green-600';
+                        voucherMessage.classList.remove('hidden');
+                        updateOrderSummary();
+                    } else {
+                        appliedVoucher = null;
+                        voucherMessage.textContent = data.error || 'Mã voucher không hợp lệ hoặc đã hết hạn';
+                        voucherMessage.className = 'mt-2 text-sm text-red-600';
+                        voucherMessage.classList.remove('hidden');
+                        updateOrderSummary();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error validating voucher:', error);
+                    appliedVoucher = null;
+                    voucherMessage.textContent = 'Có lỗi xảy ra khi kiểm tra voucher';
+                    voucherMessage.className = 'mt-2 text-sm text-red-600';
+                    voucherMessage.classList.remove('hidden');
+                    updateOrderSummary();
+                });
+        }
+
+        // Search customers
+        function searchCustomers(query) {
+            if (query.length < 1) {
+                document.getElementById('customerDropdown').classList.add('hidden');
+                return;
+            }
+            
+            // Real API call to search customers
+            fetch(`/admin/orders/api/search-customers?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const dropdown = document.getElementById('customerDropdown');
+                    
+                    if (data.success && data.data && data.data.length > 0) {
+                        dropdown.innerHTML = data.data.map(customer => `
+                            <div class="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0" onclick="selectCustomer(${customer.id}, '${customer.fullName}', '${customer.email}', ${customer.hasDefaultAddress})">
+                                <div class="flex items-center">
+                                    <div class="h-8 w-8 bg-primary-100 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-sm font-medium text-primary-600">${customer.fullName.substring(0, 2).toUpperCase()}</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">${customer.fullName}</div>
+                                        <div class="text-sm text-gray-500">${customer.email}</div>
+                                        ${customer.hasDefaultAddress ? 
+                                            '<div class="text-xs text-green-600"><i class="fas fa-check mr-1"></i>Có địa chỉ giao hàng</div>' : 
+                                            '<div class="text-xs text-orange-600"><i class="fas fa-exclamation-triangle mr-1"></i>Chưa có địa chỉ</div>'
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                        dropdown.classList.remove('hidden');
+                    } else {
+                        dropdown.innerHTML = '<div class="p-3 text-center text-gray-500">Không tìm thấy khách hàng</div>';
+                        dropdown.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching customers:', error);
+                    const dropdown = document.getElementById('customerDropdown');
+                    dropdown.innerHTML = '<div class="p-3 text-center text-red-500">Lỗi tìm kiếm khách hàng</div>';
+                    dropdown.classList.remove('hidden');
+                });
+        }
+
+        function selectCustomer(id, name, email, hasDefaultAddress) {
+            selectedCustomer = { 
+                id, 
+                name, 
+                fullName: name, // Add fullName for consistency
+                email, 
+                defaultAddress: hasDefaultAddress,
+                hasDefaultAddress: hasDefaultAddress // Add for consistency
+            };
+            document.getElementById('selectedCustomerId').value = id;
+            document.getElementById('customerName').textContent = name;
+            document.getElementById('customerEmail').textContent = email;
+            document.getElementById('customerInitials').textContent = name.substring(0, 2).toUpperCase();
+            
+            // Update address status
+            const addressStatus = document.getElementById('customerAddressStatus');
+            const noAddressWarning = document.getElementById('noAddressWarning');
+            
+            if (hasDefaultAddress) {
+                addressStatus.innerHTML = '<i class="fas fa-check text-green-600 mr-1"></i>Có địa chỉ giao hàng';
+                addressStatus.className = 'text-xs mt-1 text-green-600';
+                noAddressWarning.classList.add('hidden');
+            } else {
+                addressStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-orange-600 mr-1"></i>Chưa có địa chỉ';
+                addressStatus.className = 'text-xs mt-1 text-orange-600';
+                noAddressWarning.classList.remove('hidden');
+            }
+            
+            document.getElementById('selectedCustomer').classList.remove('hidden');
+            document.getElementById('customerSearch').value = '';
+            document.getElementById('customerDropdown').classList.add('hidden');
+            
+            // Update shipping fee calculation
+            updateOrderSummary();
+        }
+
+        // Search products
+        function searchProducts(query) {
+            if (query.length < 2) {
+                document.getElementById('productDropdown').classList.add('hidden');
+                return;
+            }
+            
+            // Real API call to search products from database
+            fetch(`/admin/orders/api/search-products?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const dropdown = document.getElementById('productDropdown');
+                    
+                    if (data.success && data.data && data.data.length > 0) {
+                        dropdown.innerHTML = data.data.map(product => `
+                            <div class="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-b-0" onclick="addProduct(${product.id}, '${escapeHtml(product.name)}', ${product.price}, '${product.image || '/images/default-product.jpg'}')">
+                                <div class="flex items-center">
+                                    <img src="${product.image || '/images/default-product.jpg'}" alt="${escapeHtml(product.name)}" class="w-10 h-10 object-cover rounded mr-3">
+                                    <div class="flex-1">
+                                        <div class="text-sm font-medium text-gray-900">${escapeHtml(product.name)}</div>
+                                        <div class="text-sm text-gray-500">${formatCurrency(product.price)} - Còn ${product.stock} sản phẩm</div>
+                                        ${!product.available ? '<div class="text-xs text-red-600"><i class="fas fa-exclamation-circle mr-1"></i>Hết hàng</div>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                        dropdown.classList.remove('hidden');
+                    } else {
+                        dropdown.innerHTML = '<div class="p-3 text-center text-gray-500">Không tìm thấy sản phẩm</div>';
+                        dropdown.classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error searching products:', error);
+                    const dropdown = document.getElementById('productDropdown');
+                    dropdown.innerHTML = '<div class="p-3 text-center text-red-500">Lỗi tìm kiếm sản phẩm</div>';
+                    dropdown.classList.remove('hidden');
+                });
+        }
+        
+        // Helper function to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function addProduct(id, name, price, image) {
+            const existingProduct = selectedProducts.find(p => p.id === id);
+            if (existingProduct) {
+                existingProduct.quantity += 1;
+            } else {
+                selectedProducts.push({ id, name, price, image, quantity: 1 });
+            }
+            
+            document.getElementById('productSearch').value = '';
+            document.getElementById('productDropdown').classList.add('hidden');
+            updateProductList();
+            updateOrderSummary();
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // View Order (Dialog)
+            document.querySelectorAll('.view-order-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.dataset.orderId;
+                    openViewOrderModal(orderId);
+                });
+            });
+
+            // Update Status Button Click
+            document.querySelectorAll('.update-status-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.dataset.orderId;
+                    const currentStatus = this.dataset.currentStatus;
+                    openUpdateStatusModal(orderId, currentStatus);
+                });
+            });
+
+            // Cancel Order Button Click
+            document.querySelectorAll('.cancel-order-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const orderId = this.dataset.orderId;
+                    openCancelOrderModal(orderId);
+                });
+            });
+
+            // Update Status Form Submit
+            document.getElementById('updateStatusForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const orderId = document.getElementById('updateOrderId').value;
+                const newStatus = document.getElementById('newStatus').value;
+                
+                fetch(`/admin/orders/api/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: newStatus })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Cập nhật trạng thái thành công!');
+                        closeUpdateStatusModal();
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast(data.error || 'Có lỗi xảy ra', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Có lỗi xảy ra khi cập nhật trạng thái', 'error');
+                });
+            });
+
+            // Cancel Order Form Submit
+            document.getElementById('cancelOrderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const orderId = document.getElementById('cancelOrderId').value;
+                const reason = document.getElementById('cancelReason').value.trim();
+                
+                // Validate reason is not empty
+                if (!reason) {
+                    showToast('Vui lòng nhập lý do hủy đơn hàng', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                const submitBtn = document.querySelector('#cancelOrderForm button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang hủy...';
+                submitBtn.disabled = true;
+                
+                fetch(`/admin/orders/api/${orderId}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ reason: reason })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Hủy đơn hàng thành công!', 'success');
+                        closeCancelOrderModal();
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast(data.error || 'Có lỗi xảy ra', 'error');
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Có lỗi xảy ra khi hủy đơn hàng', 'error');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Create Order Form Event Listeners
+            document.getElementById('customerSearch').addEventListener('input', function(e) {
+                searchCustomers(e.target.value);
+            });
+
+            document.getElementById('productSearch').addEventListener('input', function(e) {
+                searchProducts(e.target.value);
+            });
+
+            // Create Order Form Submit
+            document.getElementById('createOrderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!selectedCustomer) {
+                    showToast('Vui lòng chọn khách hàng', 'error');
+                    return;
+                }
+                
+                // Check if customer has addresses (more flexible check)
+                if (!selectedCustomer.defaultAddress && !selectedCustomer.hasDefaultAddress && !selectedCustomer.addresses) {
+                    showToast('Khách hàng chưa có địa chỉ giao hàng. Vui lòng thêm địa chỉ cho khách hàng trước khi tạo đơn hàng.', 'error');
+                    return;
+                }
+                
+                console.log('Order validation - selectedCustomer:', selectedCustomer); // Debug log
+                
+                if (selectedProducts.length === 0) {
+                    showToast('Vui lòng chọn ít nhất một sản phẩm', 'error');
+                    return;
+                }
+                
+                const orderData = {
+                    userId: selectedCustomer.id,
+                    orderItems: selectedProducts.map(product => ({
+                        productId: product.id,
+                        quantity: product.quantity,
+                        price: product.price
+                    })),
+                    paymentMethod: document.getElementById('paymentMethod').value,
+                    notes: document.getElementById('orderNotes').value,
+                    voucherCode: appliedVoucher ? appliedVoucher.code : null
+                };
+                
+                // Show loading state
+                const submitBtn = document.querySelector('#createOrderForm button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tạo...';
+                submitBtn.disabled = true;
+                
+                // Create order API call
+                fetch('/admin/orders/api/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Tạo đơn hàng thành công!');
+                        closeCreateOrderModal();
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast(data.error || 'Có lỗi xảy ra khi tạo đơn hàng', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Có lỗi xảy ra khi tạo đơn hàng', 'error');
+                })
+                .finally(() => {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                });
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('#customerSearch') && !e.target.closest('#customerDropdown')) {
+                    document.getElementById('customerDropdown').classList.add('hidden');
+                }
+                if (!e.target.closest('#productSearch') && !e.target.closest('#productDropdown')) {
+                    document.getElementById('productDropdown').classList.add('hidden');
+                }
+            });
+
+            // Close modals when clicking outside
+            document.getElementById('createOrderModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCreateOrderModal();
+                }
+            });
+
+            document.getElementById('updateStatusModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeUpdateStatusModal();
+                }
+            });
+
+            document.getElementById('cancelOrderModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeCancelOrderModal();
+                }
+            });
+
+            // Add Address Modal click outside to close
+            document.getElementById('addAddressModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeAddAddressModal();
+                }
+            });
+
+            // Add Address Form Submit
+            document.getElementById('addAddressForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const customerId = document.getElementById('addressCustomerId').value;
+                const mode = document.querySelector('input[name="addressMode"]:checked').value;
+                
+                // Get selected option texts for names
+                const provinceSelect = document.getElementById('addressProvince');
+                const districtSelect = document.getElementById('addressDistrict');
+                const wardSelect = document.getElementById('addressWard');
+                
+                const provinceName = provinceSelect.options[provinceSelect.selectedIndex]?.text || '';
+                const districtName = mode === 'OLD' ? (districtSelect.options[districtSelect.selectedIndex]?.text || '') : '';
+                const wardName = wardSelect.options[wardSelect.selectedIndex]?.text || '';
+                
+                const formData = {
+                    addressMode: mode,
+                    provinceId: parseInt(document.getElementById('addressProvince').value),
+                    districtId: mode === 'OLD' ? parseInt(document.getElementById('addressDistrict').value) : null,
+                    wardCode: document.getElementById('addressWard').value,
+                    addressDetail: document.getElementById('addressStreet').value.trim(),
+                    provinceName: provinceName,
+                    districtName: districtName,
+                    wardName: wardName,
+                    isDefault: document.getElementById('addressIsDefault').checked
+                };
+
+                // Validate required fields
+                if (!formData.provinceId || !formData.wardCode || !formData.addressDetail) {
+                    showToast('Vui lòng điền đầy đủ thông tin bắt buộc', 'warning');
+                    return;
+                }
+                
+                // Validate district for OLD mode
+                if (mode === 'OLD' && !formData.districtId) {
+                    showToast('Vui lòng chọn quận/huyện', 'warning');
+                    return;
+                }
+
+                // Submit the form
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang thêm...';
+
+                fetch(`/admin/api/users/${customerId}/addresses`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Thêm địa chỉ thành công!', 'success');
+                        closeAddAddressModal();
+                        
+                        // Update customer address status
+                        if (selectedCustomer && selectedCustomer.id == customerId) {
+                            // Update selectedCustomer object
+                            selectedCustomer.defaultAddress = true;
+                            selectedCustomer.hasDefaultAddress = true;
+                            
+                            // Update UI elements
+                            const addressStatus = document.getElementById('customerAddressStatus');
+                            const noAddressWarning = document.getElementById('noAddressWarning');
+                            
+                            addressStatus.innerHTML = '<i class="fas fa-check text-green-600 mr-1"></i>Có địa chỉ giao hàng';
+                            addressStatus.className = 'text-xs mt-1 text-green-600';
+                            noAddressWarning.classList.add('hidden');
+                            
+                            // Reload customer addresses to get the latest data
+                            loadCustomerAddressesForOrder(customerId);
+                        }
+                    } else {
+                        showToast(data.message || 'Có lỗi xảy ra khi thêm địa chỉ', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Có lỗi xảy ra khi thêm địa chỉ', 'error');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                });
+            });
+        });
+
+        // ===== View Order Modal Logic =====
+        function openViewOrderModal(orderId) {
+            const modal = document.getElementById('viewOrderModal');
+            const content = document.getElementById('orderDetailContent');
+            content.innerHTML = '<div class="text-gray-500 text-sm">Đang tải...</div>';
+            modal.classList.remove('hidden');
+
+            fetch(`/admin/orders/api/${orderId}`)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success || !data.data) {
+                        content.innerHTML = '<div class="text-red-600">Không tải được chi tiết đơn hàng</div>';
+                        return;
+                    }
+                    const o = data.data;
+                    content.innerHTML = renderOrderDetail(o);
+                })
+                .catch(() => {
+                    content.innerHTML = '<div class="text-red-600">Có lỗi xảy ra</div>';
+                });
+        }
+
+        function closeViewOrderModal() {
+            document.getElementById('viewOrderModal').classList.add('hidden');
+        }
+
+        function renderOrderDetail(o) {
+            const fmt = (v) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', minimumFractionDigits: 0 }).format(v || 0).replace('₫', '₫');
+            const statusBadge = (s) => {
+                const m = {
+                    COMPLETED: 'bg-green-100 text-green-800',
+                    PROCESSING: 'bg-blue-100 text-blue-800',
+                    SHIPPED: 'bg-purple-100 text-purple-800',
+                    PENDING: 'bg-yellow-100 text-yellow-800',
+                    CANCELLED: 'bg-red-100 text-red-800'
+                };
+                return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${m[s?.name] || 'bg-gray-100 text-gray-800'}">${s?.displayName || s || 'N/A'}</span>`;
+            };
+
+            const items = (o.items || []).map(it => `
+                <div class="py-2 grid grid-cols-12 items-center">
+                    <div class="col-span-6">
+                        <div class="text-sm font-medium text-gray-900">${it.productName || ''}</div>
+                        <div class="text-xs text-gray-500">${it.productSku || ''}</div>
+                    </div>
+                    <div class="col-span-2 text-center text-sm">${fmt(it.price)}</div>
+                    <div class="col-span-2 text-center text-sm">${it.quantity}</div>
+                    <div class="col-span-2 text-right text-sm">${fmt((it.price || 0) * (it.quantity || 0))}</div>
+                </div>
+            `).join('');
+
+            return `
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="text-lg font-semibold text-gray-900">#${o.id || ''}</div>
+                        <div class="text-sm text-gray-500">${o.orderDate || ''}</div>
+                    </div>
+                    <div>${statusBadge(o.status)}</div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm font-medium text-gray-900 mb-2">Khách hàng</div>
+                        <div class="text-sm text-gray-900">${o.userFullName || ''}</div>
+                        <div class="text-xs text-gray-600">${o.userEmail || ''}</div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="text-sm font-medium text-gray-900 mb-2">Giao hàng</div>
+                        <div class="text-sm text-gray-900">${o.addressDetails || o.shippingAddress || ''}</div>
+                        <div class="text-sm font-medium text-gray-900">SĐT nhận: ${o.userPhone || o.shippingPhone || ''}</div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg border p-4">
+                    <div class="grid grid-cols-12 text-xs font-medium text-gray-500 py-2">
+                        <div class="col-span-6">Sản phẩm</div>
+                        <div class="col-span-2 text-center">Giá</div>
+                        <div class="col-span-2 text-center">SL</div>
+                        <div class="col-span-2 text-right">Thành tiền</div>
+                    </div>
+                    <div class="divide-y divide-gray-100">${items || ''}</div>
+                    <div class="pt-4 mt-2 border-t space-y-1 text-sm">
+                        <div class="flex justify-between"><span class="text-gray-600">Tạm tính</span><span>${fmt(o.subtotal || 0)}</span></div>
+                        <div class="flex justify-between"><span class="text-gray-600">Phí vận chuyển</span><span>${fmt(o.deliveryFee || o.shippingFee || 0)}</span></div>
+                        <div class="flex justify-between"><span class="text-gray-600">Voucher</span><span>${o.voucherCode ? o.voucherCode : '-'}</span></div>
+                        <div class="flex justify-between"><span class="text-gray-600">Giảm giá</span><span class="text-green-600">-${fmt(o.discountAmount || 0)}</span></div>
+                        <div class="flex justify-between font-semibold"><span>Tổng</span><span class="text-primary-600">${fmt(o.totalAmount)}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</div>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Content Management -->
+    <div class="space-y-6">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="mt-1 text-sm text-gray-500">Quản lý bài viết, banner và nội dung website</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                    <i class="fas fa-cog mr-2"></i>
+                    Cài đặt SEO
+                </button>
+                <button class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-primary-700 transition-colors duration-200">
+                    <i class="fas fa-plus mr-2"></i>
+                    Tạo nội dung
+                </button>
+            </div>
+        </div>
+        
+        <!-- Content Types Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Blog Posts -->
+            <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-blog text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">24</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Bài viết Blog</h3>
+                <p class="text-sm text-gray-500 mb-4">Quản lý các bài viết, tin tức và hướng dẫn</p>
+                <button class="w-full px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors duration-200">
+                    Quản lý bài viết
+                </button>
+            </div>
+            
+            <!-- Banners -->
+            <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-image text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">8</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Banner & Slider</h3>
+                <p class="text-sm text-gray-500 mb-4">Quản lý banner trang chủ và slider quảng cáo</p>
+                <button class="w-full px-4 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors duration-200">
+                    Quản lý banner
+                </button>
+            </div>
+            
+            <!-- Pages -->
+            <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-alt text-green-600 text-xl"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-gray-900">12</span>
+                </div>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">Trang tĩnh</h3>
+                <p class="text-sm text-gray-500 mb-4">Quản lý các trang như Về chúng tôi, Liên hệ</p>
+                <button class="w-full px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors duration-200">
+                    Quản lý trang
+                </button>
+            </div>
+        </div>
+        
+        <!-- Recent Content -->
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Nội dung gần đây</h3>
+                <div class="flex space-x-2">
+                    <button class="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors duration-200">Tất cả</button>
+                    <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200">Bài viết</button>
+                    <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200">Banner</button>
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <!-- Content Item -->
+                <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                    <img src="https://via.placeholder.com/80x60/ec4899/ffffff?text=IMG" alt="Content" class="w-20 h-15 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">Hướng dẫn chăm sóc hoa tươi lâu</h4>
+                        <p class="text-sm text-gray-500 mt-1">Bài viết hướng dẫn khách hàng cách chăm sóc hoa để giữ tươi lâu nhất...</p>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                            <span><i class="fas fa-calendar mr-1"></i>15/12/2024</span>
+                            <span><i class="fas fa-eye mr-1"></i>1,234 lượt xem</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-green-100 text-green-800">
+                                Đã xuất bản
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 text-gray-400 hover:text-blue-600 transition-colors duration-200">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="p-2 text-gray-400 hover:text-red-600 transition-colors duration-200">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                    <img src="https://via.placeholder.com/80x60/ec4899/ffffff?text=BNR" alt="Banner" class="w-20 h-15 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">Banner khuyến mãi Noel 2024</h4>
+                        <p class="text-sm text-gray-500 mt-1">Banner quảng cáo chương trình khuyến mãi đặc biệt dịp Noel...</p>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                            <span><i class="fas fa-calendar mr-1"></i>10/12/2024</span>
+                            <span><i class="fas fa-mouse-pointer mr-1"></i>856 clicks</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                                Banner
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 text-gray-400 hover:text-blue-600 transition-colors duration-200">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="p-2 text-gray-400 hover:text-red-600 transition-colors duration-200">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200">
+                    <img src="https://via.placeholder.com/80x60/ec4899/ffffff?text=PAGE" alt="Page" class="w-20 h-15 object-cover rounded-lg">
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">Chính sách đổi trả hàng</h4>
+                        <p class="text-sm text-gray-500 mt-1">Trang thông tin về chính sách đổi trả và hoàn tiền của cửa hàng...</p>
+                        <div class="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+                            <span><i class="fas fa-calendar mr-1"></i>05/12/2024</span>
+                            <span><i class="fas fa-eye mr-1"></i>432 lượt xem</span>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">
+                                Bản nháp
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button class="p-2 text-gray-400 hover:text-blue-600 transition-colors duration-200">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="p-2 text-gray-400 hover:text-red-600 transition-colors duration-200">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SEO & Analytics -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- SEO Overview -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Tổng quan SEO</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-check-circle text-green-600"></i>
+                            <span class="text-sm font-medium text-gray-900">Meta descriptions</span>
+                        </div>
+                        <span class="text-sm text-green-600 font-medium">98%</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                            <span class="text-sm font-medium text-gray-900">Alt text cho hình ảnh</span>
+                        </div>
+                        <span class="text-sm text-yellow-600 font-medium">75%</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <i class="fas fa-times-circle text-red-600"></i>
+                            <span class="text-sm font-medium text-gray-900">Structured data</span>
+                        </div>
+                        <span class="text-sm text-red-600 font-medium">45%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Analytics -->
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Phân tích nội dung</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Tổng lượt xem tháng này</span>
+                        <span class="text-lg font-semibold text-gray-900">45,678</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Bài viết phổ biến nhất</span>
+                        <span class="text-sm font-medium text-primary-600">Hướng dẫn chăm sóc hoa</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Thời gian đọc trung bình</span>
+                        <span class="text-lg font-semibold text-gray-900">3m 24s</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-gray-600">Tỷ lệ tương tác</span>
+                        <span class="text-lg font-semibold text-green-600">12.5%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

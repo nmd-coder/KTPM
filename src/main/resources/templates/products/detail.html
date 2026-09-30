@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layouts/main :: layout(${pageTitle}, 
+          ${pageDescription}, 
+          ~{::link},
+          ~{::content})}">
+
+<head>
+    <link rel="stylesheet" href="/css/products.css">
+</head>
+
+<body>
+    <th:block th:fragment="content">
+
+        <div th:if="${product eq null}" class="product-not-found-container container py-5 my-5 text-center">
+            <h2 class="text-danger mb-3" data-translate="product-not-found-title">404 - Không tìm thấy sản phẩm!</h2>
+            <p class="mb-4" data-translate="product-not-found-desc">Sản phẩm bạn đang tìm kiếm không tồn tại hoặc đã bị xóa.</p>
+            <a th:href="@{/products}" class="btn btn-primary px-4 py-2">
+                <svg class="w-5 h-5 inline-block me-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                    fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z"
+                        clip-rule="evenodd" />
+                </svg>
+                <span data-translate="back-to-products">Về trang danh sách sản phẩm</span>
+            </a>
+        </div>
+
+        <div th:if="${product ne null}">
+            <nav aria-label="breadcrumb" class="breadcrumb-nav">
+                <div class="container">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="/home" class="breadcrumb-link">
+                                <svg class="w-4 h-4 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M9.293 2.293a1 1 0 0 1 1.414 0l7 7A1 1 0 0 1 17 11h-1v6a1 1 0 0 1-1 1h-2a1 1 0 0 1-1-1v-3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-6H3a1 1 0 0 1-.707-1.707l7-7Z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <span data-translate="nav-home">Trang chủ</span>
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="/products" class="breadcrumb-link"><span data-translate="nav-products">Sản phẩm</span></a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <span th:text="${product.name}">Tên sản phẩm</span>
+                        </li>
+                    </ol>
+                </div>
+            </nav>
+
+            <section class="product-detail-section">
+                <div class="container">
+                    <div class="product-detail-container">
+                        <!-- Cột hình ảnh (bên trái) -->
+                        <div class="product-images">
+                            <div class="main-image-container">
+                                <img th:src="${product.image ne null ? product.image : '/images/products/default-flower.jpg'}"
+                                    th:alt="${product.name}" th:title="${product.name}" class="main-image"
+                                    id="mainProductImage">
+
+                                <div class="image-zoom-overlay" id="imageZoomOverlay">
+                                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                        fill="currentColor">
+                                        <path
+                                            d="M9 6a.75.75 0 0 1 .75.75v1.5h1.5a.75.75 0 0 1 0 1.5h-1.5v1.5a.75.75 0 0 1-1.5 0v-1.5h-1.5a.75.75 0 0 1 0-1.5h1.5v-1.5A.75.75 0 0 1 9 6Z" />
+                                        <path fill-rule="evenodd"
+                                            d="M2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Zm7-5.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="thumbnail-images">
+                                <div class="thumbnail-item active">
+                                    <img th:src="${product.image ne null ? product.image : '/images/products/default-flower.jpg'}"
+                                        th:alt="${product.name}" th:title="${product.name}" class="thumbnail-image">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cột thông tin (bên phải) -->
+                        <div class="product-info">
+                            <div class="product-header">
+                                <h1 class="product-title" th:text="${product.name}">Tên sản phẩm</h1>
+
+                                <div class="product-rating-section">
+                                    <div class="rating-display">
+                                        <div class="rating-stars">
+                                            <th:block th:each="star : ${#numbers.sequence(1, 5)}">
+                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg"
+                                                    viewBox="0 0 20 20" fill="currentColor"
+                                                    th:classappend="${averageRating ne null and star le averageRating ? 'filled' : 'empty'}">
+                                                    <path fill-rule="evenodd"
+                                                        d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </th:block>
+                                        </div>
+                                        <span class="rating-score"
+                                            th:text="${averageRating ne null ? #numbers.formatDecimal(averageRating, 1, 1) : '0.0'}">0.0</span>
+                                        <span class="rating-count">
+                                            (<span th:text="${reviewCount ne null ? reviewCount : 0}">0</span> <span data-translate="reviews">đánh giá</span>)
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="product-price-section">
+                                <div class="price-display">
+                                    <span class="current-price"
+                                        th:text="${#numbers.formatCurrency(product.price)}">0₫</span>
+                                </div>
+                            </div>
+
+                            <div class="product-description" th:if="${product.description ne null}">
+                                <h3 class="description-title" data-translate="product-description">Mô tả sản phẩm</h3>
+                                <div class="description-content" th:utext="${product.description}">
+                                    Mô tả sản phẩm sẽ hiển thị ở đây...
+                                </div>
+                            </div>
+
+                            <!--/*
+                        <div class="product-attributes" th:if="${product.attributeValues ne null and not #lists.isEmpty(product.attributeValues)}">
+                            <h3 class="attributes-title">Thông tin chi tiết</h3>
+                            <div class="attributes-list">
+                                <div th:each="attr : ${product.attributeValues}" class="attribute-item">
+                                    <span class="attribute-name" th:text="${attr.attribute.name}">Thuộc tính</span>:
+                                    <span class="attribute-value" th:text="${attr.value}">Giá trị</span>
+                                </div>
+                            </div>
+                        </div>
+                        */-->
+<!-- 
+                            <div class="add-to-cart-section">
+                                <div class="quantity-selector">
+                                    <label for="quantity" class="quantity-label">Số lượng:</label>
+                                    <div class="quantity-input-group">
+                                        <button type="button" class="btn-quantity-decrease"
+                                            onclick="decreaseQuantity()">
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path fill-rule="evenodd"
+                                                    d="M4 10a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 10Z"
+                                                    clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <input type="number" id="quantity" class="quantity-input" value="1" min="1"
+                                            max="99">
+                                        <button type="button" class="btn-quantity-increase"
+                                            onclick="increaseQuantity()">
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                                fill="currentColor">
+                                                <path
+                                                    d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="action-buttons">
+                                    <button class="btn-add-to-cart primary" th:data-product-id="${product.id}"
+                                        sec:authorize="isAuthenticated()">
+                                        <svg class="w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M6 5v1H4.667a1.75 1.75 0 0 0-1.743 1.598l-.826 9.5A1.75 1.75 0 0 0 3.84 19h12.32a1.75 1.75 0 0 0 1.742-1.902l-.826-9.5A1.75 1.75 0 0 0 15.333 6H14V5a4 4 0 0 0-8 0Zm4-2.5A2.5 2.5 0 0 0 7.5 5v1h5V5A2.5 2.5 0 0 0 10 2.5Z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        <span data-translate="add-to-cart">Thêm vào giỏ hàng</span>
+                                    </button>
+
+                                    <button class="btn-buy-now" th:data-product-id="${product.id}"
+                                        onclick="buyNow(this)" sec:authorize="isAuthenticated()">
+                                        <svg class="w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path
+                                                d="M11.983 1.907a.75.75 0 0 0-1.292-.657l-8.5 9.5A.75.75 0 0 0 2.75 12h6.572l-1.305 6.093a.75.75 0 0 0 1.292.657l8.5-9.5A.75.75 0 0 0 17.25 8h-6.572l1.305-6.093Z" />
+                                        </svg>
+                                        <span data-translate="buy-now">Mua ngay</span>
+                                    </button>
+
+                                    <a th:href="@{/login}" class="btn-add-to-cart primary btn-login-required"
+                                        sec:authorize="!isAuthenticated()">
+                                        <svg class="w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg"
+                                            viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd"
+                                                d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z"
+                                                clip-rule="evenodd" />
+                                            <path fill-rule="evenodd"
+                                                d="M19 10a.75.75 0 0 0-.75-.75H8.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114L8.704 10.75H18.25A.75.75 0 0 0 19 10Z"
+                                                clip-rule="evenodd" />
+                                        </svg>
+                                        <span data-translate="login-to-buy">Đăng nhập để mua hàng</span>
+                                    </a>
+                                </div>
+
+                            </div> -->
+
+                            <!-- Phần hành động chính -->
+                            <div class="add-to-cart-section">
+                                <!-- Bộ chọn số lượng -->
+                                <div class="quantity-selector">
+                                    <label for="quantity" class="quantity-label">Số lượng:</label>
+                                    <div class="quantity-input-group">
+                                        <button type="button" class="btn-quantity-decrease" onclick="decreaseQuantity()">
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M4 10a.75.75 0 0 1 .75-.75h10.5a.75.75 0 0 1 0 1.5H4.75A.75.75 0 0 1 4 10Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        <input type="number" id="quantity" class="quantity-input" value="1" min="1" max="99">
+                                        <button type="button" class="btn-quantity-increase" onclick="increaseQuantity()">
+                                            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Nhóm nút chính: Thêm giỏ hàng + Yêu thích -->
+                                <div class="main-action-group" sec:authorize="isAuthenticated()">
+                                    <button class="btn-add-to-cart primary" th:data-product-id="${product.id}">
+                                        <svg class="w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M6 5v1H4.667a1.75 1.75 0 0 0-1.743 1.598l-.826 9.5A1.75 1.75 0 0 0 3.84 19h12.32a1.75 1.75 0 0 0 1.742-1.902l-.826-9.5A1.75 1.75 0 0 0 15.333 6H14V5a4 4 0 0 0-8 0Zm4-2.5A2.5 2.5 0 0 0 7.5 5v1h5V5A2.5 2.5 0 0 0 10 2.5Z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span data-translate="add-to-cart">Thêm vào giỏ hàng</span>
+                                    </button>
+
+                                    <button class="btn-wishlist"
+                                            th:data-product-id="${product.id}"
+                                            th:classappend="${#sets.contains(wishlistProductIds, product.id)} ? 'active'"
+                                            sec:authorize="isAuthenticated()">
+                                        <!-- Heroicons: Solid heart when active -->
+                                        <svg th:if="${#sets.contains(wishlistProductIds, product.id)}" class="hero-icon hero-icon-lg" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/>
+                                        </svg>
+                                        <!-- Heroicons: Outline heart when inactive -->
+                                        <svg th:unless="${#sets.contains(wishlistProductIds, product.id)}" class="hero-icon hero-icon-lg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- Nút mua ngay -->
+                                <button class="btn-buy-now" th:data-product-id="${product.id}" onclick="buyNow(this)" sec:authorize="isAuthenticated()">
+                                    <svg class="w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M11.983 1.907a.75.75 0 0 0-1.292-.657l-8.5 9.5A.75.75 0 0 0 2.75 12h6.572l-1.305 6.093a.75.75 0 0 0 1.292.657l8.5-9.5A.75.75 0 0 0 17.25 8h-6.572l1.305-6.093Z" />
+                                    </svg>
+                                    <span data-translate="buy-now">Mua ngay</span>
+                                </button>
+
+                                <!-- Nút đăng nhập cho người dùng chưa đăng nhập -->
+                                <a th:href="@{/login}" class="btn-add-to-cart primary btn-login-required" sec:authorize="!isAuthenticated()">
+                                    <svg class="w-5 h-5 inline-block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M3 4.25A2.25 2.25 0 0 1 5.25 2h5.5A2.25 2.25 0 0 1 13 4.25v2a.75.75 0 0 1-1.5 0v-2a.75.75 0 0 0-.75-.75h-5.5a.75.75 0 0 0-.75.75v11.5c0 .414.336.75.75.75h5.5a.75.75 0 0 0 .75-.75v-2a.75.75 0 0 1 1.5 0v2A2.25 2.25 0 0 1 10.75 18h-5.5A2.25 2.25 0 0 1 3 15.75V4.25Z" clip-rule="evenodd" />
+                                        <path fill-rule="evenodd" d="M19 10a.75.75 0 0 0-.75-.75H8.704l1.048-.943a.75.75 0 1 0-1.004-1.114l-2.5 2.25a.75.75 0 0 0 0 1.114l2.5 2.25a.75.75 0 1 0 1.004-1.114L8.704 10.75H18.25A.75.75 0 0 0 19 10Z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span data-translate="login-to-buy">Đăng nhập để mua hàng</span>
+                                </a>
+                            </div>
+
+                            <div class="product-features">
+                                <div class="feature-item">
+                                    <svg class="feature-icon w-8 h-8" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path
+                                            d="M6.5 3c-1.051 0-2.093.04-3.125.117A1.49 1.49 0 0 0 2 4.607V10.5h9V4.606c0-.771-.59-1.43-1.375-1.489A41.568 41.568 0 0 0 6.5 3ZM2 12v2.5A1.5 1.5 0 0 0 3.5 16h.041a3 3 0 0 1 5.918 0h.791a.75.75 0 0 0 .75-.75V12H2Z" />
+                                        <path
+                                            d="M6.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM13.25 5a.75.75 0 0 0-.75.75v8.514a3.001 3.001 0 0 1 4.893 1.44c.37-.275.61-.719.595-1.227a24.905 24.905 0 0 0-1.784-8.549A1.486 1.486 0 0 0 14.823 5H13.25ZM14.5 18a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" />
+                                    </svg>
+                                    <div class="feature-content">
+                                        <h4 class="feature-title" data-translate="free-shipping">Giao hàng miễn phí</h4>
+                                        <p class="feature-description" data-translate="free-shipping-desc">Miễn phí giao hàng nội thành TP.HCM</p>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <svg class="feature-icon w-8 h-8" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-13a.75.75 0 0 0-1.5 0v5c0 .414.336.75.75.75h4a.75.75 0 0 0 0-1.5h-3.25V5Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <div class="feature-content">
+                                        <h4 class="feature-title" data-translate="fast-delivery">Giao hàng nhanh</h4>
+                                        <p class="feature-description" data-translate="delivery-2-4h">Giao trong 2-4 giờ</p>
+                                    </div>
+                                </div>
+                                <div class="feature-item">
+                                    <svg class="feature-icon w-8 h-8" xmlns="http://www.w3.org/2000/svg"
+                                        viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd"
+                                            d="M5.5 3A2.5 2.5 0 0 0 3 5.5v2.879a2.5 2.5 0 0 0 .732 1.767l6.5 6.5a2.5 2.5 0 0 0 3.536 0l2.878-2.878a2.5 2.5 0 0 0 0-3.536l-6.5-6.5A2.5 2.5 0 0 0 8.38 3H5.5ZM6 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <div class="feature-content">
+                                        <h4 class="feature-title" data-translate="fresh-flowers-100">Hoa tươi 100%</h4>
+                                        <p class="feature-description" data-translate="fresh-quality-guarantee">Cam kết hoa tươi, chất lượng cao</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        <!-- Product Tabs Section - Redesigned with Tailwind -->
+        <section class="py-16 lg:py-20 bg-gradient-to-br from-gray-50 to-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <!-- Tabs Navigation -->
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+                    <div class="mb-6 lg:mb-0">
+                        <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-2" data-translate="detailed-info">Thông tin chi tiết</h2>
+                        <p class="text-gray-600" data-translate="learn-more-product">Tìm hiểu thêm về sản phẩm và cách chăm sóc</p>
+                    </div>
+
+                    <!-- Modern Tab Navigation -->
+                    <div class="bg-white rounded-2xl p-2 shadow-lg border border-gray-100">
+                        <ul class="flex space-x-1" id="productTabs" role="tablist">
+                            <li role="presentation">
+                                <button class="relative px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md"
+                                        id="description-tab" data-bs-toggle="tab"
+                                        data-bs-target="#description" type="button" role="tab"
+                                        aria-controls="description" aria-selected="true">
+                                    <svg class="w-4 h-4 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M4.25 2A2.25 2.25 0 0 0 2 4.25v11.5A2.25 2.25 0 0 0 4.25 18h11.5A2.25 2.25 0 0 0 18 15.75V4.25A2.25 2.25 0 0 0 15.75 2H4.25Zm4.03 6.28a.75.75 0 0 0-1.06-1.06L4.97 9.47a.75.75 0 0 0 0 1.06l2.25 2.25a.75.75 0 0 0 1.06-1.06L6.56 10l1.72-1.72Zm4.5-1.06a.75.75 0 1 0-1.06 1.06L13.44 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06l2.25-2.25a.75.75 0 0 0 0-1.06l-2.25-2.25Z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span data-translate="detailed-description">Mô tả chi tiết</span>
+                                </button>
+                            </li>
+                            <li role="presentation">
+                                <button class="px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        id="reviews-tab" data-bs-toggle="tab"
+                                        data-bs-target="#reviews" type="button" role="tab"
+                                        aria-controls="reviews" aria-selected="false">
+                                    <svg class="w-4 h-4 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span data-translate="reviews-tab">Đánh giá</span> (<span th:text="${reviewCount ne null ? reviewCount : 0}">0</span>)
+                                </button>
+                            </li>
+                            <li role="presentation">
+                                <button class="px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                                        id="care-tab" data-bs-toggle="tab"
+                                        data-bs-target="#care" type="button" role="tab"
+                                        aria-controls="care" aria-selected="false">
+                                    <svg class="w-4 h-4 inline-block mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M15.98 1.804a1 1 0 0 0-1.96 0l-.24 1.192a1 1 0 0 1-.784.785l-1.192.238a1 1 0 0 0 0 1.962l1.192.238a1 1 0 0 1 .785.785l.238 1.192a1 1 0 0 0 1.962 0l.238-1.192a1 1 0 0 1 .785-.785l1.192-.238a1 1 0 0 0 0-1.962l-1.192-.238a1 1 0 0 1-.785-.785l-.238-1.192ZM6.949 5.684a1 1 0 0 0-1.898 0l-.683 2.051a1 1 0 0 1-.633.633l-2.051.683a1 1 0 0 0 0 1.898l2.051.684a1 1 0 0 1 .633.632l.683 2.051a1 1 0 0 0 1.898 0l.683-2.051a1 1 0 0 1 .633-.633l2.051-.683a1 1 0 0 0 0-1.898l-2.051-.683a1 1 0 0 1-.633-.633L6.95 5.684ZM13.949 13.684a1 1 0 0 0-1.898 0l-.184.551a1 1 0 0 1-.632.633l-.551.183a1 1 0 0 0 0 1.898l.551.183a1 1 0 0 1 .633.633l.183.551a1 1 0 0 0 1.898 0l.184-.551a1 1 0 0 1 .632-.633l.551-.183a1 1 0 0 0 0-1.898l-.551-.184a1 1 0 0 1-.633-.632l-.183-.551Z" />
+                                    </svg>
+                                    <span data-translate="care-guide">Hướng dẫn chăm sóc</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Tab Content -->
+                <div class="tab-content" id="productTabContent">
+                    <!-- Description Tab -->
+                    <div class="tab-pane fade show active" id="description" role="tabpanel" aria-labelledby="description-tab">
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 lg:p-12">
+                            <div class="max-w-4xl mx-auto">
+                                <div class="flex items-center gap-3 mb-6">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M4.25 2A2.25 2.25 0 0 0 2 4.25v11.5A2.25 2.25 0 0 0 4.25 18h11.5A2.25 2.25 0 0 0 18 15.75V4.25A2.25 2.25 0 0 0 15.75 2H4.25Zm4.03 6.28a.75.75 0 0 0-1.06-1.06L4.97 9.47a.75.75 0 0 0 0 1.06l2.25 2.25a.75.75 0 0 0 1.06-1.06L6.56 10l1.72-1.72Zm4.5-1.06a.75.75 0 1 0-1.06 1.06L13.44 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06l2.25-2.25a.75.75 0 0 0 0-1.06l-2.25-2.25Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-900" data-translate="detailed-description">Mô tả chi tiết sản phẩm</h3>
+                                        <p class="text-gray-600" data-translate="full-product-info">Thông tin đầy đủ về sản phẩm</p>
+                                    </div>
+                                </div>
+
+                                <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed" th:utext="${product.description}">
+                                    <p>Mô tả chi tiết sản phẩm sẽ hiển thị ở đây...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reviews Tab -->
+                    <div class="tab-pane fade" id="reviews" role="tabpanel" aria-labelledby="reviews-tab">
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 lg:p-12">
+                            <div class="max-w-4xl mx-auto">
+                                <!-- Reviews Header -->
+                                <div class="flex items-center gap-3 mb-8">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-900" data-translate="customer-reviews">Đánh giá từ khách hàng</h3>
+                                        <p class="text-gray-600" data-translate="customer-experience">Chia sẻ trải nghiệm của khách hàng về sản phẩm</p>
+                                    </div>
+                                </div>
+
+                                <!-- Rating Summary -->
+                                <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 mb-8 border border-yellow-100">
+                                    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                                        <div class="text-center md:text-left">
+                                            <div class="flex items-center justify-center md:justify-start gap-2 mb-2">
+                                                <span class="text-4xl font-bold text-gray-900" th:text="${averageRating ne null ? #numbers.formatDecimal(averageRating, 1, 1) : '0.0'}">0.0</span>
+                                                <div class="flex items-center gap-1">
+                                                    <th:block th:each="star : ${#numbers.sequence(1, 5)}">
+                                                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                                                             th:classappend="${averageRating ne null and star le averageRating ? 'text-yellow-400' : 'text-gray-300'}">
+                                                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                                        </svg>
+                                                    </th:block>
+                                                </div>
+                                            </div>
+                                            <p class="text-gray-600 font-medium" th:text="${reviewCount ne null ? (reviewCount + ' đánh giá') : '0 đánh giá'}">0 đánh giá</p>
+                                        </div>
+                                        
+                                        <div class="flex items-center gap-4">
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-green-600">98%</div>
+                                                <div class="text-sm text-gray-600">Hài lòng</div>
+                                            </div>
+                                            <div class="text-center">
+                                                <div class="text-2xl font-bold text-blue-600">4.8</div>
+                                                <div class="text-sm text-gray-600">Chất lượng</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+    
+                                    <div class="reviews-list">
+                                        <div th:if="${reviews eq null or #lists.isEmpty(reviews)}" class="no-reviews">
+                                            <i class="bi bi-chat-square-text no-reviews-icon"></i>
+                                            <h4>Chưa có đánh giá nào</h4>
+                                            <p>Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+                                        </div>
+    
+                                        <div th:each="review : ${reviews}" class="review-item">
+                                            <div class="review-header">
+                                                <div class="reviewer-info">
+                                                    <div class="reviewer-avatar">
+                                                        <i class="bi bi-person-circle"></i>
+                                                    </div>
+                                                    <div class="reviewer-details">
+                                                        <div class="flex items-center gap-2">
+                                                            <h5 class="reviewer-name" th:text="${review.user.firstname + ' ' + review.user.lastname}">Tên khách hàng</h5>
+                                                            <span class="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+                                                                <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                                    <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                                                </svg>
+                                                                <span th:text="${review.rating} + ' sao'">5 sao</span>
+                                                            </span>
+                                                        </div>
+                                                        <div class="review-rating">
+                                                            <th:block th:each="star : ${#numbers.sequence(1, 5)}">
+                                                                <i class="bi bi-star-fill" 
+                                                                   th:classappend="${star le review.rating ? 'filled' : 'empty'}"></i>
+                                                            </th:block>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd/MM/yyyy')}">
+                                                        01/01/2024
+                                                    </div>
+                                                    <div class="review-actions" 
+                                                         sec:authorize="isAuthenticated()"
+                                                         th:if="${#authentication.name == review.user.email}">
+                                                        <button class="btn-edit-review text-blue-600 hover:text-blue-700 text-sm" 
+                                                                th:onclick="'editReview(' + ${review.id} + ')'">
+                                                            <i class="bi bi-pencil"></i> Sửa
+                                                        </button>
+                                                        <button class="btn-delete-review text-red-600 hover:text-red-700 text-sm ml-2" 
+                                                                th:onclick="'deleteReview(' + ${review.id} + ')'">
+                                                            <i class="bi bi-trash"></i> Xóa
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="review-content" th:if="${review.comment ne null}">
+                                                <p th:text="${review.comment}">Nội dung đánh giá...</p>
+                                            </div>
+                                            
+                                            <!-- Media Files -->
+                                            <div th:if="${review.mediaUrls ne null and review.mediaUrls != ''}" class="review-media mt-3">
+                                                <div class="flex flex-wrap gap-2">
+                                                    <div th:each="mediaUrl : ${#strings.arraySplit(review.mediaUrls, ',')}" class="media-item">
+                                                        <div th:if="${#strings.startsWith(mediaUrl.trim(), '/upload/')}">
+                                                            <!-- Image -->
+                                                            <img th:if="${#strings.contains(mediaUrl, '.jpg') or #strings.contains(mediaUrl, '.jpeg') or #strings.contains(mediaUrl, '.png') or #strings.contains(mediaUrl, '.gif')}"
+                                                                 th:src="${mediaUrl.trim()}" 
+                                                                 th:alt="'Review media'"
+                                                                 th:data-media-url="${mediaUrl.trim()}"
+                                                                 class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                                                 onclick="openMediaModal(this.dataset.mediaUrl)">
+                                                            <!-- Video -->
+                                                            <video th:if="${#strings.contains(mediaUrl, '.mp4') or #strings.contains(mediaUrl, '.mov')}"
+                                                                   th:src="${mediaUrl.trim()}"
+                                                                   th:data-media-url="${mediaUrl.trim()}"
+                                                                   class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                                                   onclick="openMediaModal(this.dataset.mediaUrl)"
+                                                                   controls>
+                                                            </video>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Admin Response -->
+                                            <div th:if="${review.adminResponse != null}" class="admin-response mt-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                                                <div class="flex items-center gap-2 mb-2">
+                                                    <i class="bi bi-shield-check text-blue-600"></i>
+                                                    <span class="font-semibold text-blue-900">Phản hồi từ StarShop</span>
+                                                    <span class="text-sm text-gray-500" th:text="${review.adminResponseAt != null ? #temporals.format(review.adminResponseAt, 'dd/MM/yyyy') : ''}"></span>
+                                                </div>
+                                                <p class="text-gray-700 mb-0" th:text="${review.adminResponse}"></p>
+                                            </div>
+                                            
+                                            <div class="review-helpful mt-3">
+                                                <button class="btn-helpful inline-flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-600 text-sm rounded-lg hover:bg-gray-200 transition-colors" 
+                                                        th:onclick="'markHelpful(' + ${review.id} + ')'">
+                                                    <i class="bi bi-hand-thumbs-up"></i> Hữu ích (<span>0</span>)
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+    
+                                    <div class="write-review-section" sec:authorize="isAuthenticated()">
+                                        <div class="text-center p-6 bg-gray-50 rounded-xl">
+                                            <i class="bi bi-info-circle text-2xl text-blue-500 mb-3"></i>
+                                            <h4 class="text-lg font-semibold text-gray-900 mb-2">Mua sản phẩm để có thể đánh giá</h4>
+                                            <p class="text-gray-600 mb-4">Bạn chỉ có thể đánh giá sản phẩm sau khi đã mua và đơn hàng hoàn thành.</p>
+                                            <a href="/account/orders" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-medium rounded-xl hover:shadow-lg transition-all">
+                                                <i class="bi bi-bag-check"></i>
+                                                Xem đơn hàng của tôi
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+    
+                    <!-- Care Guide Tab -->
+                    <div class="tab-pane fade" id="care" role="tabpanel" aria-labelledby="care-tab">
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 lg:p-12">
+                            <div class="max-w-4xl mx-auto">
+                                <!-- Care Guide Header -->
+                                <div class="flex items-center gap-3 mb-8">
+                                    <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path d="M15.98 1.804a1 1 0 0 0-1.96 0l-.24 1.192a1 1 0 0 1-.784.785l-1.192.238a1 1 0 0 0 0 1.962l1.192.238a1 1 0 0 1 .785.785l.238 1.192a1 1 0 0 0 1.962 0l.238-1.192a1 1 0 0 1 .785-.785l1.192-.238a1 1 0 0 0 0-1.962l-1.192-.238a1 1 0 0 1-.785-.785l-.238-1.192ZM6.949 5.684a1 1 0 0 0-1.898 0l-.683 2.051a1 1 0 0 1-.633.633l-2.051.683a1 1 0 0 0 0 1.898l2.051.684a1 1 0 0 1 .633.632l.683 2.051a1 1 0 0 0 1.898 0l.683-2.051a1 1 0 0 1 .633-.633l2.051-.683a1 1 0 0 0 0-1.898l-2.051-.683a1 1 0 0 1-.633-.633L6.95 5.684ZM13.949 13.684a1 1 0 0 0-1.898 0l-.184.551a1 1 0 0 1-.632.633l-.551.183a1 1 0 0 0 0 1.898l.551.183a1 1 0 0 1 .633.633l.183.551a1 1 0 0 0 1.898 0l.184-.551a1 1 0 0 1 .632-.633l.551-.183a1 1 0 0 0 0-1.898l-.551-.184a1 1 0 0 1-.633-.632l-.183-.551Z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-xl font-bold text-gray-900">Hướng dẫn chăm sóc hoa tươi</h3>
+                                        <p class="text-gray-600">Bí quyết giữ hoa tươi lâu và đẹp nhất</p>
+                                    </div>
+                                </div>
+
+                                <!-- Care Tips Grid -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <!-- Water Care -->
+                                    <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center mb-4">
+                                            <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v1.5h3.75a.75.75 0 0 1 0 1.5H10.75v1.5a.75.75 0 0 1-1.5 0v-1.5H5.5a.75.75 0 0 1 0-1.5h3.75v-1.5A.75.75 0 0 1 10 2ZM5.5 6A.5.5 0 0 0 5 6.5v2.25a.75.75 0 0 0 1.5 0V7.25h7V8.75a.75.75 0 0 0 1.5 0V6.5a.5.5 0 0 0-.5-.5h-9Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-lg font-bold text-gray-900 mb-2">Tưới nước đều đặn</h4>
+                                        <p class="text-gray-600 text-sm leading-relaxed">Thay nước sạch mỗi 2-3 ngày, cắt chéo gốc hoa khoảng 1cm để hoa hút nước tốt hơn.</p>
+                                    </div>
+
+                                    <!-- Light Care -->
+                                    <div class="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-100 hover:shadow-lg transition-all duration-300">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center mb-4">
+                                            <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path d="M10 2a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 2ZM10 15a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0v-1.5A.75.75 0 0 1 10 15ZM10 7a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM15.657 5.404a.75.75 0 1 0-1.06-1.06l-1.061 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM6.464 14.596a.75.75 0 1 0-1.06-1.06l-1.06 1.06a.75.75 0 0 0 1.06 1.061l1.06-1.06ZM18 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 18 10ZM5 10a.75.75 0 0 1-.75.75h-1.5a.75.75 0 0 1 0-1.5h1.5A.75.75 0 0 1 5 10ZM14.596 15.657a.75.75 0 0 0 1.06-1.06l-1.06-1.061a.75.75 0 1 0-1.061 1.06l1.06 1.061ZM5.404 6.464a.75.75 0 0 0 1.06-1.06l-1.06-1.06a.75.75 0 1 0-1.061 1.06l1.06 1.06Z" />
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-lg font-bold text-gray-900 mb-2">Tránh ánh nắng trực tiếp</h4>
+                                        <p class="text-gray-600 text-sm leading-relaxed">Đặt hoa ở nơi thoáng mát, có ánh sáng nhẹ nhưng tránh ánh nắng trực tiếp và gió mạnh.</p>
+                                    </div>
+
+                                    <!-- Temperature Care -->
+                                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-100 hover:shadow-lg transition-all duration-300">
+                                        <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4">
+                                            <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v8.5a2.25 2.25 0 1 1-1.5 0v-8.5A.75.75 0 0 1 10 2ZM8.5 13a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                        <h4 class="text-lg font-bold text-gray-900 mb-2">Nhiệt độ phù hợp</h4>
+                                        <p class="text-gray-600 text-sm leading-relaxed">Giữ nhiệt độ phòng từ 18-22°C, tránh để hoa gần điều hòa hoặc quạt gió.</p>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Tips -->
+                                <div class="mt-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
+                                    <h4 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                        <svg class="w-5 h-5 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clip-rule="evenodd" />
+                                        </svg>
+                                        Mẹo hay
+                                    </h4>
+                                    <ul class="space-y-2 text-gray-600">
+                                        <li class="flex items-start gap-2">
+                                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                                            <span>Thêm một ít đường vào nước để hoa tươi lâu hơn</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                                            <span>Loại bỏ lá héo và hoa tàn để tránh nhiễm khuẩn</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                                            <span>Xịt nhẹ nước lên cánh hoa vào buổi sáng</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="related-products-section" th:if="${relatedProducts ne null and not #lists.isEmpty(relatedProducts)}">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Sản phẩm liên quan</h2>
+                    <p class="section-subtitle">Các sản phẩm tương tự có thể bạn quan tâm</p>
+                </div>
+                
+                <div class="related-products-grid">
+                    <div th:each="relatedProduct : ${relatedProducts}" class="product-card">
+                        <div class="product-image-container">
+                            <a th:href="@{/products/{id}(id=${relatedProduct.id})}" class="product-image-link">
+                                <img th:src="${relatedProduct.image ne null ? relatedProduct.image : '/images/products/default-flower.jpg'}" 
+                                     th:alt="${relatedProduct.name}" 
+                                     th:title="${relatedProduct.name}"
+                                     class="product-image"
+                                     loading="lazy">
+                            </a>
+                        </div>
+    
+                        <div class="product-content">
+                            <h3 class="product-title">
+                                <a th:href="@{/products/{id}(id=${relatedProduct.id})}" 
+                                   class="product-title-link" 
+                                   th:text="${relatedProduct.name}">Tên sản phẩm</a>
+                            </h3>
+                            
+                            <div class="product-price">
+                                <span class="current-price" th:text="${#numbers.formatCurrency(relatedProduct.price)}">0₫</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        </div>
+    </th:block>
+
+    <style>
+        /* Image Modal Styles */
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+        }
+
+        .image-modal-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            cursor: default;
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .image-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Media Modal Styles */
+        .media-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .media-modal-content {
+            position: relative;
+            margin: auto;
+            padding: 20px;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .media-modal img,
+        .media-modal video {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .media-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .media-modal-close:hover {
+            color: #bbb;
+        }
+    </style>
+
+    <!-- Tab Switching JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all tab buttons and content panes
+            const tabButtons = document.querySelectorAll('#productTabs button[data-bs-toggle="tab"]');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+            
+            // Add click event listeners to tab buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all buttons
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('bg-gradient-to-r', 'from-pink-500', 'to-purple-600', 'text-white', 'shadow-md');
+                        btn.classList.add('text-gray-600', 'hover:text-gray-900', 'hover:bg-gray-50');
+                        btn.setAttribute('aria-selected', 'false');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.add('bg-gradient-to-r', 'from-pink-500', 'to-purple-600', 'text-white', 'shadow-md');
+                    this.classList.remove('text-gray-600', 'hover:text-gray-900', 'hover:bg-gray-50');
+                    this.setAttribute('aria-selected', 'true');
+                    
+                    // Hide all tab panes
+                    tabPanes.forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                        pane.classList.add('fade');
+                    });
+                    
+                    // Show target tab pane
+                    const targetId = this.getAttribute('data-bs-target');
+                    const targetPane = document.querySelector(targetId);
+                    if (targetPane) {
+                        targetPane.classList.add('show', 'active');
+                    }
+                });
+            });
+        });
+
+        // Media Modal Functions
+        function openMediaModal(mediaUrl) {
+            const modal = document.getElementById('mediaModal');
+            const modalContent = document.getElementById('mediaModalContent');
+            
+            // Clear previous content
+            modalContent.innerHTML = '';
+            
+            // Create media element
+            if (mediaUrl.includes('.mp4') || mediaUrl.includes('.mov')) {
+                const video = document.createElement('video');
+                video.src = mediaUrl;
+                video.controls = true;
+                video.style.maxWidth = '100%';
+                video.style.maxHeight = '100%';
+                video.style.objectFit = 'contain';
+                modalContent.appendChild(video);
+            } else {
+                const img = document.createElement('img');
+                img.src = mediaUrl;
+                img.alt = 'Review media';
+                img.style.maxWidth = '100%';
+                img.style.maxHeight = '100%';
+                img.style.objectFit = 'contain';
+                modalContent.appendChild(img);
+            }
+            
+            modal.style.display = 'block';
+        }
+
+        function closeMediaModal() {
+            document.getElementById('mediaModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('mediaModal');
+            if (event.target === modal) {
+                closeMediaModal();
+            }
+        }
+    </script>
+
+    <!-- Media Modal -->
+    <div id="mediaModal" class="media-modal">
+        <div class="media-modal-content">
+            <span class="media-modal-close" onclick="closeMediaModal()">&times;</span>
+            <div id="mediaModalContent"></div>
+        </div>
+    </div>
+
+</body>
+
+</html>

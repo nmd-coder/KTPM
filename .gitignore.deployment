@@ -1,0 +1,28 @@
+# AWS Deployment - Sensitive Files
+# Thêm những dòng này vào file .gitignore chính
+
+# Backup files
+backups/
+*.dump
+*.sql.gz
+
+# AWS credentials (nếu có)
+.aws/
+credentials
+
+# Environment files với sensitive data
+.env.production
+.env.local
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# DuckDNS token (đã có trong script, cẩn thận khi share)
+# update-duckdns.sh chứa token, cân nhắc kỹ trước khi push lên git public
+
+# Task definition có thể chứa passwords
+# Cân nhắc sử dụng AWS Secrets Manager thay vì hardcode trong task-definition.json

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/main :: layout(${pageTitle}, ${pageDescription}, ~{::link}, ~{::content})}">
+
+<head>
+    <link th:href="@{/css/orders.css}" rel="stylesheet">
+</head>
+
+<body>
+<th:block th:fragment="content">
+    <main class="main-content">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <!-- Breadcrumbs (hidden for payment-only panel) -->
+            <nav aria-label="breadcrumb" th:if="${breadcrumbs}" class="hidden"></nav>
+
+            <!-- Page Title -->
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800 mb-1" data-translate="checkout-title">Thanh toán</h1>
+                <p class="text-gray-500" data-translate="checkout-subtitle">Hoàn tất đơn hàng của bạn</p>
+            </div>
+
+            <!-- Error Alert -->
+            <div th:if="${error}" role="alert" class="rounded-lg bg-red-50 text-red-700 px-4 py-3 mb-4">
+                <span th:text="${error}"></span>
+            </div>
+
+            <!-- Profile Update Required Alert -->
+            <div th:if="${requireProfileUpdate}" role="alert" class="rounded-lg bg-amber-50 text-amber-800 px-4 py-3 mb-4">
+                <div class="flex items-start gap-3">
+                    <div class="flex-1">
+                        <h6 class="font-semibold mb-1" data-translate="profile-update-required">Cần cập nhật thông tin tài khoản</h6>
+                        <p class="mb-2" th:text="${error}"></p>
+                        <div class="mt-2 flex items-center gap-3">
+                            <a href="/account/profile" class="inline-flex items-center rounded-lg bg-amber-500 text-white px-4 py-2 text-sm font-medium hover:opacity-95">
+                                <span data-translate="update-info">Cập nhật thông tin</span>
+                            </a>
+                            <a href="/account/addresses" class="inline-flex items-center rounded-xl border-2 border-amber-400 text-amber-700 px-4 py-2 text-sm font-medium hover:bg-amber-100 hover:border-amber-500 transition-all duration-200">
+                                <span data-translate="manage-addresses">Quản lý địa chỉ</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8" th:unless="${requireProfileUpdate}">
+                <!-- Checkout Left: Payment-only panel -->
+                <div class="lg:col-span-2">
+                    <div class="rounded-2xl border border-gray-100 bg-white shadow-soft">
+                        <div class="px-6 py-5 rounded-t-2xl bg-white border-b border-gray-100">
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white font-semibold shadow">💳</span>
+                                <div>
+                                    <h5 class="text-lg font-semibold text-gray-900" data-translate="order-payment-info">Thông tin đơn và thanh toán</h5>
+                                    <p class="text-sm text-gray-600" data-translate="check-cart-payment">Kiểm tra giỏ hàng và chọn phương thức thanh toán phù hợp.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- Cart Items -->
+                            <section>
+                                <h6 class="text-sm font-semibold text-gray-700 mb-3" data-translate="cart">Giỏ hàng</h6>
+                                <div id="cart-items">
+                                    <div class="space-y-2">
+                                        <div class="h-16 rounded-lg bg-gray-100 animate-pulse"></div>
+                                        <div class="h-16 rounded-lg bg-gray-100 animate-pulse"></div>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+                            <!-- Address selection for shipping calculation -->
+                            <div th:if="${addresses != null and !addresses.isEmpty()}" class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2" data-translate="shipping-address">Địa chỉ giao hàng</label>
+                                <div class="relative">
+                                    <select id="addressSelect" class="w-full py-3 pr-12 border-2 border-gray-400 rounded-xl focus:outline-none focus:border-primary hover:border-gray-500 bg-white appearance-none transition-all duration-200" style="padding-left: 3rem;">
+                                        <option value="" th:unless="${defaultAddress != null}" data-translate="select-shipping-address">Chọn địa chỉ giao hàng</option>
+                                        <option th:each="address : ${addresses}"
+                                                th:value="${address.id}"
+                                                th:text="${address.street + ', ' + address.city + ', ' + address.province}"
+                                                th:selected="${defaultAddress != null and address.id == defaultAddress.id}">
+                                        </option>
+                                    </select>
+                                    
+                                    <!-- Dropdown arrow -->
+                                    <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                                        <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    
+                                    <!-- Selected indicator -->
+                                    <div id="addressSelectedIndicator" class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none" style="display: none;">
+                                        <div class="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center shadow-sm">
+                                            <svg class="w-2.5 h-2.5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-7.25 9a.75.75 0 01-1.127.05l-3.25-3.5a.75.75 0 111.102-1.02l2.66 2.868 6.71-8.34a.75.75 0 011.012-.11z" clip-rule="evenodd"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Payment Methods -->
+                            <section>
+                                <h6 class="text-sm font-semibold text-gray-700 mb-3" data-translate="payment-method">Phương thức thanh toán</h6>
+                                <div id="payment-methods" class="grid sm:grid-cols-2 gap-3"></div>
+                            </section>
+
+                            <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+
+                            <!-- Shipping Fee Section -->
+                            <section id="shippingFeeSection" class="mb-4">
+                                <h6 class="text-sm font-semibold text-gray-700 mb-3" data-translate="shipping-fee">Phí vận chuyển</h6>
+                                <div id="shippingFeeContent" class="p-4 rounded-xl border-2 border-gray-400 bg-gray-50">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <strong class="text-gray-600" data-translate="calculating-fee">Đang tính phí...</strong>
+                                            <br><small class="text-gray-500" data-translate="please-select-address">Vui lòng chọn địa chỉ giao hàng</small>
+                                        </div>
+                                        <svg class="animate-spin h-5 w-5 text-gray-400" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <div class="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+
+                            <!-- Order Notes -->
+                            <section>
+                                <h6 class="text-sm font-semibold text-gray-700 mb-2" data-translate="order-notes">Ghi chú đơn hàng</h6>
+                                <div class="relative">
+                                    <textarea id="orderNotes" rows="3" 
+                                              data-translate-placeholder="order-notes-placeholder"
+                                              placeholder="Ghi chú thêm cho đơn hàng (không bắt buộc)..."
+                                              class="w-full rounded-xl border-2 border-gray-400 px-4 py-3 focus:outline-none focus:border-primary hover:border-gray-500 transition-all duration-200"></textarea>
+                                    <div class="pointer-events-none absolute right-3 top-3 text-gray-300">✍️</div>
+                                </div>
+                                <p class="mt-2 text-xs text-gray-500" data-translate="order-notes-example">Ví dụ: thời gian nhận hàng mong muốn, lưu ý cho nhân viên giao hàng...</p>
+                            </section>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="lg:col-span-1">
+                    <div class="rounded-2xl border border-gray-100 bg-white shadow-soft lg:sticky lg:top-24">
+                        <div class="px-6 py-5 rounded-t-2xl bg-white border-b border-gray-100">
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white font-semibold shadow">🧾</span>
+                                <h5 class="text-lg font-semibold text-gray-900" data-translate="order-summary">Tóm tắt đơn hàng</h5>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <!-- Order Summary (will be loaded via AJAX) -->
+                            <div id="order-summary">
+                                <div class="space-y-2">
+                                    <div class="h-4 w-2/3 rounded bg-gray-100 animate-pulse"></div>
+                                    <div class="h-4 w-1/2 rounded bg-gray-100 animate-pulse"></div>
+                                    <div class="h-8 w-full rounded bg-gray-100 animate-pulse"></div>
+                                </div>
+                            </div>
+
+                            <!-- Voucher Apply -->
+                            <div class="mt-4">
+                                <label for="voucher-input" class="block text-sm font-medium text-gray-700 mb-1" data-translate="voucher-code">Mã giảm giá</label>
+                                <div class="flex gap-2">
+                                    <input id="voucher-input" type="text" 
+                                           data-translate-placeholder="enter-code"
+                                           placeholder="NHẬP MÃ"
+                                           class="flex-1 rounded-xl border-2 border-gray-400 px-4 py-2 focus:outline-none focus:border-primary hover:border-gray-500 uppercase tracking-wider transition-all duration-200" />
+                                    <button id="apply-voucher-btn" type="button" class="inline-flex items-center rounded-xl bg-gradient-to-r from-primary to-primary-hover text-white px-4 py-2 font-medium shadow hover:shadow-hover">
+                                        <span data-translate="apply">Áp dụng</span>
+                                    </button>
+                                </div>
+                                <p id="voucher-message" class="mt-2 text-sm text-gray-600"></p>
+                            </div>
+                            
+                            <!-- Place Order Button -->
+                            <div class="mt-4">
+                                <button type="button" class="w-full inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-primary to-primary-hover text-white px-5 py-3 font-semibold shadow hover:shadow-hover disabled:opacity-60" id="place-order-btn" disabled>
+                                    <span data-translate="place-order">Đặt hàng</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Security Notice -->
+                            <div class="mt-3">
+                                <small class="text-gray-500" data-translate="security-notice">Thông tin của bạn được bảo mật và mã hóa</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty state when profile update is required -->
+            <div th:if="${requireProfileUpdate}" class="text-center py-12">
+                <h4 class="mt-3 text-gray-600" data-translate="please-update-profile">Vui lòng cập nhật thông tin tài khoản</h4>
+                <p class="text-gray-500" data-translate="complete-profile-before-order">Bạn cần hoàn thiện thông tin cá nhân trước khi có thể đặt hàng.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Page JS -->
+    <script src="/js/checkout.js"></script>
+    </th:block>
+</body>
+</html>

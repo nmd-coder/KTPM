@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Vouchers Management Content -->
+    <div class="space-y-6" x-data="voucherManager()">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <p class="mt-1 text-sm text-gray-500">Tạo và quản lý các mã giảm giá cho khách hàng</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button @click="exportVouchers()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all duration-200 shadow-sm hover:shadow">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Xuất báo cáo
+                </button>
+                <button @click="openCreateModal" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:from-pink-700 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tạo voucher
+                </button>
+            </div>
+        </div>
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-blue-100 text-sm font-medium">Tổng voucher</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.total">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-blue-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-blue-200 text-sm">Tất cả voucher</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-green-100 text-sm font-medium">Đang hoạt động</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.active">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-green-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-green-200 text-sm">Có thể sử dụng</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-yellow-100 text-sm font-medium">Sắp hết hạn</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.expiring">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-yellow-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-yellow-200 text-sm">Trong 7 ngày</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-transform duration-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex-1">
+                        <p class="text-purple-100 text-sm font-medium">Đã sử dụng</p>
+                        <p class="text-3xl font-bold mt-2" x-text="stats.used">0</p>
+                        <div class="flex items-center mt-2">
+                            <svg class="w-4 h-4 text-purple-200 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                            </svg>
+                            <span class="text-purple-200 text-sm">Lượt sử dụng</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-4">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filters -->
+        <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-200">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Loại voucher</label>
+                    <select x-model="filters.type" @change="fetchVouchers" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors">
+                        <option value="">Tất cả loại</option>
+                        <option value="PERCENTAGE">Giảm theo %</option>
+                        <option value="FIXED">Giảm cố định</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                    <select x-model="filters.status" @change="fetchVouchers" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="ACTIVE">Đang hoạt động</option>
+                        <option value="EXPIRED">Hết hạn</option>
+                        <option value="USED_UP">Đã hết lượt</option>
+                        <option value="INACTIVE">Tạm dừng</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Từ ngày</label>
+                    <input type="date" x-model="filters.fromDate" @change="fetchVouchers" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                    <div class="relative">
+                        <input type="text" x-model="filters.search" @input.debounce.300ms="fetchVouchers" placeholder="Mã voucher, tên voucher..." class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors">
+                        <svg class="absolute left-3 top-3 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div x-show="loading" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+        </div>
+        
+        <!-- Vouchers Grid/Table -->
+        <div x-show="!loading" class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <template x-for="voucher in vouchers" :key="voucher.id">
+                <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden border border-gray-200">
+                    <!-- Voucher Card Header -->
+                    <div :class="getVoucherHeaderClass(voucher.status)" class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <div :class="getVoucherIconClass(voucher.discountType)" class="w-12 h-12 rounded-lg flex items-center justify-center">
+                                        <svg x-show="voucher.discountType === 'PERCENTAGE'" class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                                        </svg>
+                                        <svg x-show="voucher.discountType === 'FIXED'" class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900 break-all" x-text="voucher.code"></h3>
+                                        <p class="text-sm text-gray-600" x-text="voucher.name || 'Không có tên'"></p>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <span :class="getStatusBadgeClass(voucher.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                        <div :class="getStatusDotClass(voucher.status)" class="w-1.5 h-1.5 rounded-full mr-1"></div>
+                                        <span x-text="getStatusText(voucher.status)"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Voucher Details -->
+                    <div class="px-6 py-4 space-y-3 bg-gray-50">
+                        <!-- Discount Value -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Giá trị giảm:</span>
+                            <span class="text-lg font-bold text-pink-600">
+                                <span x-text="formatDiscountValue(voucher)"></span>
+                            </span>
+                        </div>
+                        
+                        <!-- Min Order Value -->
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-600">Đơn tối thiểu:</span>
+                            <span class="text-sm font-medium text-gray-900" x-text="formatCurrency(voucher.minOrderValue)"></span>
+                        </div>
+                        
+                        <!-- Usage Progress -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between items-center text-sm">
+                                <span class="text-gray-600">Sử dụng:</span>
+                                <span class="font-medium text-gray-900">
+                                    <span x-text="voucher.uses"></span>
+                                    <span x-show="voucher.maxUses">/ <span x-text="voucher.maxUses"></span></span>
+                                    <span x-show="!voucher.maxUses">/ ∞</span>
+                                </span>
+                            </div>
+                            <div x-show="voucher.maxUses" class="w-full bg-gray-200 rounded-full h-2">
+                                <div :class="getUsageBarClass(voucher.usagePercentage)" class="h-2 rounded-full transition-all duration-300" :style="`width: ${voucher.usagePercentage || 0}%`"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Expiry Date -->
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-200">
+                            <span class="text-sm text-gray-600">Hạn sử dụng:</span>
+                            <span class="text-sm font-medium" :class="isExpiringSoon(voucher.expiryDate) ? 'text-orange-600' : 'text-gray-900'" x-text="formatDate(voucher.expiryDate)"></span>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="px-6 py-4 bg-white border-t border-gray-200 flex justify-between items-center">
+                        <button @click="viewVoucher(voucher)" class="text-blue-600 hover:text-blue-800 transition-colors" title="Xem chi tiết">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                        <button @click="editVoucher(voucher)" class="text-green-600 hover:text-green-800 transition-colors" title="Chỉnh sửa">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button @click="toggleStatus(voucher)" :class="voucher.isActive ? 'text-yellow-600 hover:text-yellow-800' : 'text-green-600 hover:text-green-800'" class="transition-colors" :title="voucher.isActive ? 'Tạm dừng' : 'Kích hoạt'">
+                            <svg x-show="voucher.isActive" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <svg x-show="!voucher.isActive" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                        <button @click="deleteVoucher(voucher)" class="text-red-600 hover:text-red-800 transition-colors" title="Xóa">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Empty State -->
+            <div x-show="vouchers.length === 0" class="col-span-full text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+                <p class="mt-2 text-gray-500">Không tìm thấy voucher nào</p>
+                <button @click="openCreateModal" class="mt-4 inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:from-pink-700 hover:to-purple-700 transition-all duration-200">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tạo voucher đầu tiên
+                </button>
+            </div>
+        </div>
+        
+        <!-- Pagination -->
+        <div x-show="!loading && vouchers.length > 0" class="bg-white rounded-xl shadow-sm p-4 border border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-700">
+                        Hiển thị 
+                        <span class="font-medium" x-text="pagination.currentPage * pagination.size + 1"></span>
+                        đến 
+                        <span class="font-medium" x-text="Math.min((pagination.currentPage + 1) * pagination.size, pagination.totalItems)"></span>
+                        của 
+                        <span class="font-medium" x-text="pagination.totalItems"></span>
+                        voucher
+                    </p>
+                </div>
+                <div>
+                    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                        <button @click="prevPage" :disabled="pagination.currentPage === 0" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <template x-for="page in getVisiblePages()" :key="page">
+                            <button @click="goToPage(page)" :class="page === pagination.currentPage ? 'bg-pink-50 border-pink-500 text-pink-600 z-10' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium" x-text="page + 1">
+                            </button>
+                        </template>
+                        <button @click="nextPage" :disabled="pagination.currentPage >= pagination.totalPages - 1" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Create/Edit Voucher Modal -->
+    <div x-data="voucherModalManager()" x-show="showModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" @click="closeModal()"></div>
+            
+            <!-- Modal panel -->
+            <div x-show="showModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" class="inline-block w-full max-w-2xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-2xl">
+                
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-bold text-gray-900" x-text="modalMode === 'create' ? 'Tạo voucher mới' : (modalMode === 'edit' ? 'Chỉnh sửa voucher' : 'Chi tiết voucher')"></h3>
+                    <button @click="closeModal()" class="text-gray-400 hover:text-gray-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- AI Voucher Suggestion Section -->
+                <div x-show="modalMode === 'create'" class="mb-6 p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                        </svg>
+                        Tạo Voucher bằng AI
+                    </h4>
+                    
+                    <!-- Objective Selection -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                        <select x-model="aiObjective" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm">
+                            <option value="">Chọn mục tiêu</option>
+                            <option value="NEW_CUSTOMER">Thu hút khách hàng mới</option>
+                            <option value="INCREASE_AOV">Tăng giá trị đơn hàng (AOV)</option>
+                            <option value="CLEAR_INVENTORY">Đẩy hàng tồn kho</option>
+                        </select>
+                        
+                        <!-- Target Product (show only for CLEAR_INVENTORY) -->
+                        <input x-show="aiObjective === 'CLEAR_INVENTORY'" 
+                               x-model="aiTargetProduct"
+                               type="text" 
+                               placeholder="Tên sản phẩm (tùy chọn)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm">
+                    </div>
+                    
+                    <!-- Suggest Button -->
+                    <button @click="getAiSuggestion()" 
+                            :disabled="!aiObjective || aiLoading"
+                            :class="!aiObjective || aiLoading ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-700 hover:to-pink-700'"
+                            class="w-full px-4 py-2.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg transition-all duration-200 text-sm font-medium">
+                        <span x-show="!aiLoading">💡 Gợi ý cấu hình Voucher</span>
+                        <span x-show="aiLoading">⏳ AI đang phân tích...</span>
+                    </button>
+                    
+                    <!-- AI Explanation Box (show after suggestion) -->
+                    <div x-show="aiExplanation" class="mt-3 p-3 bg-white rounded border border-purple-200">
+                        <p class="text-sm text-gray-700 font-medium">📊 AI Giải thích:</p>
+                        <p class="text-sm text-gray-600 mt-1" x-text="aiExplanation"></p>
+                        
+                        <!-- Warnings (if any) -->
+                        <div x-show="aiWarnings && aiWarnings.length > 0" class="mt-2">
+                            <p class="text-xs font-semibold text-orange-600">⚠️ Lưu ý:</p>
+                            <template x-for="warning in aiWarnings" :key="warning">
+                                <p class="text-xs text-orange-600" x-text="warning"></p>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                
+                <form @submit.prevent="submitForm()" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Mã voucher -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Mã voucher <span class="text-red-500">*</span></label>
+                            <input type="text" x-model="formData.code" :readonly="modalMode !== 'create'" :class="modalMode !== 'create' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500 uppercase" placeholder="VD: AOV-FLOWER-1026-BC34" required>
+                            <p class="text-xs text-gray-500 mt-1">Chỉ chữ in hoa, số và dấu gạch ngang</p>
+                        </div>
+                        
+                        <!-- Tên voucher -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tên voucher <span class="text-red-500">*</span></label>
+                            <input type="text" x-model="formData.name" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="VD: Giảm giá mùa hè" required>
+                        </div>
+                    </div>
+                    
+                    <!-- Mô tả -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+                        <textarea x-model="formData.description" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" rows="3" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="Mô tả chi tiết về voucher"></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Loại giảm giá -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Loại giảm giá <span class="text-red-500">*</span></label>
+                            <select x-model="formData.discountType" :disabled="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" required>
+                                <option value="">Chọn loại</option>
+                                <option value="PERCENTAGE">Giảm theo %</option>
+                                <option value="FIXED">Giảm cố định</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Giá trị giảm -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Giá trị giảm <span class="text-red-500">*</span></label>
+                            <input type="number" x-model="formData.discountValue" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" step="0.01" min="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="VD: 20" required>
+                            <p class="text-xs text-gray-500 mt-1" x-show="formData.discountType === 'PERCENTAGE'">% giảm giá</p>
+                            <p class="text-xs text-gray-500 mt-1" x-show="formData.discountType === 'FIXED'">Số tiền giảm (VNĐ)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Giảm tối đa -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Giảm tối đa (VNĐ)</label>
+                            <input type="number" x-model="formData.maxDiscountAmount" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" step="1000" min="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="VD: 100000">
+                            <p class="text-xs text-gray-500 mt-1">Để trống nếu không giới hạn</p>
+                        </div>
+                        
+                        <!-- Đơn tối thiểu -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Đơn tối thiểu (VNĐ)</label>
+                            <input type="number" x-model="formData.minOrderValue" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" step="1000" min="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="VD: 200000">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Ngày hết hạn -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ngày hết hạn <span class="text-red-500">*</span></label>
+                            <input type="date" x-model="formData.expiryDate" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" required>
+                        </div>
+                        
+                        <!-- Số lượt sử dụng tối đa -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Số lượt sử dụng tối đa</label>
+                            <input type="number" x-model="formData.maxUses" :readonly="modalMode === 'view'" :class="modalMode === 'view' ? 'bg-gray-100' : ''" min="1" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-pink-500" placeholder="VD: 100">
+                            <p class="text-xs text-gray-500 mt-1">Để trống nếu không giới hạn</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Trạng thái -->
+                    <div x-show="modalMode !== 'view'">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" x-model="formData.isActive" class="w-4 h-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
+                            <span class="text-sm font-medium text-gray-700">Kích hoạt ngay</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Thông tin thêm (chỉ hiển thị khi xem) -->
+                    <div x-show="modalMode === 'view'" class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500">Đã sử dụng</label>
+                            <p class="text-lg font-semibold text-gray-900" x-text="formData.uses || 0"></p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-500">Trạng thái</label>
+                            <span :class="getStatusBadgeClass(formData.status)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                                <span x-text="getStatusText(formData.status)"></span>
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Buttons -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                        <button type="button" @click="closeModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            <span x-text="modalMode === 'view' ? 'Đóng' : 'Hủy'"></span>
+                        </button>
+                        <button x-show="modalMode !== 'view'" type="submit" class="px-4 py-2 bg-gradient-to-r from-pink-600 to-purple-600 border border-transparent rounded-lg text-sm font-medium text-white hover:from-pink-700 hover:to-purple-700">
+                            <span x-text="modalMode === 'create' ? 'Tạo voucher' : 'Cập nhật'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function exportVouchers() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams();
+            const type = url.searchParams.get('type');
+            const status = url.searchParams.get('status');
+            const fromDate = url.searchParams.get('fromDate');
+            const search = url.searchParams.get('search');
+            if (type) params.append('type', type);
+            if (status) params.append('status', status);
+            if (fromDate) params.append('fromDate', fromDate);
+            if (search) params.append('search', search);
+            window.location.href = '/admin/api/vouchers/export' + (params.toString() ? ('?' + params.toString()) : '');
+        }
+        function voucherManager() {
+            return {
+                vouchers: [],
+                loading: false,
+                filters: {
+                    type: '',
+                    status: '',
+                    fromDate: '',
+                    search: ''
+                },
+                pagination: {
+                    currentPage: 0,
+                    size: 12,
+                    totalPages: 0,
+                    totalItems: 0
+                },
+                stats: {
+                    total: 0,
+                    active: 0,
+                    expiring: 0,
+                    used: 0
+                },
+                
+                init() {
+                    this.fetchVouchers();
+                },
+                
+                async fetchVouchers() {
+                    this.loading = true;
+                    try {
+                        const params = new URLSearchParams({
+                            page: this.pagination.currentPage,
+                            size: this.pagination.size,
+                            sortBy: 'createdAt',
+                            sortDir: 'desc'
+                        });
+                        
+                        // Add filter parameters
+                        if (this.filters.type) params.append('type', this.filters.type);
+                        if (this.filters.status) params.append('status', this.filters.status);
+                        if (this.filters.fromDate) params.append('fromDate', this.filters.fromDate);
+                        if (this.filters.search) params.append('search', this.filters.search);
+                        
+                        const response = await fetch(`/admin/api/vouchers?${params}`);
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            this.vouchers = data.vouchers;
+                            this.pagination.totalPages = data.totalPages;
+                            this.pagination.totalItems = data.totalItems;
+                            this.pagination.currentPage = data.currentPage;
+                            this.updateStats();
+                        }
+                    } catch (error) {
+                        console.error('Error fetching vouchers:', error);
+                        showToast('Lỗi khi tải danh sách voucher', 'error');
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                updateStats() {
+                    this.stats.total = this.vouchers.length;
+                    this.stats.active = this.vouchers.filter(v => v.status === 'ACTIVE').length;
+                    this.stats.expiring = this.vouchers.filter(v => this.isExpiringSoon(v.expiryDate)).length;
+                    this.stats.used = this.vouchers.reduce((sum, v) => sum + (v.uses || 0), 0);
+                },
+                
+                formatCurrency(value) {
+                    if (!value) return '0₫';
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
+                },
+                
+                formatDiscountValue(voucher) {
+                    if (voucher.discountType === 'PERCENTAGE') {
+                        return voucher.discountValue + '%';
+                    }
+                    return this.formatCurrency(voucher.discountValue);
+                },
+                
+                formatDate(date) {
+                    if (!date) return '-';
+                    return new Date(date).toLocaleDateString('vi-VN');
+                },
+                
+                isExpiringSoon(date) {
+                    if (!date) return false;
+                    const expiry = new Date(date);
+                    const now = new Date();
+                    const diff = expiry - now;
+                    const days = diff / (1000 * 60 * 60 * 24);
+                    return days > 0 && days <= 7;
+                },
+                
+                getVoucherHeaderClass(status) {
+                    const classes = {
+                        'ACTIVE': 'bg-gradient-to-br from-green-50 to-emerald-50',
+                        'EXPIRED': 'bg-gradient-to-br from-gray-50 to-gray-100',
+                        'USED_UP': 'bg-gradient-to-br from-orange-50 to-amber-50',
+                        'INACTIVE': 'bg-gradient-to-br from-red-50 to-rose-50'
+                    };
+                    return classes[status] || 'bg-gray-50';
+                },
+                
+                getVoucherIconClass(type) {
+                    return type === 'PERCENTAGE' 
+                        ? 'bg-gradient-to-br from-blue-500 to-purple-600' 
+                        : 'bg-gradient-to-br from-green-500 to-emerald-600';
+                },
+                
+                getStatusBadgeClass(status) {
+                    const classes = {
+                        'ACTIVE': 'bg-green-100 text-green-800',
+                        'EXPIRED': 'bg-gray-100 text-gray-800',
+                        'USED_UP': 'bg-orange-100 text-orange-800',
+                        'INACTIVE': 'bg-red-100 text-red-800'
+                    };
+                    return classes[status] || 'bg-gray-100 text-gray-800';
+                },
+                
+                getStatusDotClass(status) {
+                    const classes = {
+                        'ACTIVE': 'bg-green-400',
+                        'EXPIRED': 'bg-gray-400',
+                        'USED_UP': 'bg-orange-400',
+                        'INACTIVE': 'bg-red-400'
+                    };
+                    return classes[status] || 'bg-gray-400';
+                },
+                
+                getStatusText(status) {
+                    const texts = {
+                        'ACTIVE': 'Hoạt động',
+                        'EXPIRED': 'Hết hạn',
+                        'USED_UP': 'Đã hết lượt',
+                        'INACTIVE': 'Tạm dừng'
+                    };
+                    return texts[status] || status;
+                },
+                
+                getUsageBarClass(percentage) {
+                    if (percentage >= 80) return 'bg-red-500';
+                    if (percentage >= 60) return 'bg-orange-500';
+                    if (percentage >= 40) return 'bg-yellow-500';
+                    return 'bg-green-500';
+                },
+                
+                openCreateModal() {
+                    window.dispatchEvent(new CustomEvent('open-voucher-modal', { 
+                        detail: { mode: 'create' }
+                    }));
+                },
+                
+                viewVoucher(voucher) {
+                    window.dispatchEvent(new CustomEvent('open-voucher-modal', { 
+                        detail: { mode: 'view', voucher: voucher }
+                    }));
+                },
+                
+                editVoucher(voucher) {
+                    window.dispatchEvent(new CustomEvent('open-voucher-modal', { 
+                        detail: { mode: 'edit', voucher: voucher }
+                    }));
+                },
+                
+                async toggleStatus(voucher) {
+                    // THAY THẾ confirm bằng SweetAlert2
+                    Swal.fire({
+                        title: `Xác nhận ${voucher.isActive ? 'tạm dừng' : 'kích hoạt'}?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đồng ý',
+                        cancelButtonText: 'Hủy'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                const response = await fetch(`/admin/api/vouchers/${voucher.id}/toggle-status`, {
+                                    method: 'PATCH'
+                                });
+                                const data = await response.json();
+                                
+                                if (data.success) {
+                                    await this.fetchVouchers();
+                                    showToast(data.message, data.success ? 'success' : 'error');
+                                } else {
+                                    showToast(data.message, 'error');
+                                }
+                            } catch (error) {
+                                console.error('Error toggling voucher status:', error);
+                                showToast('Lỗi khi cập nhật trạng thái', 'error');
+                            }
+                        }
+                    });
+                },
+                
+                async deleteVoucher(voucher) {
+                    // THAY THẾ confirm bằng SweetAlert2
+                    Swal.fire({
+                        title: `Bạn chắc chắn muốn xóa voucher "${voucher.code}"?`,
+                        text: 'Hành động này không thể hoàn tác!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'Xóa ngay!',
+                        cancelButtonText: 'Hủy'
+                    }).then(async (result) => {
+                        if (result.isConfirmed) {
+                            try {
+                                const response = await fetch(`/admin/api/vouchers/${voucher.id}`, {
+                                    method: 'DELETE'
+                                });
+                                const data = await response.json();
+                                
+                                if (data.success) {
+                                    await this.fetchVouchers();
+                                    showToast(data.message, 'success');
+                                } else {
+                                    showToast(data.message, 'error');
+                                }
+                            } catch (error) {
+                                console.error('Error deleting voucher:', error);
+                                showToast('Lỗi khi xóa voucher', 'error');
+                            }
+                        }
+                    });
+                },
+                
+                exportData() {
+                    showToast('Chức năng đang được phát triển', 'info');
+                },
+                
+                prevPage() {
+                    if (this.pagination.currentPage > 0) {
+                        this.pagination.currentPage--;
+                        this.fetchVouchers();
+                    }
+                },
+                
+                nextPage() {
+                    if (this.pagination.currentPage < this.pagination.totalPages - 1) {
+                        this.pagination.currentPage++;
+                        this.fetchVouchers();
+                    }
+                },
+                
+                goToPage(page) {
+                    this.pagination.currentPage = page;
+                    this.fetchVouchers();
+                },
+                
+                getVisiblePages() {
+                    const pages = [];
+                    const maxVisible = 5;
+                    let start = Math.max(0, this.pagination.currentPage - Math.floor(maxVisible / 2));
+                    let end = Math.min(this.pagination.totalPages, start + maxVisible);
+                    
+                    if (end - start < maxVisible) {
+                        start = Math.max(0, end - maxVisible);
+                    }
+                    
+                    for (let i = start; i < end; i++) {
+                        pages.push(i);
+                    }
+                    
+                    return pages;
+                }
+            };
+        }
+        
+        function voucherModalManager() {
+            return {
+                showModal: false,
+                modalMode: 'create', // 'create', 'edit', 'view'
+                formData: {
+                    id: null,
+                    code: '',
+                    name: '',
+                    description: '',
+                    discountType: '',
+                    discountValue: null,
+                    maxDiscountAmount: null,
+                    minOrderValue: 0,
+                    expiryDate: '',
+                    maxUses: null,
+                    isActive: true,
+                    uses: 0,
+                    status: ''
+                },
+                // AI suggestion fields
+                aiObjective: '',
+                aiTargetProduct: '',
+                aiLoading: false,
+                aiExplanation: '',
+                aiWarnings: [],
+                
+                init() {
+                    window.addEventListener('open-voucher-modal', (e) => {
+                        this.openModal(e.detail.mode, e.detail.voucher);
+                    });
+                },
+                
+                openModal(mode, voucher = null) {
+                    this.modalMode = mode;
+                    
+                    if (mode === 'create') {
+                        this.resetForm();
+                    } else if (voucher) {
+                        this.formData = {
+                            id: voucher.id,
+                            code: voucher.code,
+                            name: voucher.name,
+                            description: voucher.description || '',
+                            discountType: voucher.discountType,
+                            discountValue: voucher.discountValue,
+                            maxDiscountAmount: voucher.maxDiscountAmount,
+                            minOrderValue: voucher.minOrderValue || 0,
+                            expiryDate: voucher.expiryDate,
+                            maxUses: voucher.maxUses,
+                            isActive: voucher.isActive,
+                            uses: voucher.uses || 0,
+                            status: voucher.status || ''
+                        };
+                    }
+                    
+                    this.showModal = true;
+                },
+                
+                closeModal() {
+                    this.showModal = false;
+                    setTimeout(() => this.resetForm(), 300);
+                },
+                
+                resetForm() {
+                    this.formData = {
+                        id: null,
+                        code: '',
+                        name: '',
+                        description: '',
+                        discountType: '',
+                        discountValue: null,
+                        maxDiscountAmount: null,
+                        minOrderValue: 0,
+                        expiryDate: '',
+                        maxUses: null,
+                        isActive: true,
+                        uses: 0,
+                        status: ''
+                    };
+                    // Reset AI fields
+                    this.aiObjective = '';
+                    this.aiTargetProduct = '';
+                    this.aiExplanation = '';
+                    this.aiWarnings = [];
+                },
+                
+                async submitForm() {
+                    try {
+                        const url = this.modalMode === 'create' 
+                            ? '/admin/api/vouchers' 
+                            : `/admin/api/vouchers/${this.formData.id}`;
+                        
+                        const method = this.modalMode === 'create' ? 'POST' : 'PUT';
+                        
+                        const payload = {
+                            code: this.formData.code.toUpperCase(),
+                            name: this.formData.name,
+                            description: this.formData.description,
+                            discountType: this.formData.discountType,
+                            discountValue: parseFloat(this.formData.discountValue),
+                            maxDiscountAmount: this.formData.maxDiscountAmount ? parseFloat(this.formData.maxDiscountAmount) : null,
+                            minOrderValue: this.formData.minOrderValue ? parseFloat(this.formData.minOrderValue) : 0,
+                            expiryDate: this.formData.expiryDate,
+                            maxUses: this.formData.maxUses ? parseInt(this.formData.maxUses) : null,
+                            isActive: this.formData.isActive
+                        };
+                        
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(payload)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showToast(data.message, 'success');
+                            this.closeModal();
+                            window.location.reload(); // Reload to refresh the list
+                        } else {
+                            showToast(data.message, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error submitting form:', error);
+                        showToast('Lỗi khi lưu voucher', 'error');
+                    }
+                },
+                
+                getStatusBadgeClass(status) {
+                    const classes = {
+                        'ACTIVE': 'bg-green-100 text-green-800',
+                        'EXPIRED': 'bg-gray-100 text-gray-800',
+                        'USED_UP': 'bg-orange-100 text-orange-800',
+                        'INACTIVE': 'bg-red-100 text-red-800'
+                    };
+                    return classes[status] || 'bg-gray-100 text-gray-800';
+                },
+                
+                getStatusText(status) {
+                    const texts = {
+                        'ACTIVE': 'Hoạt động',
+                        'EXPIRED': 'Hết hạn',
+                        'USED_UP': 'Đã hết lượt',
+                        'INACTIVE': 'Tạm dừng'
+                    };
+                    return texts[status] || status;
+                },
+                
+                async getAiSuggestion() {
+                    if (!this.aiObjective) {
+                        showToast('Vui lòng chọn mục tiêu!', 'warning');
+                        return;
+                    }
+                    
+                    this.aiLoading = true;
+                    this.aiExplanation = '';
+                    this.aiWarnings = [];
+                    
+                    try {
+                        const response = await fetch('/admin/api/vouchers/suggest', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                objective: this.aiObjective,
+                                targetProduct: this.aiTargetProduct || null
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        // Use ResponseWrapper format: data.data instead of data.suggestion
+                        if (data.data) {
+                            // Auto-fill ALL form fields from AI response
+                            this.formData.code = data.data.code || '';
+                            this.formData.name = data.data.name || '';
+                            this.formData.description = data.data.description || '';
+                            this.formData.discountType = data.data.discountType || '';
+                            this.formData.discountValue = data.data.discountValue || null;
+                            this.formData.maxDiscountAmount = data.data.maxDiscountAmount || null;
+                            this.formData.minOrderValue = data.data.minOrderValue || 0;
+                            this.formData.expiryDate = data.data.expiryDate || '';
+                            this.formData.maxUses = data.data.maxUses || null;
+                            
+                            // Show explanation
+                            this.aiExplanation = data.data.explanation;
+                            this.aiWarnings = data.data.warnings || [];
+                            
+                            showToast('✅ AI đã tự động điền đầy đủ thông tin voucher!', 'success');
+                        } else {
+                            showToast('Lỗi: ' + (data.error || 'Không thể tạo gợi ý'), 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error getting AI suggestion:', error);
+                        showToast('Lỗi khi gọi AI. Vui lòng thử lại.', 'error');
+                    } finally {
+                        this.aiLoading = false;
+                    }
+                }
+            };
+        }
+    </script>
+</body>
+</html>

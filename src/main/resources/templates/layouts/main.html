@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" 
+      lang="vi" 
+      th:fragment="layout (title, description, extraCSS, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title != null ? title + ' - StarShop 🌸' : 'StarShop 🌸 - Cửa hàng hoa tươi'}">StarShop 🌸</title>
+    
+    <!-- Meta Tags for SEO -->
+    <meta name="description" th:content="${description != null ? description : 'StarShop - Cửa hàng hoa tươi, đẹp, chất lượng cao. Giao hàng nhanh chóng toàn quốc.'}">
+    <meta name="keywords" content="hoa tươi, shop hoa, StarShop, hoa sinh nhật, hoa tình yêu, hoa cưới, hoa khai trương">
+    <meta name="author" content="StarShop">
+    
+    <!-- CSRF Token -->
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" th:content="${title != null ? title + ' - StarShop 🌸' : 'StarShop 🌸 - Cửa hàng hoa tươi'}">
+    <meta property="og:description" th:content="${description != null ? description : 'StarShop - Cửa hàng hoa tươi, đẹp, chất lượng cao. Giao hàng nhanh chóng toàn quốc.'}">
+    <meta property="og:image" content="/images/starshop-og.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" th:content="${title != null ? title + ' - StarShop 🌸' : 'StarShop 🌸 - Cửa hàng hoa tươi'}">
+    <meta property="twitter:description" th:content="${description != null ? description : 'StarShop - Cửa hàng hoa tươi, đẹp, chất lượng cao. Giao hàng nhanh chóng toàn quốc.'}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    
+    <!-- DNS Prefetch & Preconnect for faster CDN loading -->
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Custom Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            DEFAULT: '#EC407A',
+                            light: '#F8BBD9',
+                            dark: '#AD1457',
+                            hover: '#E91E63'
+                        },
+                        secondary: '#ffcccb',
+                        accent: '#e8f5e8',
+                        cream: '#fdf8f5',
+                        sage: '#9caf88',
+                        lavender: '#e6e6fa',
+                        peach: '#ffeaa7',
+                        'rose-gold': '#f4c2a1'
+                    },
+                    fontFamily: {
+                        'roboto': ['Roboto', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px rgba(248, 180, 217, 0.15)',
+                        'hover': '0 8px 25px rgba(236, 64, 122, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- ❌ REMOVED: Font Awesome (900KB) - Replaced with Heroicons (lightweight inline SVG) -->
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" /> -->
+    
+    <!-- ✅ Heroicons CSS Utilities (~2KB) -->
+    <link rel="stylesheet" th:href="@{/css/heroicons.css}">
+    
+    <!-- SweetAlert2 - MUST load before notifications.js -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Notifications Utility - Centralized notification system -->
+    <script th:src="@{/js/notifications.js}"></script>
+    
+    <!-- Google Fonts - Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Preload critical font for faster rendering -->
+    <link rel="preload" as="font" type="font/woff2" href="https://fonts.gstatic.com/s/roboto/v30/KFOmCnqEu92Fr1Mu4mxK.woff2" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="/css/main.css">
+    
+    <!-- Page-specific CSS -->
+    <th:block th:replace="${extraCSS}"></th:block>
+    
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "StarShop",
+        "description": "Cửa hàng hoa tươi chất lượng cao",
+        "url": "https://starshop.vn",
+        "logo": "https://starshop.vn/images/logo.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+84-901-234-567",
+            "contactType": "customer service",
+            "availableLanguage": ["Vietnamese"]
+        },
+        "sameAs": [
+            "https://facebook.com/starshop",
+            "https://instagram.com/starshop",
+            "https://tiktok.com/@starshop"
+        ]
+    }
+    </script>
+</head>
+<body>
+    <!-- Background Decoration -->
+    <div class="bg-decoration"></div>
+    
+    <!-- Floating Petals Animation -->
+    <div class="floating-petals">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
+    
+    <!-- Header -->
+    <div th:replace="~{fragments/header :: header}"></div>
+    
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Page-specific content goes here -->
+        <th:block th:replace="${content}">
+            <!-- Content will be inserted here -->
+        </th:block>
+    </main>
+    
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    
+    <!-- Back to Top Button -->
+    <button type="button" id="backToTop" title="Lên đầu trang"
+            class="fixed bottom-8 right-8 w-12 h-12 rounded-full bg-gradient-to-r from-primary to-primary-hover text-white shadow-lg hover:shadow-hover transition-all duration-300 opacity-0 invisible z-50">
+        <svg class="hero-icon mx-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 17a.75.75 0 0 1-.75-.75V5.612L5.29 9.77a.75.75 0 0 1-1.08-1.04l5.25-5.5a.75.75 0 0 1 1.08 0l5.25 5.5a.75.75 0 1 1-1.08 1.04l-3.96-4.158V16.25A.75.75 0 0 1 10 17Z" clip-rule="evenodd" />
+        </svg>
+    </button>
+    
+    <!-- Alpine.js for interactive components -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Main JavaScript - Defer to prevent blocking -->
+    <script defer src="/js/main.js"></script>
+    
+    <!-- AOS - Lazy load library only, initialization handled by main.js -->
+    <script>
+        // Lazy load AOS library when elements with data-aos exist
+        window.addEventListener('DOMContentLoaded', function() {
+            if (document.querySelector('[data-aos]')) {
+                const aosLink = document.createElement('link');
+                aosLink.rel = 'stylesheet';
+                aosLink.href = 'https://unpkg.com/aos@2.3.1/dist/aos.css';
+                document.head.appendChild(aosLink);
+                
+                const aosScript = document.createElement('script');
+                aosScript.src = 'https://unpkg.com/aos@2.3.1/dist/aos.js';
+                // Note: AOS.init() is called by main.js after library loads
+                document.body.appendChild(aosScript);
+            }
+        });
+    </script>
+    
+    <!-- Language Switcher JS -->
+    <script src="/js/language-switcher.js"></script>
+    
+    <!-- Page-specific JavaScript -->
+    <th:block th:if="${additionalJS}" th:each="js : ${additionalJS}">
+        <script th:src="@{${js}}"></script>
+    </th:block>
+    
+    <!-- Chat Widget for Customer Support -->
+    <div th:replace="~{fragments/chat-bubble :: chat-widget}"></div>
+
+    <!-- SockJS & STOMP - Lazy load only when chat widget exists -->
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            const chatWidget = document.querySelector('.chat-widget, #chatWidget, [data-chat-widget]');
+            if (chatWidget) {
+                // Load SockJS
+                const sockjsScript = document.createElement('script');
+                sockjsScript.src = 'https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js';
+                sockjsScript.onload = function() {
+                    // Load STOMP after SockJS
+                    const stompScript = document.createElement('script');
+                    stompScript.src = 'https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js';
+                    document.body.appendChild(stompScript);
+                };
+                document.body.appendChild(sockjsScript);
+            }
+        });
+    </script>
+
+    <!-- Chat CSS -->
+    <link rel="stylesheet" th:href="@{/css/chat.css}">
+
+    <!-- Chat Widget JavaScript -->
+    <script src="/js/chat-widget.js"></script>
+
+    <!-- Analytics & Tracking (Add your tracking codes here) -->
+    <!-- Google Analytics -->
+    <!-- Facebook Pixel -->
+    <!-- Other tracking codes -->
+</body>
+</html>
+
+<style>
+/* Skip to main content for accessibility */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    background: #EC407A;
+    color: white;
+    padding: 8px;
+    text-decoration: none;
+    border-radius: 4px;
+    z-index: 1001;
+    transition: top 0.15s ease-in-out;
+}
+
+.skip-link:focus {
+    top: 6px;
+    color: white;
+}
+</style>
+
+<script>
+// Back to Top Button Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const backToTopBtn = document.getElementById('backToTop');
+    
+    // Show/hide button based on scroll position
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            backToTopBtn.classList.remove('opacity-0', 'invisible');
+            backToTopBtn.classList.add('opacity-100', 'visible');
+        } else {
+            backToTopBtn.classList.add('opacity-0', 'invisible');
+            backToTopBtn.classList.remove('opacity-100', 'visible');
+        }
+    });
+    
+    // Smooth scroll to top
+    backToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+});
+
+// Enhanced loading states
+window.addEventListener('load', function() {
+    document.body.classList.add('loaded');
+});
+
+// Preload critical resources
+const preloadResource = (href, as, type = null) => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.href = href;
+    link.as = as;
+    if (type) link.type = type;
+    document.head.appendChild(link);
+};
+
+// Note: Font preloading is already handled in HTML head (line 99)
+// No need to preload again via JavaScript
+</script>

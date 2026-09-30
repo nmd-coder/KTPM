@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Finance Management Content -->
+    <div class="space-y-6">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">Quản lý Tài chính</h2>
+                <p class="mt-1 text-sm text-gray-500">Theo dõi doanh thu, chi phí và lợi nhuận</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                    <i class="fas fa-calendar-alt mr-2"></i>
+                    Chọn khoảng thời gian
+                </button>
+                <button class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-primary-700 transition-colors duration-200">
+                    <i class="fas fa-download mr-2"></i>
+                    Xuất báo cáo
+                </button>
+            </div>
+        </div>
+        
+        <!-- Financial Overview Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Total Revenue -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-green-100 text-sm font-medium">Tổng doanh thu</p>
+                        <p class="text-3xl font-bold mt-2">125,000,000₫</p>
+                        <div class="flex items-center mt-2">
+                            <i class="fas fa-arrow-up text-green-300 text-sm mr-1"></i>
+                            <span class="text-green-300 text-sm font-medium">+12.5%</span>
+                            <span class="text-green-100 text-sm ml-1">so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-chart-line text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Total Expenses -->
+            <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-red-100 text-sm font-medium">Tổng chi phí</p>
+                        <p class="text-3xl font-bold mt-2">45,000,000₫</p>
+                        <div class="flex items-center mt-2">
+                            <i class="fas fa-arrow-up text-red-300 text-sm mr-1"></i>
+                            <span class="text-red-300 text-sm font-medium">+8.2%</span>
+                            <span class="text-red-100 text-sm ml-1">so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-credit-card text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Net Profit -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-blue-100 text-sm font-medium">Lợi nhuận ròng</p>
+                        <p class="text-3xl font-bold mt-2">80,000,000₫</p>
+                        <div class="flex items-center mt-2">
+                            <i class="fas fa-arrow-up text-green-300 text-sm mr-1"></i>
+                            <span class="text-green-300 text-sm font-medium">+15.8%</span>
+                            <span class="text-blue-100 text-sm ml-1">so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-coins text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Profit Margin -->
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-purple-100 text-sm font-medium">Tỷ suất lợi nhuận</p>
+                        <p class="text-3xl font-bold mt-2">64%</p>
+                        <div class="flex items-center mt-2">
+                            <i class="fas fa-arrow-up text-green-300 text-sm mr-1"></i>
+                            <span class="text-green-300 text-sm font-medium">+2.1%</span>
+                            <span class="text-purple-100 text-sm ml-1">so với tháng trước</span>
+                        </div>
+                    </div>
+                    <div class="bg-white bg-opacity-20 rounded-full p-3">
+                        <i class="fas fa-percentage text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Revenue vs Expenses Chart -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Doanh thu vs Chi phí</h3>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors duration-200">6 tháng</button>
+                        <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors duration-200">1 năm</button>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="revenueExpenseChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Expense Breakdown -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900">Phân tích chi phí</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                        <span class="text-sm text-gray-600">Hàng hóa</span>
+                        <div class="w-3 h-3 bg-blue-500 rounded-full ml-4"></div>
+                        <span class="text-sm text-gray-600">Vận hành</span>
+                        <div class="w-3 h-3 bg-yellow-500 rounded-full ml-4"></div>
+                        <span class="text-sm text-gray-600">Marketing</span>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="expenseBreakdownChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Financial Summary Tables -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Revenue Sources -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Nguồn doanh thu</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-shopping-cart text-green-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Bán hàng trực tuyến</p>
+                                <p class="text-sm text-gray-500">1,234 đơn hàng</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-gray-900">95,000,000₫</p>
+                            <p class="text-sm text-green-600">76%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-store text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Bán hàng tại cửa hàng</p>
+                                <p class="text-sm text-gray-500">456 đơn hàng</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-gray-900">25,000,000₫</p>
+                            <p class="text-sm text-blue-600">20%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-gift text-purple-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Dịch vụ khác</p>
+                                <p class="text-sm text-gray-500">78 dịch vụ</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-gray-900">5,000,000₫</p>
+                            <p class="text-sm text-purple-600">4%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Top Expenses -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-6">Chi phí chính</h3>
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-box text-red-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Chi phí hàng hóa</p>
+                                <p class="text-sm text-gray-500">Giá vốn sản phẩm</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-gray-900">28,000,000₫</p>
+                            <p class="text-sm text-red-600">62%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-bullhorn text-yellow-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Marketing & Quảng cáo</p>
+                                <p class="text-sm text-gray-500">Quảng cáo online, offline</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-gray-900">8,000,000₫</p>
+                            <p class="text-sm text-yellow-600">18%</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cogs text-blue-600"></i>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">Chi phí vận hành</p>
+                                <p class="text-sm text-gray-500">Điện, nước, thuê mặt bằng</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-medium text-gray-900">9,000,000₫</p>
+                            <p class="text-sm text-blue-600">20%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Monthly Financial Report -->
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Báo cáo tài chính theo tháng</h3>
+                <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                    <i class="fas fa-filter mr-2"></i>
+                    Lọc theo tháng
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tháng</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Doanh thu</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Chi phí</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lợi nhuận</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tỷ suất LN</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tăng trưởng</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tháng 12/2024</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">125,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">45,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">80,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">64%</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    +12.5%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tháng 11/2024</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">111,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">42,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">69,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">62%</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    +8.2%
+                                </span>
+                            </td>
+                        </tr>
+                        <tr class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Tháng 10/2024</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">102,500,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">39,000,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">63,500,000₫</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">62%</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <i class="fas fa-arrow-up mr-1"></i>
+                                    +3.1%
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chart.js Scripts -->
+    <script>
+        // Revenue vs Expense Chart
+        const revenueExpenseCtx = document.getElementById('revenueExpenseChart').getContext('2d');
+        new Chart(revenueExpenseCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                datasets: [{
+                    label: 'Doanh thu (triệu đồng)',
+                    data: [85, 92, 78, 102.5, 111, 125],
+                    backgroundColor: '#10b981',
+                    borderRadius: 4
+                }, {
+                    label: 'Chi phí (triệu đồng)',
+                    data: [32, 35, 30, 39, 42, 45],
+                    backgroundColor: '#ef4444',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6'
+                        },
+                        ticks: {
+                            color: '#6b7280'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#6b7280'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Expense Breakdown Chart
+        const expenseBreakdownCtx = document.getElementById('expenseBreakdownChart').getContext('2d');
+        new Chart(expenseBreakdownCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Hàng hóa', 'Vận hành', 'Marketing', 'Khác'],
+                datasets: [{
+                    data: [62, 20, 18, 5],
+                    backgroundColor: ['#ef4444', '#3b82f6', '#f59e0b', '#8b5cf6'],
+                    borderWidth: 0,
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

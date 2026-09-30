@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout('Danh sách yêu thích', 
+          'Quản lý danh sách sản phẩm yêu thích của bạn tại StarShop. Theo dõi và mua sắm những sản phẩm bạn quan tâm.',
+          ~{::extraCSS},
+          ~{::content})}">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/account.css}" />
+    <th:block th:fragment="extraCSS">
+        <!-- No extra CSS needed for this page -->
+    </th:block>
+</head>
+
+<body>
+<th:block th:fragment="content">
+
+    <!-- Main Content -->
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-pink-50/30 py-8">
+        <div class="container mx-auto px-4">
+            <div class="max-w-7xl mx-auto">
+                <div>
+                        
+                        <!-- Empty State -->
+                        <div th:if="${wishlistCount == 0}" class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-16">
+                            <div class="text-center">
+                                <div class="relative inline-flex items-center justify-center mb-8">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full blur-2xl opacity-20 animate-pulse"></div>
+                                    <div class="relative w-24 h-24 bg-gradient-to-br from-pink-500 to-rose-500 rounded-full flex items-center justify-center shadow-xl">
+                                        <svg class="w-12 h-12 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <h3 class="text-3xl font-bold text-gray-900 mb-4" data-translate="wishlist-empty-title">Danh sách yêu thích trống</h3>
+                                <p class="text-gray-600 text-lg mb-10 max-w-md mx-auto leading-relaxed" data-translate="wishlist-empty-desc">
+                                    Khám phá bộ sưu tập hoa tươi đẹp và lưu lại những sản phẩm yêu thích của bạn
+                                </p>
+                                <a href="/products" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-semibold rounded-xl hover:from-pink-700 hover:to-rose-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+                                    </svg>
+                                    <span data-translate="explore-now">Khám phá ngay</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Wishlist Grid -->
+                        <div th:if="${wishlistCount > 0}">
+                            <!-- Header -->
+                            <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 p-6 mb-6">
+                                <div class="flex items-center justify-between flex-wrap gap-4">
+                                    <div>
+                                        <h2 class="text-2xl font-bold text-gray-900 mb-1" data-translate="wishlist-title">Sản phẩm yêu thích</h2>
+                                        <p class="text-gray-600" data-translate="wishlist-count">
+                                            <span class="font-semibold text-pink-600" th:text="${wishlistCount}">0</span> sản phẩm đang được lưu
+                                        </p>
+                                    </div>
+                                    <button onclick="clearAllWishlist()" class="inline-flex items-center px-5 py-2.5 bg-white border-2 border-red-200 text-red-600 font-semibold rounded-xl hover:bg-red-50 hover:border-red-300 transition-all duration-200 shadow-sm hover:shadow-md">
+                                        <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                                        </svg>
+                                        <span data-translate="clear-all">Xóa tất cả</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Products Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="wishlistItems">
+                                <!-- Wishlist items will be loaded here by JavaScript -->
+                            </div>
+                        </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inline JavaScript -->
+    <script th:inline="javascript">
+        // Load wishlist on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadWishlist();
+        });
+
+        // Load wishlist from API
+        function loadWishlist() {
+            fetch('/api/wishlist/list')
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.length > 0) {
+                    displayWishlist(data.data);
+                }
+            })
+            .catch(error => console.error('Error loading wishlist:', error));
+        }
+
+        // Display wishlist in grid
+        function displayWishlist(wishlist) {
+            const container = document.getElementById('wishlistItems');
+            let html = '';
+            
+            // Get translations
+            const currentLang = typeof window.languageSwitcher !== 'undefined' && window.languageSwitcher ? 
+                window.languageSwitcher.currentLanguage : 'vi';
+            const translations = typeof window.languageSwitcher !== 'undefined' && window.languageSwitcher ? 
+                window.languageSwitcher.translations[currentLang] : {};
+            
+            const inStock = translations['in-stock'] || 'Còn hàng';
+            const outOfStock = translations['out-of-stock'] || 'Hết hàng';
+            const viewDetails = translations['view-details'] || 'Xem chi tiết';
+            const removeFromWishlistTitle = translations['remove-from-wishlist'] || 'Xóa khỏi yêu thích';
+            const saved = translations['saved'] || 'Đã lưu';
+            const contactUs = translations['contact-us'] || 'Liên hệ';
+            
+            wishlist.forEach(item => {
+                const statusBadge = item.productStatus === 'ACTIVE' 
+                    ? '<span class="absolute top-4 left-4 inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-green-500 text-white shadow-lg"><span class="w-1.5 h-1.5 bg-white rounded-full mr-1.5 animate-pulse"></span>' + inStock + '</span>'
+                    : '<span class="absolute top-4 left-4 inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-500 text-white shadow-lg">' + outOfStock + '</span>';
+                
+                // Format date based on current language
+                const savedDate = new Date(item.followedAt).toLocaleDateString(currentLang === 'vi' ? 'vi-VN' : 'en-US');
+                
+                html += `
+                    <div class="group relative bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl hover:border-pink-200 transition-all duration-300 transform hover:-translate-y-1" data-product-id="${item.productId}">
+                        <!-- Product Image -->
+                        <div class="relative overflow-hidden aspect-square bg-gradient-to-br from-gray-100 to-gray-50">
+                            ${statusBadge}
+                            <img src="${item.productImage || '/images/placeholder-product.jpg'}" 
+                                 alt="${item.productName}" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                            
+                            <!-- Overlay Actions -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                <div class="absolute bottom-4 left-4 right-4 flex gap-2">
+                                    <a href="/products/${item.productId}" 
+                                       class="flex-1 text-center px-4 py-2.5 bg-white text-gray-900 font-semibold rounded-xl hover:bg-gray-100 transition-colors duration-200 shadow-lg">
+                                        ${viewDetails}
+                                    </a>
+                                    <button onclick="removeFromWishlist(${item.productId})" 
+                                            class="p-2.5 bg-white text-red-600 rounded-xl hover:bg-red-50 transition-colors duration-200 shadow-lg"
+                                            title="${removeFromWishlistTitle}">
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Info -->
+                        <div class="p-5">
+                            <h3 class="font-bold text-gray-900 mb-3 line-clamp-2 min-h-[3rem] text-lg group-hover:text-pink-600 transition-colors duration-200">${item.productName}</h3>
+                            
+                            <div class="flex items-baseline gap-2 mb-4">
+                                <span class="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
+                                    ${item.productPrice ? item.productPrice.toLocaleString(currentLang === 'vi' ? 'vi-VN' : 'en-US') + '₫' : contactUs}
+                                </span>
+                            </div>
+                            
+                            <div class="flex items-center text-sm text-gray-500 pt-4 border-t border-gray-100">
+                                <svg class="w-4 h-4 mr-1.5 text-pink-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="m9.653 16.915-.005-.003-.019-.01a20.759 20.759 0 0 1-1.162-.682 22.045 22.045 0 0 1-2.582-1.9C4.045 12.733 2 10.352 2 7.5a4.5 4.5 0 0 1 8-2.828A4.5 4.5 0 0 1 18 7.5c0 2.852-2.044 5.233-3.885 6.82a22.049 22.049 0 0 1-3.744 2.582l-.019.01-.005.003h-.002a.739.739 0 0 1-.69.001l-.002-.001Z" />
+                                </svg>
+                                <span class="text-xs">${saved} ${savedDate}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Remove specific item from wishlist
+        async function removeFromWishlist(productId) {
+            let confirmed = false;
+            if (typeof confirmDelete === 'function') {
+                confirmed = await confirmDelete('Xóa sản phẩm yêu thích?', 'Bạn có chắc muốn xóa sản phẩm này khỏi danh sách yêu thích?');
+            } else {
+                confirmed = confirm('Bạn có chắc muốn xóa sản phẩm này khỏi danh sách yêu thích?');
+            }
+            if (!confirmed) {
+                return;
+            }
+            
+            fetch('/api/wishlist/remove', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: parseInt(productId) })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.success) {
+                    // Remove the product card from UI
+                    const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+                    if (productCard) {
+                        productCard.remove();
+                    }
+                    
+                    // Update wishlist count in header (same logic as products page)
+                    const wishlistCount = data.data.userWishlistCount;
+                    if (wishlistCount !== undefined && wishlistCount !== null) {
+                        if (typeof window.updateWishlistCount === 'function') {
+                            window.updateWishlistCount(wishlistCount);
+                        }
+                    } else {
+                        // Fallback: count remaining cards
+                        const remainingCards = document.querySelectorAll('#wishlistItems [data-product-id]');
+                        if (typeof window.updateWishlistCount === 'function') {
+                            window.updateWishlistCount(remainingCards.length);
+                        }
+                    }
+                    
+                    // Check if no wishlist items left
+                    const remainingCards = document.querySelectorAll('#wishlistItems [data-product-id]');
+                    if (remainingCards.length === 0) {
+                        location.reload(); // Reload to show empty state
+                    }
+                    
+                    if (typeof showToast === 'function') {
+                        showToast('Đã xóa sản phẩm khỏi danh sách yêu thích!', 'success');
+                    }
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('Có lỗi xảy ra khi xóa sản phẩm!', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error removing from wishlist:', error);
+                if (typeof showToast === 'function') {
+                    showToast('Có lỗi xảy ra khi xóa sản phẩm!', 'error');
+                }
+            });
+        }
+
+        // Clear all wishlist items
+        async function clearAllWishlist() {
+            let confirmed = false;
+            if (typeof confirmDelete === 'function') {
+                confirmed = await confirmDelete('Xóa toàn bộ danh sách yêu thích?', 'Bạn có chắc muốn xóa tất cả sản phẩm yêu thích?');
+            } else {
+                confirmed = confirm('Bạn có chắc muốn xóa tất cả sản phẩm yêu thích?');
+            }
+            if (!confirmed) {
+                return;
+            }
+            
+            fetch('/api/wishlist/clear', { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.data && data.data.success) {
+                    // Update wishlist count in header (same logic as products page)
+                    const wishlistCount = data.data.userWishlistCount;
+                    if (wishlistCount !== undefined && wishlistCount !== null) {
+                        if (typeof window.updateWishlistCount === 'function') {
+                            window.updateWishlistCount(wishlistCount);
+                        }
+                    }
+                    
+                    location.reload(); // Reload to show empty state
+                } else {
+                    if (typeof showToast === 'function') {
+                        showToast('Có lỗi xảy ra khi xóa danh sách yêu thích!', 'error');
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing wishlist:', error);
+                if (typeof showToast === 'function') {
+                    showToast('Có lỗi xảy ra khi xóa danh sách yêu thích!', 'error');
+                }
+            });
+        }
+    </script>
+
+</th:block>
+</body>
+</html>

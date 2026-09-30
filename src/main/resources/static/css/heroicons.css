@@ -1,0 +1,76 @@
+/* ================================
+   Heroicons Integration for StarShop
+   Solid and Outline icons from https://heroicons.com/
+   ================================ */
+
+.hero-icon {
+    display: inline-block;
+    width: 1.25rem;
+    height: 1.25rem;
+    vertical-align: middle;
+    fill: currentColor;
+    stroke: currentColor;
+}
+
+.hero-icon-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.hero-icon-lg {
+    width: 1.5rem;
+    height: 1.5rem;
+}
+
+.hero-icon-xl {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Icon color utilities */
+.hero-icon-primary {
+    color: var(--primary);
+}
+
+.hero-icon-secondary {
+    color: var(--gray-600);
+}
+
+.hero-icon-white {
+    color: var(--white);
+}
+
+.hero-icon-danger {
+    color: #dc3545;
+}
+
+.hero-icon-success {
+    color: #28a745;
+}
+
+/* Animation utilities */
+.hero-icon-spin {
+    animation: heroIconSpin 1s linear infinite;
+}
+
+@keyframes heroIconSpin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.hero-icon-pulse {
+    animation: heroIconPulse 2s ease-in-out infinite;
+}
+
+@keyframes heroIconPulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}

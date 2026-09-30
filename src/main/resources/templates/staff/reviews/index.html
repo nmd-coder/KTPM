@@ -1,0 +1,1833 @@
+<!-- Staff Reviews Management Content -->
+<div xmlns:th="http://www.thymeleaf.org" class="min-h-screen bg-gray-50">
+    
+    <!-- Page Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="py-6">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-star text-white text-xl"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-bold text-gray-900">Quản lý Đánh giá</h1>
+                            <p class="text-sm text-gray-500 mt-1">Theo dõi và phản hồi đánh giá sản phẩm của khách hàng</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="refreshReviews()" class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Làm mới
+                        </button>
+                        <button onclick="exportReviews()" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
+                            <i class="fas fa-download mr-2"></i>
+                            Xuất Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Total Reviews -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-comments text-blue-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Tổng đánh giá</p>
+                        <p class="text-2xl font-bold text-gray-900" id="totalReviews">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Average Rating -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-star text-yellow-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Đánh giá trung bình</p>
+                        <p class="text-2xl font-bold text-gray-900" id="averageRating">0.0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 Star Reviews -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-thumbs-up text-green-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Đánh giá 5 sao</p>
+                        <p class="text-2xl font-bold text-gray-900" id="fiveStarReviews">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Reviews -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clock text-purple-600 text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-500">Đánh giá hôm nay</p>
+                        <p class="text-2xl font-bold text-gray-900" id="todayReviews">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                <!-- Rating Filter -->
+                <div>
+                    <label for="ratingFilter" class="block text-sm font-medium text-gray-700 mb-2">Lọc theo đánh giá</label>
+                    <select id="ratingFilter" onchange="filterReviews()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        <option value="">Tất cả đánh giá</option>
+                        <option value="5">⭐⭐⭐⭐⭐ 5 sao</option>
+                        <option value="4">⭐⭐⭐⭐ 4 sao</option>
+                        <option value="3">⭐⭐⭐ 3 sao</option>
+                        <option value="2">⭐⭐ 2 sao</option>
+                        <option value="1">⭐ 1 sao</option>
+                    </select>
+                </div>
+
+                <!-- Search -->
+                <div>
+                    <label for="searchInput" class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Tên sản phẩm, người dùng..." 
+                               onkeyup="searchReviews()" 
+                               class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                </div>
+
+                <!-- Sort -->
+                <div>
+                    <label for="sortBy" class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp</label>
+                    <select id="sortBy" onchange="filterReviews()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        <option value="newest">Mới nhất</option>
+                        <option value="oldest">Cũ nhất</option>
+                        <option value="rating-high">Đánh giá cao</option>
+                        <option value="rating-low">Đánh giá thấp</option>
+                    </select>
+                </div>
+
+                <!-- Status Filter -->
+                <div>
+                    <label for="statusFilter" class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                    <select id="statusFilter" onchange="filterReviews()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        <option value="">Tất cả</option>
+                        <option value="verified">Đã xác minh</option>
+                        <option value="unverified">Chưa xác minh</option>
+                    </select>
+                </div>
+
+                <!-- Sentiment Filter -->
+                <div>
+                    <label for="sentimentFilter" class="block text-sm font-medium text-gray-700 mb-2">Phân loại</label>
+                    <select id="sentimentFilter" onchange="filterReviews()" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        <option value="">Tất cả</option>
+                        <option value="POSITIVE">Tích cực 😊</option>
+                        <option value="NEUTRAL">Trung tính 😐</option>
+                        <option value="NEGATIVE">Tiêu cực 😡</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Loading State -->
+            <div id="loadingState" class="p-12 text-center">
+                <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-indigo-500 bg-indigo-100">
+                    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Đang tải đánh giá...
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="p-12 text-center" style="display: none;">
+                <div class="mx-auto h-24 w-24 text-gray-400 mb-4">
+                    <i class="fas fa-star text-6xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">Chưa có đánh giá nào</h3>
+                <p class="text-gray-500">Khách hàng chưa đánh giá sản phẩm nào.</p>
+            </div>
+
+            <!-- Reviews Table -->
+            <div id="reviewsTable" style="display: none;">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản phẩm & Khách hàng</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản phẩm & Đánh giá</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bình luận</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Media</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Phản hồi Staff</th>
+                                <th class="px-3 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày đánh giá</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reviewsTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Reviews will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button onclick="previousPage()" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Trước
+                        </button>
+                        <button onclick="nextPage()" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            Sau
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700" id="paginationInfo">
+                                Hiển thị <span class="font-medium">1</span> đến <span class="font-medium">10</span> 
+                                trong tổng số <span class="font-medium">0</span> kết quả
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" id="pagination">
+                                <!-- Pagination will be generated here -->
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                    <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mt-4">Xác nhận xóa</h3>
+                <div class="mt-2 px-7 py-3">
+                    <p class="text-sm text-gray-500">
+                        Bạn có chắc chắn muốn xóa đánh giá này? Hành động này không thể hoàn tác.
+                    </p>
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button onclick="confirmDelete()" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-24 mr-2 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        Xóa
+                    </button>
+                    <button onclick="cancelDelete()" class="px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md w-24 hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Response Modal -->
+    <div id="adminResponseModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+        <div class="relative top-20 mx-auto p-5 border w-2/3 max-w-2xl shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="adminResponseModalTitle">Thêm phản hồi</h3>
+                    <button onclick="closeAdminResponseModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <label for="adminResponseText" class="block text-sm font-medium text-gray-700 mb-2">Nội dung phản hồi</label>
+                    <textarea id="adminResponseText" rows="4" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                              placeholder="Nhập phản hồi của bạn..."></textarea>
+                    <div class="text-xs text-gray-500 mt-1">
+                        <span id="adminResponseCharCount">0</span>/1000 ký tự
+                    </div>
+                </div>
+                
+                <!-- AI Assistant Box -->
+                <div id="aiAssistBox" style="display: none;" class="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-robot text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="ml-3 flex-1">
+                            <h4 class="text-sm font-semibold text-blue-900 mb-2">AI Hỗ trợ</h4>
+                            <div id="aiMainIssue" class="text-sm text-blue-800 mb-3"></div>
+                            <div id="aiSuggestedReplies" class="space-y-2"></div>
+                            <div id="aiLoadingIndicator" style="display: none;" class="flex items-center text-blue-600">
+                                <i class="fas fa-spinner fa-spin mr-2"></i>
+                                <span class="text-sm">Đang phân tích...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3">
+                    <button onclick="closeAdminResponseModal()" class="px-4 py-2 bg-gray-300 text-gray-800 text-base font-medium rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                        Hủy
+                    </button>
+                    <button onclick="saveAdminResponse()" class="px-4 py-2 bg-indigo-600 text-white text-base font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <span id="adminResponseSaveText">Lưu phản hồi</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Detail Modal -->
+    <div id="reviewDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" style="display: none;">
+        <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-xl bg-white">
+            <div class="mt-3">
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-star text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-900">Chi tiết đánh giá</h3>
+                            <p class="text-gray-600 text-sm">Xem đánh giá và phản hồi của admin</p>
+                        </div>
+                    </div>
+                    <button onclick="closeReviewDetailModal()" class="text-gray-400 hover:text-gray-600 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Content -->
+                <div class="space-y-6">
+                    <!-- Review Info -->
+                    <div class="bg-gray-50 rounded-xl p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-sm font-medium text-gray-500">Người dùng</label>
+                                <div class="flex items-center gap-3 mt-1">
+                                    <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                                        <span class="text-sm font-medium text-white" id="reviewDetailUserInitial">U</span>
+                                    </div>
+                                    <span class="font-medium text-gray-900" id="reviewDetailUserName">Tên người dùng</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-500">Sản phẩm</label>
+                                <div class="mt-1">
+                                    <div class="font-medium text-gray-900" id="reviewDetailProductName">Tên sản phẩm</div>
+                                    <div class="text-sm text-gray-500" id="reviewDetailProductId">ID: 0</div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-500">Đánh giá</label>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <div id="reviewDetailStars" class="flex items-center">
+                                        <!-- Stars will be generated here -->
+                                    </div>
+                                    <span class="font-medium text-gray-900" id="reviewDetailRating">5/5</span>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-sm font-medium text-gray-500">Ngày đánh giá</label>
+                                <div class="mt-1 font-medium text-gray-900" id="reviewDetailDate">01/01/2024</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customer Comment -->
+                    <div class="bg-blue-50 rounded-xl p-6 border-l-4 border-blue-400">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-comment text-blue-600"></i>
+                            <h4 class="font-semibold text-blue-900">Bình luận của khách hàng</h4>
+                        </div>
+                        <div class="text-gray-700 leading-relaxed" id="reviewDetailComment">
+                            Nội dung bình luận sẽ hiển thị ở đây...
+                        </div>
+                        
+                        <!-- Media Files -->
+                        <div id="reviewDetailMedia" class="mt-4 hidden">
+                            <div class="flex items-center gap-2 mb-2">
+                                <i class="fas fa-images text-blue-600"></i>
+                                <h5 class="font-semibold text-blue-900">Hình ảnh/Video đính kèm</h5>
+                            </div>
+                            <div id="reviewDetailMediaList" class="flex flex-wrap gap-2">
+                                <!-- Media files will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Admin Response -->
+                    <div id="reviewDetailAdminResponseSection" class="bg-green-50 rounded-xl p-6 border-l-4 border-green-400">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="fas fa-reply text-green-600"></i>
+                            <h4 class="font-semibold text-green-900">Phản hồi từ Admin</h4>
+                        </div>
+                        <div class="text-gray-700 leading-relaxed mb-3" id="reviewDetailAdminResponse">
+                            Nội dung phản hồi sẽ hiển thị ở đây...
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm text-green-600" id="reviewDetailAdminInfo">
+                                - Admin Root • 23/10/2024
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="editAdminResponseFromDetail()" class="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-sm font-medium rounded-lg transition-colors">
+                                    <i class="fas fa-edit mr-1"></i>Sửa phản hồi
+                                </button>
+                                <button onclick="removeAdminResponseFromDetail()" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-medium rounded-lg transition-colors">
+                                    <i class="fas fa-trash mr-1"></i>Xóa phản hồi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- No Response -->
+                    <div id="reviewDetailNoResponse" class="bg-orange-50 rounded-xl p-6 border-l-4 border-orange-400 text-center" style="display: none;">
+                        <i class="fas fa-clock text-orange-500 text-2xl mb-3"></i>
+                        <h4 class="font-semibold text-orange-900 mb-2">Chưa có phản hồi</h4>
+                        <p class="text-orange-700 mb-4">Đánh giá này chưa được admin phản hồi</p>
+                        <button onclick="addAdminResponseFromDetail()" class="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-colors">
+                            <i class="fas fa-reply mr-2"></i>Thêm phản hồi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="flex justify-end mt-8 pt-4 border-t border-gray-200">
+                    <button onclick="closeReviewDetailModal()" class="px-6 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium rounded-lg transition-colors">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed top-4 right-4 z-50 transform translate-x-full transition-transform duration-300">
+        <div class="bg-white border-l-4 border-green-400 p-4 shadow-lg rounded-lg">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-check-circle text-green-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-medium text-gray-900" id="toastMessage">Thành công!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+// Global variables
+let currentPage = 0;
+let pageSize = 20;
+let currentRating = '';
+let currentSearch = '';
+let currentStatus = '';
+let currentSentiment = '';
+let currentSort = 'newest';
+let deleteReviewId = null;
+let currentAdminResponseReviewId = null;
+let isEditingAdminResponse = false;
+let currentAiAnalysis = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadStatistics();
+    loadReviews();
+    
+    // Setup character counter for admin response
+    const adminResponseText = document.getElementById('adminResponseText');
+    const charCount = document.getElementById('adminResponseCharCount');
+    
+    adminResponseText.addEventListener('input', function() {
+        const count = this.value.length;
+        charCount.textContent = count;
+        
+        if (count > 1000) {
+            charCount.classList.add('text-red-500');
+            charCount.classList.remove('text-gray-500');
+        } else {
+            charCount.classList.remove('text-red-500');
+            charCount.classList.add('text-gray-500');
+        }
+    });
+});
+
+// Load statistics
+async function loadStatistics() {
+    try {
+        const response = await fetch('/staff/api/reviews/statistics');
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            document.getElementById('totalReviews').textContent = data.data.totalReviews || 0;
+            document.getElementById('averageRating').textContent = (data.data.averageRating || 0).toFixed(1);
+            document.getElementById('fiveStarReviews').textContent = data.data.fiveStarReviews || 0;
+            document.getElementById('todayReviews').textContent = data.data.todayReviews || 0;
+        }
+    } catch (error) {
+        console.error('Error loading statistics:', error);
+    }
+}
+
+// Load reviews by product from API
+async function loadReviews() {
+    const loadingState = document.getElementById('loadingState');
+    const emptyState = document.getElementById('emptyState');
+    const reviewsTable = document.getElementById('reviewsTable');
+    
+    loadingState.style.display = 'block';
+    emptyState.style.display = 'none';
+    reviewsTable.style.display = 'none';
+    
+    try {
+        let url = `/staff/api/reviews?page=${currentPage}&size=${pageSize}`;
+        if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+        if (currentSort) url += `&sort=${currentSort}`;
+        if (currentRating) url += `&rating=${currentRating}`;
+        if (currentSentiment) url += `&sentiment=${currentSentiment}`;
+        if (currentStatus) url += `&status=${currentStatus}`;
+        
+        console.log('Loading product-based reviews with URL:', url);
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.success && data.data.content && data.data.content.length > 0) {
+            renderReviewsTable(data.data);
+            renderPagination(data.data);
+            reviewsTable.style.display = 'block';
+        } else {
+            emptyState.style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error loading order reviews:', error);
+        emptyState.style.display = 'block';
+    } finally {
+        loadingState.style.display = 'none';
+    }
+}
+
+// Render product-based reviews table
+function renderReviewsTable(reviewsPage) {
+    const tbody = document.getElementById('reviewsTableBody');
+    tbody.innerHTML = '';
+    
+    reviewsPage.content.forEach(review => {
+        const row = document.createElement('tr');
+        row.className = 'hover:bg-gray-50 transition-colors duration-150';
+        row.innerHTML = `
+            <td class="px-6 py-4">
+                <div class="flex items-center space-x-3">
+                    <div class="flex-shrink-0">
+                        <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-box-open text-white text-sm"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="text-sm font-medium text-gray-900">${review.productName || 'Sản phẩm'}</div>
+                        <div class="text-sm text-gray-500">${review.userName || ''}</div>
+                        <div class="text-xs text-gray-400">ID SP: ${review.productId || ''}</div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="flex items-center space-x-2">
+                    <div class="flex items-center">${generateStars(review.rating)}</div>
+                    <span class="text-sm font-medium text-gray-900">${review.rating}/5</span>
+                    ${review.verified ? '<span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded">Đã mua</span>' : ''}
+                </div>
+            </td>
+            <td class="px-6 py-4">
+                <div class="text-sm text-gray-900 max-w-xs">${review.comment ? `<div class=\"truncate\" title=\"${review.comment}\">${review.comment}</div>` : '<span class=\"text-gray-400 italic\">Không có bình luận</span>'}</div>
+            </td>
+            <td class="px-4 py-4 text-center">
+                ${(review.mediaUrls && review.mediaUrls.trim() !== '') ? 
+                    `<div class=\"inline-flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full\" title=\"Có media đính kèm\">\n<i class=\"fas fa-images text-sm\"></i>\n</div>` : 
+                    `<div class=\"inline-flex items-center justify-center w-8 h-8 bg-gray-100 text-gray-400 rounded-full\" title=\"Không có media\">\n<i class=\"fas fa-image text-sm\"></i>\n</div>`
+                }
+            </td>
+            <td class="px-4 py-4 text-center">
+                ${review.adminResponse ? 
+                    `<div class=\"inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-600 rounded-full\" title=\"Đã phản hồi\">\n<i class=\"fas fa-check text-sm\"></i>\n</div>` : 
+                    `<div class=\"inline-flex items-center justify-center w-8 h-8 bg-orange-100 text-orange-600 rounded-full animate-pulse\" title=\"Chưa có phản hồi\">\n<i class=\"fas fa-clock text-sm\"></i>\n</div>`
+                }
+            </td>
+            <td class="px-3 py-4 whitespace-nowrap text-center">
+                <div class="flex items-center justify-center space-x-1">
+                    <button onclick="viewReviewDetail('${review.id}')" class="p-1.5 text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 rounded-md transition-all duration-150" title="Xem chi tiết">
+                        <i class="fas fa-eye text-xs"></i>
+                    </button>
+                    ${!review.adminResponse ? 
+                        `<button onclick=\"addAdminResponse('${review.id}')\" class=\"p-1.5 text-green-600 hover:text-green-900 hover:bg-green-50 rounded-md transition-all duration-150\" title=\"Thêm phản hồi\">\n<i class=\"fas fa-reply text-xs\"></i>\n</button>` : 
+                        `<button onclick=\"editAdminResponse('${review.id}','${(review.adminResponse || '').replace(/"/g,'\\\"').replace(/'/g,\\' )}')\" class=\"p-1.5 text-blue-600 hover:text-blue-900 hover:bg-blue-50 rounded-md transition-all duration-150\" title=\"Sửa phản hồi\">\n<i class=\"fas fa-edit text-xs\"></i>\n</button>\n<button onclick=\"removeAdminResponse('${review.id}')\" class=\"p-1.5 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-md transition-all duration-150\" title=\"Xóa phản hồi\">\n<i class=\"fas fa-trash text-xs\"></i>\n</button>`
+                    }
+                </div>
+            </td>
+            <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
+                <div>${formatDate(review.createdAt)}</div>
+                <div class="text-xs">${formatTime(review.createdAt)}</div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Generate star rating display
+function generateStars(rating) {
+    let stars = '';
+    for (let i = 1; i <= 5; i++) {
+        if (i <= rating) {
+            stars += '<i class="fas fa-star text-yellow-400"></i>';
+        } else {
+            stars += '<i class="far fa-star text-gray-300"></i>';
+        }
+    }
+    return stars;
+}
+
+// Format date
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+}
+
+// Format time
+function formatTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Render pagination
+function renderPagination(reviewsPage) {
+    const pagination = document.getElementById('pagination');
+    const paginationInfo = document.getElementById('paginationInfo');
+    
+    // Update pagination info
+    const start = reviewsPage.number * reviewsPage.size + 1;
+    const end = Math.min((reviewsPage.number + 1) * reviewsPage.size, reviewsPage.totalElements);
+    paginationInfo.innerHTML = `
+        Hiển thị <span class="font-medium">${start}</span> đến <span class="font-medium">${end}</span> 
+        trong tổng số <span class="font-medium">${reviewsPage.totalElements}</span> kết quả
+    `;
+    
+    // Generate pagination buttons
+    pagination.innerHTML = '';
+    
+    // Previous button
+    const prevButton = document.createElement('button');
+    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevButton.className = `relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${!reviewsPage.hasPrevious ? 'opacity-50 cursor-not-allowed' : ''}`;
+    prevButton.onclick = () => reviewsPage.hasPrevious && goToPage(reviewsPage.number - 1);
+    prevButton.disabled = !reviewsPage.hasPrevious;
+    pagination.appendChild(prevButton);
+    
+    // Page numbers
+    const startPage = Math.max(0, reviewsPage.number - 2);
+    const endPage = Math.min(reviewsPage.totalPages - 1, reviewsPage.number + 2);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i + 1;
+        pageButton.className = `relative inline-flex items-center px-4 py-2 border text-sm font-medium ${i === reviewsPage.number ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`;
+        pageButton.onclick = () => goToPage(i);
+        pagination.appendChild(pageButton);
+    }
+    
+    // Next button
+    const nextButton = document.createElement('button');
+    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextButton.className = `relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 ${!reviewsPage.hasNext ? 'opacity-50 cursor-not-allowed' : ''}`;
+    nextButton.onclick = () => reviewsPage.hasNext && goToPage(reviewsPage.number + 1);
+    nextButton.disabled = !reviewsPage.hasNext;
+    pagination.appendChild(nextButton);
+}
+
+// Filter functions
+function filterReviews() {
+    currentRating = document.getElementById('ratingFilter').value;
+    currentStatus = document.getElementById('statusFilter').value;
+    currentSentiment = document.getElementById('sentimentFilter').value;
+    currentSort = document.getElementById('sortBy').value;
+    currentPage = 0;
+    
+    console.log('Filter/Sort changed:', {
+        rating: currentRating,
+        status: currentStatus,
+        sentiment: currentSentiment,
+        sort: currentSort,
+        page: currentPage
+    });
+    
+    loadReviews();
+}
+
+function searchReviews() {
+    currentSearch = document.getElementById('searchInput').value;
+    currentSort = document.getElementById('sortBy').value;
+    currentPage = 0;
+    loadReviews();
+}
+
+// Pagination functions
+function goToPage(page) {
+    currentPage = page;
+    loadReviews();
+}
+
+function previousPage() {
+    if (currentPage > 0) {
+        currentPage--;
+        loadReviews();
+    }
+}
+
+function nextPage() {
+    currentPage++;
+    loadReviews();
+}
+
+// Action functions
+function viewReview(reviewId) {
+    // Implementation for viewing review details
+    showToast('Xem chi tiết đánh giá: ' + reviewId);
+}
+
+function deleteReview(reviewId) {
+    deleteReviewId = reviewId;
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+async function confirmDelete() {
+    if (deleteReviewId) {
+        try {
+            const response = await fetch(`/staff/api/reviews/${deleteReviewId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('Đánh giá đã được xóa thành công');
+                document.getElementById('deleteModal').style.display = 'none';
+                loadReviews();
+                loadStatistics(); // Cập nhật lại thống kê
+                deleteReviewId = null;
+            } else {
+                showToast(data.message || 'Có lỗi xảy ra khi xóa đánh giá', 'error');
+            }
+        } catch (error) {
+            console.error('Error deleting review:', error);
+            showToast('Có lỗi xảy ra khi xóa đánh giá', 'error');
+        }
+    }
+}
+
+function cancelDelete() {
+    document.getElementById('deleteModal').style.display = 'none';
+    deleteReviewId = null;
+}
+
+function refreshReviews() {
+    loadStatistics();
+    loadReviews();
+    showToast('Đã làm mới danh sách đánh giá');
+}
+
+async function exportReviews() {
+    try {
+        showToast('Đang xuất file Excel...', 'info');
+        
+        // Get current filter values - with null checks
+        const ratingEl = document.getElementById('filterRating');
+        const searchEl = document.getElementById('searchInput');
+        const sentimentEl = document.getElementById('filterSentiment');
+        const statusEl = document.getElementById('filterStatus');
+        const sortEl = document.getElementById('sortBy');
+        
+        const rating = ratingEl ? ratingEl.value : '';
+        const search = searchEl ? searchEl.value : '';
+        const sentiment = sentimentEl ? sentimentEl.value : '';
+        const status = statusEl ? statusEl.value : '';
+        const sort = sortEl ? sortEl.value : 'newest';
+        
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (rating) params.append('rating', rating);
+        if (search) params.append('search', search);
+        if (sentiment) params.append('sentiment', sentiment);
+        if (status) params.append('status', status);
+        if (sort) params.append('sort', sort);
+        
+        // Call export API
+        const response = await fetch(`/staff/api/reviews/export?${params.toString()}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('token')
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Không thể xuất file Excel');
+        }
+        
+        // Get the blob from response
+        const blob = await response.blob();
+        
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `danh-gia-${new Date().getTime()}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        showToast('Xuất file Excel thành công!', 'success');
+        
+    } catch (error) {
+        console.error('Error exporting reviews:', error);
+        showToast('Lỗi khi xuất file Excel: ' + error.message, 'error');
+    }
+}
+
+// Utility functions
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    
+    toastMessage.textContent = message;
+    
+    // Update toast styling based on type
+    const toastContainer = toast.querySelector('div');
+    if (type === 'error') {
+        toastContainer.className = 'bg-white border-l-4 border-red-400 p-4 shadow-lg rounded-lg';
+        toastContainer.querySelector('i').className = 'fas fa-exclamation-circle text-red-400';
+    } else if (type === 'info') {
+        toastContainer.className = 'bg-white border-l-4 border-blue-400 p-4 shadow-lg rounded-lg';
+        toastContainer.querySelector('i').className = 'fas fa-info-circle text-blue-400';
+    } else {
+        toastContainer.className = 'bg-white border-l-4 border-green-400 p-4 shadow-lg rounded-lg';
+        toastContainer.querySelector('i').className = 'fas fa-check-circle text-green-400';
+    }
+    
+    toast.classList.remove('translate-x-full');
+    
+    setTimeout(() => {
+        toast.classList.add('translate-x-full');
+    }, 3000);
+}
+
+// Admin Response Functions
+function addAdminResponse(reviewId) {
+    console.log('addAdminResponse called for reviewId:', reviewId);
+    
+    if (!reviewId) {
+        console.error('reviewId is null or undefined');
+        showToast('Lỗi: ID đánh giá không hợp lệ', 'error');
+        return;
+    }
+    
+    currentAdminResponseReviewId = reviewId;
+    isEditingAdminResponse = false;
+    
+    console.log('Setting up add admin response modal for review:', reviewId);
+    
+    document.getElementById('adminResponseModalTitle').textContent = 'Thêm phản hồi';
+    document.getElementById('adminResponseSaveText').textContent = 'Lưu phản hồi';
+    document.getElementById('adminResponseText').value = '';
+    document.getElementById('adminResponseCharCount').textContent = '0';
+    document.getElementById('adminResponseCharCount').classList.remove('text-red-500');
+    document.getElementById('adminResponseCharCount').classList.add('text-gray-500');
+    
+    document.getElementById('adminResponseModal').style.display = 'block';
+    
+    // Auto-fetch AI analysis when modal opens
+    fetchAiAnalysis(reviewId);
+}
+
+function editAdminResponse(reviewId, currentResponse) {
+    currentAdminResponseReviewId = reviewId;
+    isEditingAdminResponse = true;
+    
+    document.getElementById('adminResponseModalTitle').textContent = 'Sửa phản hồi';
+    document.getElementById('adminResponseSaveText').textContent = 'Cập nhật phản hồi';
+    document.getElementById('adminResponseText').value = currentResponse;
+    
+    const count = currentResponse.length;
+    document.getElementById('adminResponseCharCount').textContent = count;
+    if (count > 1000) {
+        document.getElementById('adminResponseCharCount').classList.add('text-red-500');
+        document.getElementById('adminResponseCharCount').classList.remove('text-gray-500');
+    } else {
+        document.getElementById('adminResponseCharCount').classList.remove('text-red-500');
+        document.getElementById('adminResponseCharCount').classList.add('text-gray-500');
+    }
+    
+    document.getElementById('adminResponseModal').style.display = 'block';
+    
+    // Auto-fetch AI analysis when modal opens
+    fetchAiAnalysis(reviewId);
+}
+
+function closeAdminResponseModal() {
+    document.getElementById('adminResponseModal').style.display = 'none';
+    document.getElementById('aiAssistBox').style.display = 'none';
+    currentAdminResponseReviewId = null;
+    isEditingAdminResponse = false;
+    currentAiAnalysis = null;
+}
+
+async function saveAdminResponse() {
+    const responseText = document.getElementById('adminResponseText').value.trim();
+    
+    if (!responseText) {
+        showToast('Vui lòng nhập nội dung phản hồi', 'error');
+        return;
+    }
+    
+    if (responseText.length > 1000) {
+        showToast('Phản hồi không được vượt quá 1000 ký tự', 'error');
+        return;
+    }
+    
+    try {
+        const url = isEditingAdminResponse ? 
+            `/staff/api/reviews/${currentAdminResponseReviewId}/response` :
+            `/staff/api/reviews/${currentAdminResponseReviewId}/respond`;
+        
+        const method = isEditingAdminResponse ? 'PUT' : 'POST';
+        
+        console.log('Saving admin response:', {
+            url: url,
+            method: method,
+            reviewId: currentAdminResponseReviewId,
+            isEditing: isEditingAdminResponse,
+            responseLength: responseText.length
+        });
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin', // Include session cookies
+            body: JSON.stringify({
+                adminResponse: responseText
+            })
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        if (response.ok && data.success) {
+            showToast(isEditingAdminResponse ? 'Phản hồi đã được cập nhật thành công' : 'Phản hồi đã được thêm thành công');
+            closeAdminResponseModal();
+            loadReviews();
+        } else {
+            // Show detailed error message
+            const errorMsg = data.message || `HTTP ${response.status}: ${response.statusText}`;
+            showToast(`Lỗi lưu phản hồi: ${errorMsg}`, 'error');
+            console.error('API Error:', errorMsg, data);
+        }
+    } catch (error) {
+        console.error('Network/Parse Error:', error);
+        showToast(`Lỗi kết nối: ${error.message}`, 'error');
+    }
+}
+
+async function removeAdminResponse(reviewId) {
+    console.log('removeAdminResponse called for reviewId:', reviewId);
+    
+    if (!reviewId) {
+        console.error('reviewId is null or undefined');
+        showToast('Lỗi: ID đánh giá không hợp lệ', 'error');
+        return;
+    }
+    
+    // Show confirmation dialog using SweetAlert2
+    let confirmed = false;
+    try {
+        const result = await Swal.fire({
+            title: 'Xóa phản hồi?',
+            text: 'Bạn có chắc chắn muốn xóa phản hồi này? Hành động này không thể hoàn tác.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Xóa',
+            cancelButtonText: 'Hủy',
+            reverseButtons: true
+        });
+        confirmed = result.isConfirmed;
+    } catch (error) {
+        console.warn('SweetAlert2 not available, using native confirm');
+        confirmed = confirm('Bạn có chắc chắn muốn xóa phản hồi này?');
+    }
+    
+    if (!confirmed) {
+        console.log('User cancelled delete operation');
+        return;
+    }
+    
+    try {
+        console.log('Deleting admin response for review:', reviewId);
+        
+        const response = await fetch(`/staff/api/reviews/${reviewId}/response`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin'
+        });
+        
+        console.log('Delete response status:', response.status);
+        
+        const data = await response.json();
+        console.log('Delete response data:', data);
+        
+        if (response.ok && data.success) {
+            showToast('Phản hồi đã được xóa thành công');
+            loadReviews();
+            loadStatistics(); // Update statistics
+        } else {
+            const errorMsg = data.message || `HTTP ${response.status}: ${response.statusText}`;
+            showToast(`Lỗi xóa phản hồi: ${errorMsg}`, 'error');
+            console.error('API Error:', errorMsg, data);
+        }
+    } catch (error) {
+        console.error('Network/Parse Error:', error);
+        showToast(`Lỗi kết nối: ${error.message}`, 'error');
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const deleteModal = document.getElementById('deleteModal');
+    const adminResponseModal = document.getElementById('adminResponseModal');
+    const reviewDetailModal = document.getElementById('reviewDetailModal');
+    
+    if (event.target === deleteModal) {
+        deleteModal.style.display = 'none';
+    }
+    
+    if (event.target === adminResponseModal) {
+        closeAdminResponseModal();
+    }
+    
+    if (event.target === reviewDetailModal) {
+        closeReviewDetailModal();
+    }
+}
+
+// AI Analysis Functions
+async function fetchAiAnalysis(reviewId) {
+    const aiBox = document.getElementById('aiAssistBox');
+    const loadingIndicator = document.getElementById('aiLoadingIndicator');
+    
+    aiBox.style.display = 'block';
+    loadingIndicator.style.display = 'block';
+    
+    try {
+        const response = await fetch(`/staff/api/reviews/${reviewId}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            currentAiAnalysis = data.data;
+            renderAiSuggestions(data.data);
+        } else {
+            console.error('AI analysis failed:', data.message);
+            aiBox.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('AI analysis failed:', error);
+        aiBox.style.display = 'none';
+    } finally {
+        loadingIndicator.style.display = 'none';
+    }
+}
+
+function renderAiSuggestions(analysis) {
+    const mainIssueDiv = document.getElementById('aiMainIssue');
+    const suggestedRepliesDiv = document.getElementById('aiSuggestedReplies');
+    
+    // Render main issue
+    if (analysis.mainIssue) {
+        mainIssueDiv.innerHTML = `<strong>Tóm tắt vấn đề:</strong> ${analysis.mainIssue}`;
+    } else {
+        mainIssueDiv.innerHTML = '';
+    }
+    
+    // Render suggested replies
+    suggestedRepliesDiv.innerHTML = '';
+    
+    if (analysis.suggestedReplies && analysis.suggestedReplies.length > 0) {
+        analysis.suggestedReplies.forEach((reply, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors duration-150';
+            button.innerHTML = `
+                <div class="font-medium text-blue-900 mb-1">${reply.label}</div>
+                <div class="text-sm text-blue-700">${reply.content}</div>
+            `;
+            button.onclick = () => {
+                document.getElementById('adminResponseText').value = reply.content;
+                // Update character count
+                const count = reply.content.length;
+                document.getElementById('adminResponseCharCount').textContent = count;
+                if (count > 1000) {
+                    document.getElementById('adminResponseCharCount').classList.add('text-red-500');
+                    document.getElementById('adminResponseCharCount').classList.remove('text-gray-500');
+                } else {
+                    document.getElementById('adminResponseCharCount').classList.remove('text-red-500');
+                    document.getElementById('adminResponseCharCount').classList.add('text-gray-500');
+                }
+            };
+            suggestedRepliesDiv.appendChild(button);
+        });
+        
+        // Add regenerate button
+        const regenerateButton = document.createElement('button');
+        regenerateButton.type = 'button';
+        regenerateButton.className = 'mt-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors duration-150';
+        regenerateButton.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Tạo thêm gợi ý';
+        regenerateButton.onclick = () => {
+            if (currentAdminResponseReviewId) {
+                fetchAiAnalysis(currentAdminResponseReviewId);
+            }
+        };
+        suggestedRepliesDiv.appendChild(regenerateButton);
+    } else {
+        suggestedRepliesDiv.innerHTML = '<div class="text-sm text-blue-600 italic">Không có gợi ý nào</div>';
+    }
+}
+
+// Sentiment helper functions
+function getSentimentLabel(sentiment) {
+    switch (sentiment) {
+        case 'POSITIVE':
+            return 'Tích cực 😊';
+        case 'NEUTRAL':
+            return 'Trung tính 😐';
+        case 'NEGATIVE':
+            return 'Tiêu cực 😡';
+        default:
+            return 'Không xác định';
+    }
+}
+
+function getSentimentBadgeClass(sentiment) {
+    switch (sentiment) {
+        case 'POSITIVE':
+            return 'bg-green-100 text-green-800';
+        case 'NEUTRAL':
+            return 'bg-gray-100 text-gray-800';
+        case 'NEGATIVE':
+            return 'bg-red-100 text-red-800';
+        default:
+            return 'bg-gray-100 text-gray-800';
+    }
+}
+
+// Review Detail Modal Functions
+let currentReviewDetail = null;
+
+async function viewReviewDetail(reviewId) {
+    // Show loading toast
+    const loadingToast = showToast('Đang tải chi tiết đánh giá...', 'info', { timer: false });
+    
+    try {
+        console.log('Fetching review detail for ID:', reviewId);
+        
+        // Fetch review details from API
+        const response = await fetch(`/staff/api/reviews/${reviewId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any auth headers if needed
+            },
+            credentials: 'same-origin' // Include session cookies
+        });
+        
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        // Close loading toast
+        if (loadingToast && loadingToast.close) loadingToast.close();
+        
+        if (response.ok && data.success && data.data) {
+            currentReviewDetail = data.data;
+            populateReviewDetailModal(data.data);
+            document.getElementById('reviewDetailModal').style.display = 'block';
+        } else {
+            // Show detailed error message
+            const errorMsg = data.message || `HTTP ${response.status}: ${response.statusText}`;
+            showToast(`Lỗi tải chi tiết: ${errorMsg}`, 'error');
+            console.error('API Error:', errorMsg, data);
+        }
+    } catch (error) {
+        // Close loading toast
+        if (loadingToast && loadingToast.close) loadingToast.close();
+        
+        console.error('Network/Parse Error:', error);
+        showToast(`Lỗi kết nối: ${error.message}`, 'error');
+    }
+}
+
+function populateReviewDetailModal(review) {
+    // User info
+    document.getElementById('reviewDetailUserInitial').textContent = 
+        review.userName ? review.userName.charAt(0).toUpperCase() : 'U';
+    document.getElementById('reviewDetailUserName').textContent = review.userName || 'Unknown';
+    
+    // Product info
+    document.getElementById('reviewDetailProductName').textContent = review.productName || 'Unknown';
+    document.getElementById('reviewDetailProductId').textContent = `ID: ${review.productId || 'N/A'}`;
+    
+    // Rating
+    document.getElementById('reviewDetailStars').innerHTML = generateStars(review.rating);
+    document.getElementById('reviewDetailRating').textContent = `${review.rating}/5`;
+    
+    // Date
+    document.getElementById('reviewDetailDate').textContent = formatDate(review.createdAt);
+    
+    // Comment
+    document.getElementById('reviewDetailComment').textContent = 
+        review.comment || 'Khách hàng không để lại bình luận';
+    
+    // Media files
+    const mediaSection = document.getElementById('reviewDetailMedia');
+    const mediaList = document.getElementById('reviewDetailMediaList');
+    
+    if (review.mediaUrls && review.mediaUrls.trim() !== '') {
+        mediaSection.classList.remove('hidden');
+        mediaList.innerHTML = '';
+        
+        const mediaUrls = review.mediaUrls.split(',').map(url => url.trim());
+        mediaUrls.forEach(url => {
+            if (url.startsWith('/upload/')) {
+                const mediaItem = document.createElement('div');
+                mediaItem.className = 'relative group';
+                
+                if (url.includes('.mp4') || url.includes('.mov')) {
+                    // Video
+                    mediaItem.innerHTML = `
+                        <video class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                               src="${url}" 
+                               onclick="openStaffMediaModal('${url}')"
+                               controls>
+                        </video>
+                    `;
+                } else {
+                    // Image
+                    mediaItem.innerHTML = `
+                        <img class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                             src="${url}" 
+                             alt="Review media"
+                             onclick="openStaffMediaModal('${url}')">
+                    `;
+                }
+                
+                mediaList.appendChild(mediaItem);
+            }
+        });
+    } else {
+        mediaSection.classList.add('hidden');
+    }
+    
+    // Admin response
+    const adminResponseSection = document.getElementById('reviewDetailAdminResponseSection');
+    const noResponseSection = document.getElementById('reviewDetailNoResponse');
+    
+    if (review.adminResponse) {
+        // Show admin response
+        adminResponseSection.style.display = 'block';
+        noResponseSection.style.display = 'none';
+        
+        document.getElementById('reviewDetailAdminResponse').textContent = review.adminResponse;
+        
+        const adminInfo = review.adminResponseByName ? 
+            `- ${review.adminResponseByName}` : '- Admin';
+        const responseDate = review.adminResponseAt ? 
+            ` • ${formatDate(review.adminResponseAt)}` : '';
+        document.getElementById('reviewDetailAdminInfo').textContent = adminInfo + responseDate;
+    } else {
+        // Show no response
+        adminResponseSection.style.display = 'none';
+        noResponseSection.style.display = 'block';
+    }
+}
+
+function closeReviewDetailModal() {
+    console.log('Closing review detail modal, currentReviewDetail:', currentReviewDetail, 'currentOrderId:', currentOrderId);
+    document.getElementById('reviewDetailModal').style.display = 'none';
+    // Don't immediately null the variables to allow other functions to use them
+    // They will be reset when a new review/order is loaded
+    setTimeout(() => {
+        currentReviewDetail = null;
+        currentOrderId = null;
+        console.log('currentReviewDetail and currentOrderId reset to null');
+    }, 100);
+}
+
+function editAdminResponseFromDetail() {
+    console.log('editAdminResponseFromDetail called, currentReviewDetail:', currentReviewDetail);
+    
+    if (!currentReviewDetail) {
+        console.error('currentReviewDetail is null or undefined');
+        showToast('Lỗi: Không thể tải thông tin đánh giá', 'error');
+        return;
+    }
+    
+    if (!currentReviewDetail.adminResponse) {
+        console.error('No admin response found');
+        showToast('Đánh giá này chưa có phản hồi để sửa', 'warning');
+        return;
+    }
+    
+    // Store data before closing modal to avoid losing it
+    const reviewId = currentReviewDetail.id;
+    const adminResponse = currentReviewDetail.adminResponse;
+    
+    console.log('Editing admin response for review:', reviewId, 'Response:', adminResponse);
+    
+    closeReviewDetailModal();
+    editAdminResponse(reviewId, adminResponse);
+}
+
+function removeAdminResponseFromDetail() {
+    console.log('removeAdminResponseFromDetail called, currentReviewDetail:', currentReviewDetail);
+    
+    if (!currentReviewDetail) {
+        console.error('currentReviewDetail is null or undefined');
+        showToast('Lỗi: Không thể tải thông tin đánh giá', 'error');
+        return;
+    }
+    
+    // Store data before closing modal
+    const reviewId = currentReviewDetail.id;
+    
+    closeReviewDetailModal();
+    removeAdminResponse(reviewId);
+}
+
+function addAdminResponseFromDetail() {
+    console.log('addAdminResponseFromDetail called, currentReviewDetail:', currentReviewDetail);
+    console.log('currentOrderId:', currentOrderId);
+    
+    // Check if we're in order-grouped view
+    if (currentOrderId) {
+        // We're viewing order details, use order response
+        closeReviewDetailModal();
+        addOrderAdminResponse(currentOrderId);
+        return;
+    }
+    
+    // Fallback to individual review logic
+    if (!currentReviewDetail) {
+        console.error('currentReviewDetail is null or undefined');
+        showToast('Lỗi: Không thể tải thông tin đánh giá', 'error');
+        return;
+    }
+    
+    // Store data before closing modal
+    const reviewId = currentReviewDetail.id;
+    
+    closeReviewDetailModal();
+    addAdminResponse(reviewId);
+}
+
+// New functions for order-grouped reviews
+let currentOrderId = null;
+
+// View order review detail
+async function viewOrderReviewDetail(orderId) {
+    try {
+        const response = await fetch(`/staff/api/reviews/orders/${orderId}`);
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            const orderGroup = data.data;
+            
+            // Set currentOrderId for modal functions to work correctly
+            currentOrderId = orderId;
+            // Clear currentReviewDetail since we're in order view
+            currentReviewDetail = null;
+            
+            // Update modal title
+            document.getElementById('adminResponseModalTitle').textContent = `Đánh giá đơn hàng #${orderId}`;
+            
+            // Show order details in modal (reuse existing modal)
+            document.getElementById('reviewDetailUserName').textContent = orderGroup.customerName;
+            document.getElementById('reviewDetailUserInitial').textContent = orderGroup.customerName.charAt(0).toUpperCase();
+            document.getElementById('reviewDetailProductName').textContent = orderGroup.productNames;
+            document.getElementById('reviewDetailProductId').textContent = `Đơn hàng: ${orderId}`;
+            document.getElementById('reviewDetailRating').textContent = `${orderGroup.formattedAverageRating}/5`;
+            document.getElementById('reviewDetailStars').innerHTML = generateStars(Math.round(orderGroup.averageRating));
+            document.getElementById('reviewDetailDate').textContent = formatDate(orderGroup.orderDate);
+            document.getElementById('reviewDetailComment').textContent = orderGroup.commonComment || 'Không có bình luận';
+            
+            // Handle media files for order-grouped reviews
+            const mediaSection = document.getElementById('reviewDetailMedia');
+            const mediaList = document.getElementById('reviewDetailMediaList');
+            
+            if (orderGroup.hasMedia && orderGroup.reviews && orderGroup.reviews.length > 0) {
+                // Collect all media URLs from all reviews in the order
+                let allMediaUrls = [];
+                orderGroup.reviews.forEach(review => {
+                    if (review.mediaUrls && review.mediaUrls.trim() !== '') {
+                        const urls = review.mediaUrls.split(',').map(url => url.trim());
+                        allMediaUrls = allMediaUrls.concat(urls);
+                    }
+                });
+                
+                if (allMediaUrls.length > 0) {
+                    mediaSection.classList.remove('hidden');
+                    mediaList.innerHTML = '';
+                    
+                    allMediaUrls.forEach(url => {
+                        if (url.startsWith('/upload/')) {
+                            const mediaItem = document.createElement('div');
+                            mediaItem.className = 'relative group';
+                            
+                            if (url.includes('.mp4') || url.includes('.mov')) {
+                                // Video
+                                mediaItem.innerHTML = `
+                                    <video class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                           src="${url}" 
+                                           onclick="openStaffMediaModal('${url}')"
+                                           controls>
+                                    </video>
+                                `;
+                            } else {
+                                // Image
+                                mediaItem.innerHTML = `
+                                    <img class="w-20 h-20 object-cover rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+                                         src="${url}" 
+                                         alt="Review media"
+                                         onclick="openStaffMediaModal('${url}')">
+                                `;
+                            }
+                            
+                            mediaList.appendChild(mediaItem);
+                        }
+                    });
+                } else {
+                    mediaSection.classList.add('hidden');
+                }
+            } else {
+                mediaSection.classList.add('hidden');
+            }
+            
+            if (orderGroup.hasAdminResponse) {
+                document.getElementById('reviewDetailAdminResponse').textContent = orderGroup.adminResponse;
+                document.getElementById('reviewDetailAdminInfo').textContent = `- ${orderGroup.adminResponseBy} • ${formatDate(orderGroup.adminResponseAt)}`;
+                document.getElementById('reviewDetailAdminResponseSection').style.display = 'block';
+                document.getElementById('reviewDetailNoResponse').style.display = 'none';
+            } else {
+                document.getElementById('reviewDetailAdminResponseSection').style.display = 'none';
+                document.getElementById('reviewDetailNoResponse').style.display = 'block';
+            }
+            
+            document.getElementById('reviewDetailModal').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error loading order review detail:', error);
+        showToast('Không thể tải chi tiết đánh giá đơn hàng', 'error');
+    }
+}
+
+// Add admin response for entire order
+async function addOrderAdminResponse(orderId) {
+    currentOrderId = orderId;
+    document.getElementById('adminResponseModalTitle').textContent = `Phản hồi đơn hàng #${orderId}`;
+    document.getElementById('adminResponseText').value = '';
+    document.getElementById('adminResponseSaveText').textContent = 'Lưu phản hồi';
+    isEditingAdminResponse = false;
+    
+    // Show modal first
+    document.getElementById('adminResponseModal').style.display = 'block';
+    
+    // Show AI loading state
+    const aiBox = document.getElementById('aiAssistBox');
+    const loadingIndicator = document.getElementById('aiLoadingIndicator');
+    aiBox.style.display = 'block';
+    loadingIndicator.style.display = 'block';
+    
+    // Clear previous AI suggestions
+    document.getElementById('aiMainIssue').innerHTML = '';
+    document.getElementById('aiSuggestedReplies').innerHTML = '';
+    
+    try {
+        // Fetch AI analysis for the order
+        const response = await fetch(`/staff/api/reviews/orders/${orderId}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            currentAiAnalysis = data.data;
+            renderAiSuggestions(data.data);
+        } else {
+            console.error('AI analysis failed:', data.message);
+            aiBox.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error fetching AI analysis:', error);
+        aiBox.style.display = 'none';
+    } finally {
+        loadingIndicator.style.display = 'none';
+    }
+}
+
+// Edit admin response for entire order
+async function editOrderAdminResponse(orderId) {
+    try {
+        const response = await fetch(`/staff/api/reviews/orders/${orderId}`);
+        const data = await response.json();
+        
+        if (data.success && data.data && data.data.hasAdminResponse) {
+            currentOrderId = orderId;
+            document.getElementById('adminResponseModalTitle').textContent = `Sửa phản hồi đơn hàng #${orderId}`;
+            document.getElementById('adminResponseText').value = data.data.adminResponse;
+            document.getElementById('adminResponseSaveText').textContent = 'Cập nhật phản hồi';
+            isEditingAdminResponse = true;
+            document.getElementById('adminResponseModal').style.display = 'block';
+        }
+    } catch (error) {
+        console.error('Error loading order admin response:', error);
+        showToast('Không thể tải phản hồi hiện tại', 'error');
+    }
+}
+
+// Remove admin response for entire order
+async function removeOrderAdminResponse(orderId) {
+    if (!confirm('Bạn có chắc chắn muốn xóa phản hồi cho tất cả đánh giá trong đơn hàng này?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/staff/api/reviews/orders/${orderId}/response`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Phản hồi đã được xóa thành công', 'success');
+            loadReviews();
+        } else {
+            showToast(data.message || 'Có lỗi xảy ra khi xóa phản hồi', 'error');
+        }
+    } catch (error) {
+        console.error('Error removing order admin response:', error);
+        showToast('Có lỗi xảy ra khi xóa phản hồi', 'error');
+    }
+}
+
+// Update saveAdminResponse to handle order responses
+async function saveAdminResponse() {
+    const adminResponse = document.getElementById('adminResponseText').value.trim();
+    
+    if (!adminResponse) {
+        showToast('Vui lòng nhập nội dung phản hồi', 'warning');
+        return;
+    }
+    
+    if (adminResponse.length > 1000) {
+        showToast('Nội dung phản hồi không được vượt quá 1000 ký tự', 'warning');
+        return;
+    }
+    
+    try {
+        let url, method;
+        
+        if (currentOrderId) {
+            // Handle order response
+            if (isEditingAdminResponse) {
+                url = `/staff/api/reviews/orders/${currentOrderId}/response`;
+                method = 'PUT';
+            } else {
+                url = `/staff/api/reviews/orders/${currentOrderId}/respond`;
+                method = 'POST';
+            }
+        } else {
+            // Handle individual review response (fallback)
+            if (isEditingAdminResponse) {
+                url = `/staff/api/reviews/${currentAdminResponseReviewId}/response`;
+                method = 'PUT';
+            } else {
+                url = `/staff/api/reviews/${currentAdminResponseReviewId}/respond`;
+                method = 'POST';
+            }
+        }
+        
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                adminResponse: adminResponse
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message || 'Phản hồi đã được lưu thành công', 'success');
+            closeAdminResponseModal();
+            loadReviews();
+        } else {
+            showToast(data.message || 'Có lỗi xảy ra khi lưu phản hồi', 'error');
+        }
+    } catch (error) {
+        console.error('Error saving admin response:', error);
+        showToast('Có lỗi xảy ra khi lưu phản hồi', 'error');
+    }
+}
+
+// Update closeAdminResponseModal to reset currentOrderId
+function closeAdminResponseModal() {
+    document.getElementById('adminResponseModal').style.display = 'none';
+    document.getElementById('adminResponseText').value = '';
+    currentAdminResponseReviewId = null;
+    currentOrderId = null;
+    isEditingAdminResponse = false;
+    currentAiAnalysis = null;
+    
+    // Hide AI assist box
+    document.getElementById('aiAssistBox').style.display = 'none';
+}
+
+// AI Analysis Functions
+async function fetchAiAnalysis(reviewId) {
+    const aiBox = document.getElementById('aiAssistBox');
+    const loadingIndicator = document.getElementById('aiLoadingIndicator');
+    
+    aiBox.style.display = 'block';
+    loadingIndicator.style.display = 'block';
+    
+    try {
+        const response = await fetch(`/staff/api/reviews/${reviewId}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            currentAiAnalysis = data.data;
+            renderAiSuggestions(data.data);
+        } else {
+            console.error('AI analysis failed:', data.message);
+            aiBox.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('AI analysis failed:', error);
+        aiBox.style.display = 'none';
+    } finally {
+        loadingIndicator.style.display = 'none';
+    }
+}
+
+function renderAiSuggestions(analysis) {
+    const mainIssueDiv = document.getElementById('aiMainIssue');
+    const suggestedRepliesDiv = document.getElementById('aiSuggestedReplies');
+    
+    // Render main issue
+    if (analysis.mainIssue) {
+        mainIssueDiv.innerHTML = `<strong>Tóm tắt vấn đề:</strong> ${analysis.mainIssue}`;
+    } else {
+        mainIssueDiv.innerHTML = '';
+    }
+    
+    // Render suggested replies
+    suggestedRepliesDiv.innerHTML = '';
+    
+    if (analysis.suggestedReplies && analysis.suggestedReplies.length > 0) {
+        analysis.suggestedReplies.forEach((reply, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'w-full text-left p-3 bg-white border border-blue-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors duration-150';
+            button.innerHTML = `
+                <div class="font-medium text-blue-900 mb-1">${reply.label}</div>
+                <div class="text-sm text-blue-700">${reply.content}</div>
+            `;
+            button.onclick = () => {
+                document.getElementById('adminResponseText').value = reply.content;
+                // Update character count
+                const count = reply.content.length;
+                document.getElementById('adminResponseCharCount').textContent = count;
+                if (count > 1000) {
+                    document.getElementById('adminResponseCharCount').classList.add('text-red-500');
+                    document.getElementById('adminResponseCharCount').classList.remove('text-gray-500');
+                } else {
+                    document.getElementById('adminResponseCharCount').classList.remove('text-red-500');
+                    document.getElementById('adminResponseCharCount').classList.add('text-gray-500');
+                }
+            };
+            suggestedRepliesDiv.appendChild(button);
+        });
+        
+        // Add regenerate button
+        const regenerateButton = document.createElement('button');
+        regenerateButton.type = 'button';
+        regenerateButton.className = 'mt-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors duration-150';
+        regenerateButton.innerHTML = '<i class="fas fa-sync-alt mr-1"></i>Tạo thêm gợi ý';
+        regenerateButton.onclick = () => {
+            if (currentOrderId) {
+                // Regenerate for order reviews
+                regenerateOrderAiAnalysis(currentOrderId);
+            } else if (currentAdminResponseReviewId) {
+                // Regenerate for individual review
+                fetchAiAnalysis(currentAdminResponseReviewId);
+            }
+        };
+        suggestedRepliesDiv.appendChild(regenerateButton);
+    } else {
+        suggestedRepliesDiv.innerHTML = '<div class="text-sm text-blue-600 italic">Không có gợi ý nào</div>';
+    }
+}
+
+// Regenerate AI analysis for order reviews
+async function regenerateOrderAiAnalysis(orderId) {
+    const aiBox = document.getElementById('aiAssistBox');
+    const loadingIndicator = document.getElementById('aiLoadingIndicator');
+    
+    // Show loading state
+    loadingIndicator.style.display = 'block';
+    
+    // Clear previous suggestions
+    document.getElementById('aiMainIssue').innerHTML = '';
+    document.getElementById('aiSuggestedReplies').innerHTML = '';
+    
+    try {
+        // Fetch AI analysis for the order
+        const response = await fetch(`/staff/api/reviews/orders/${orderId}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+            currentAiAnalysis = data.data;
+            renderAiSuggestions(data.data);
+        } else {
+            console.error('AI analysis failed:', data.message);
+            aiBox.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Error fetching AI analysis:', error);
+        aiBox.style.display = 'none';
+    } finally {
+        loadingIndicator.style.display = 'none';
+    }
+}
+
+// Staff Media Modal Functions
+function openStaffMediaModal(mediaUrl) {
+    const modal = document.getElementById('staffMediaModal');
+    const modalContent = document.getElementById('staffMediaModalContent');
+    
+    // Clear previous content
+    modalContent.innerHTML = '';
+    
+    // Create media element
+    if (mediaUrl.includes('.mp4') || mediaUrl.includes('.mov')) {
+        const video = document.createElement('video');
+        video.src = mediaUrl;
+        video.controls = true;
+        video.style.maxWidth = '100%';
+        video.style.maxHeight = '100%';
+        video.style.objectFit = 'contain';
+        modalContent.appendChild(video);
+    } else {
+        const img = document.createElement('img');
+        img.src = mediaUrl;
+        img.alt = 'Review media';
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '100%';
+        img.style.objectFit = 'contain';
+        modalContent.appendChild(img);
+    }
+    
+    modal.style.display = 'block';
+}
+
+function closeStaffMediaModal() {
+    document.getElementById('staffMediaModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('staffMediaModal');
+    if (event.target === modal) {
+        closeStaffMediaModal();
+    }
+}
+</script>
+
+<!-- Staff Media Modal -->
+<div id="staffMediaModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-90 flex items-center justify-center">
+    <div class="relative max-w-4xl max-h-full p-4">
+        <span class="absolute top-4 right-4 text-white text-4xl cursor-pointer hover:text-gray-300" onclick="closeStaffMediaModal()">&times;</span>
+        <div id="staffMediaModalContent" class="flex items-center justify-center"></div>
+    </div>
+</div>

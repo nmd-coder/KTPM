@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout('Blog - StarShop', 
+          'Khám phá thế giới hoa tươi và nghệ thuật cắm hoa', 
+          ~{::link},
+          ~{::content})}">
+
+<head>
+    <th:block th:fragment="link">
+        <link rel="stylesheet" href="@/css/blog.css">
+    </th:block>
+</head>
+
+<body>
+<th:block th:fragment="content">
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-pink-50 via-white to-green-50 py-16">
+        <div class="container mx-auto px-4">
+            <div class="text-center max-w-3xl mx-auto" data-aos="fade-up">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    <span data-translate="blog-title">Blog StarShop</span> 🌸
+                </h1>
+                <p class="text-lg text-gray-600 mb-8" data-translate="blog-subtitle">
+                    Khám phá nghệ thuật cắm hoa, chăm sóc hoa tươi và xu hướng trang trí mới nhất
+                </p>
+                
+                <!-- Search Bar -->
+                <div class="max-w-2xl mx-auto">
+                    <form action="/blog/search" method="GET" class="relative">
+                        <input type="text" 
+                               name="q" 
+                               data-translate-placeholder="search-articles"
+                               placeholder="Tìm kiếm bài viết..." 
+                               class="w-full px-6 py-4 pl-14 rounded-full border-2 border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
+                        <svg class="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
+                        </svg>
+                        <button type="submit" class="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-primary text-white rounded-full hover:bg-primary-hover transition-colors">
+                            <span data-translate="search">Tìm</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="py-8 bg-white border-b">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-3" data-aos="fade-up">
+                <a href="/blog?category=all" class="px-6 py-2 rounded-full bg-primary text-white hover:bg-primary-hover transition-all">
+                    <span data-translate="all">Tất cả</span>
+                </a>
+                <a href="/blog?category=care" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <span data-translate="flower-care">Chăm sóc hoa</span>
+                </a>
+                <a href="/blog?category=arrangement" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <span data-translate="flower-arrangement">Nghệ thuật cắm hoa</span>
+                </a>
+                <a href="/blog?category=trends" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <span data-translate="trends">Xu hướng</span>
+                </a>
+                <a href="/blog?category=occasions" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <span data-translate="special-occasions">Dịp đặc biệt</span>
+                </a>
+                <a href="/blog?category=tips" class="px-6 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all">
+                    <span data-translate="tips">Mẹo hay</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Post -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden" data-aos="fade-up">
+                    <div class="grid md:grid-cols-2 gap-0">
+                        <div class="relative h-64 md:h-auto">
+                            <img src="/images/blog/featured-rose-care.jpg" 
+                                 alt="Chăm sóc hoa hồng" 
+                                 class="w-full h-full object-cover"
+                                 onerror="this.src='https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800'">
+                            <div class="absolute top-4 left-4">
+                                <span class="px-4 py-2 bg-primary text-white text-sm font-semibold rounded-full">
+                                    <span data-translate="featured">Nổi bật</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-8 md:p-12 flex flex-col justify-center">
+                            <div class="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    15 Tháng 12, 2024
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M10 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3.465 14.493a1.23 1.23 0 0 0 .41 1.412A9.957 9.957 0 0 0 10 18c2.31 0 4.438-.784 6.131-2.1.43-.333.604-.903.408-1.41a7.002 7.002 0 0 0-13.074.003Z" />
+                                    </svg>
+                                    Nguyễn Thị Hoa
+                                </span>
+                            </div>
+                            <h2 class="text-3xl font-bold text-gray-800 mb-4">
+                                Bí quyết chăm sóc hoa hồng tươi lâu cả tuần
+                            </h2>
+                            <p class="text-gray-600 mb-6 leading-relaxed">
+                                Khám phá những mẹo đơn giản nhưng hiệu quả giúp hoa hồng của bạn luôn tươi tắn, 
+                                rực rỡ và giữ được hương thơm quyến rũ trong nhiều ngày.
+                            </p>
+                            <a href="/blog/post/cham-soc-hoa-hong" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold hover:gap-3 transition-all">
+                                <span data-translate="read-more">Đọc thêm</span>
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Posts Grid -->
+    <section class="py-16">
+        <div class="container mx-auto px-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <!-- Blog Post 1 -->
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group" data-aos="fade-up">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="/images/blog/tulip-arrangement.jpg" 
+                                 alt="Cắm hoa tulip" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=600'">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-full">
+                                    <span data-translate="art">Nghệ thuật</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    10 Tháng 12
+                                </span>
+                                <span>•</span>
+                                <span>5 <span data-translate="min-read">phút đọc</span></span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                7 cách cắm hoa tulip đẹp cho mùa xuân
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                Tulip là loài hoa biểu tượng của mùa xuân. Cùng khám phá những cách cắm hoa tulip 
+                                đơn giản nhưng vô cùng ấn tượng cho không gian sống của bạn.
+                            </p>
+                            <a href="/blog/post/cam-hoa-tulip" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                                Xem thêm
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Blog Post 2 -->
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="/images/blog/wedding-flowers.jpg" 
+                                 alt="Hoa cưới" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=600'">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 bg-pink-500 text-white text-xs font-semibold rounded-full">
+                                    <span data-translate="special-occasions">Dịp đặc biệt</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    8 Tháng 12
+                                </span>
+                                <span>•</span>
+                                <span>7 <span data-translate="min-read">phút đọc</span></span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                Chọn hoa cưới hoàn hảo cho ngày trọng đại
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                Hướng dẫn chi tiết cách chọn hoa cưới phù hợp với chủ đề, màu sắc và phong cách 
+                                đám cưới của bạn. Từ hoa cầm tay cô dâu đến trang trí tiệc cưới.
+                            </p>
+                            <a href="/blog/post/hoa-cuoi" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                                Xem thêm
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Blog Post 3 -->
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="200">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="/images/blog/orchid-care.jpg" 
+                                 alt="Chăm sóc lan" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=600'">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 bg-blue-500 text-white text-xs font-semibold rounded-full">
+                                    <span data-translate="care">Chăm sóc</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    5 Tháng 12
+                                </span>
+                                <span>•</span>
+                                <span>6 <span data-translate="min-read">phút đọc</span></span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                Hướng dẫn chăm sóc hoa lan tại nhà
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                Hoa lan là loài hoa quý phái và đòi hỏi sự chăm sóc đặc biệt. 
+                                Tìm hiểu cách tưới nước, bón phân và chăm sóc để lan nở đẹp quanh năm.
+                            </p>
+                            <a href="/blog/post/cham-soc-lan" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                                Xem thêm
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Blog Post 4 -->
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group" data-aos="fade-up">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="/images/blog/seasonal-flowers.jpg" 
+                                 alt="Hoa theo mùa" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=600'">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 bg-purple-500 text-white text-xs font-semibold rounded-full">
+                                    <span data-translate="trends">Xu hướng</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    1 Tháng 12
+                                </span>
+                                <span>•</span>
+                                <span>4 <span data-translate="min-read">phút đọc</span></span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                Top 10 loài hoa đẹp nhất mùa đông
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                Mùa đông không thiếu sắc màu với những loài hoa đặc trưng. 
+                                Khám phá danh sách hoa nở đẹp nhất trong mùa lạnh giá.
+                            </p>
+                            <a href="/blog/post/hoa-mua-dong" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                                Xem thêm
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Blog Post 5 -->
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="100">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="/images/blog/diy-bouquet.jpg" 
+                                 alt="Tự làm bó hoa" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1487070183336-b863922373d4?w=600'">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 bg-yellow-500 text-white text-xs font-semibold rounded-full">
+                                    <span data-translate="tips">Mẹo hay</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    28 Tháng 11
+                                </span>
+                                <span>•</span>
+                                <span>8 <span data-translate="min-read">phút đọc</span></span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                DIY: Tự tay làm bó hoa tặng người thân
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                Hướng dẫn từng bước cách tự tay làm một bó hoa đẹp và ý nghĩa. 
+                                Không cần kỹ năng chuyên nghiệp, bạn vẫn có thể tạo nên tác phẩm tuyệt vời.
+                            </p>
+                            <a href="/blog/post/diy-bo-hoa" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                                Xem thêm
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Blog Post 6 -->
+                    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 group" data-aos="fade-up" data-aos-delay="200">
+                        <div class="relative h-48 overflow-hidden">
+                            <img src="/images/blog/flower-meanings.jpg" 
+                                 alt="Ý nghĩa hoa" 
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 onerror="this.src='https://images.unsplash.com/photo-1496062031456-07b8f162a322?w=600'">
+                            <div class="absolute top-3 right-3">
+                                <span class="px-3 py-1 bg-red-500 text-white text-xs font-semibold rounded-full">
+                                    <span data-translate="knowledge">Kiến thức</span>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M5.75 2a.75.75 0 0 1 .75.75V4h7V2.75a.75.75 0 0 1 1.5 0V4h.25A2.75 2.75 0 0 1 18 6.75v8.5A2.75 2.75 0 0 1 15.25 18H4.75A2.75 2.75 0 0 1 2 15.25v-8.5A2.75 2.75 0 0 1 4.75 4H5V2.75A.75.75 0 0 1 5.75 2Zm-1 5.5c-.69 0-1.25.56-1.25 1.25v6.5c0 .69.56 1.25 1.25 1.25h10.5c.69 0 1.25-.56 1.25-1.25v-6.5c0-.69-.56-1.25-1.25-1.25H4.75Z" clip-rule="evenodd" />
+                                    </svg>
+                                    20 Tháng 11
+                                </span>
+                                <span>•</span>
+                                <span>10 <span data-translate="min-read">phút đọc</span></span>
+                            </div>
+                            <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-primary transition-colors">
+                                Ý nghĩa của 20 loài hoa phổ biến nhất
+                            </h3>
+                            <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+                                Mỗi loài hoa đều mang một thông điệp riêng. Tìm hiểu ý nghĩa sâu xa 
+                                của các loài hoa để chọn đúng hoa cho từng dịp và người nhận.
+                            </p>
+                            <a href="/blog/post/y-nghia-hoa" 
+                               class="inline-flex items-center gap-2 text-primary font-semibold text-sm hover:gap-3 transition-all">
+                                Xem thêm
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-12 flex justify-center" data-aos="fade-up">
+                    <nav class="flex items-center gap-2">
+                        <button class="px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-400 cursor-not-allowed">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                        <button class="px-4 py-2 rounded-lg bg-primary text-white font-semibold">1</button>
+                        <button class="px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors">2</button>
+                        <button class="px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors">3</button>
+                        <span class="px-2 text-gray-400">...</span>
+                        <button class="px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors">10</button>
+                        <button class="px-4 py-2 rounded-lg border-2 border-gray-200 text-gray-700 hover:border-primary hover:text-primary transition-colors">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter Section -->
+    <section class="py-16 bg-gradient-to-br from-primary/10 to-green-50">
+        <div class="container mx-auto px-4">
+            <div class="max-w-2xl mx-auto text-center" data-aos="fade-up">
+                <div class="w-16 h-16 mx-auto mb-6 bg-primary/20 rounded-full flex items-center justify-center">
+                    <svg class="w-8 h-8 text-primary" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M3 4a2 2 0 0 0-2 2v1.161l8.441 4.221a1.25 1.25 0 0 0 1.118 0L19 7.162V6a2 2 0 0 0-2-2H3Z" />
+                        <path d="m19 8.839-7.77 3.885a2.75 2.75 0 0 1-2.46 0L1 8.839V14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.839Z" />
+                    </svg>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-800 mb-4" data-translate="newsletter-title">
+                    Đăng ký nhận bản tin
+                </h2>
+                <p class="text-gray-600 mb-8" data-translate="newsletter-desc">
+                    Nhận những bài viết mới nhất, mẹo chăm sóc hoa và ưu đãi đặc biệt qua email
+                </p>
+                <form class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                    <input type="email" 
+                           placeholder="email@example.com" 
+                           required
+                           class="flex-1 px-6 py-3 rounded-full border-2 border-gray-200 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all outline-none">
+                    <button type="submit" 
+                            class="px-8 py-3 bg-primary text-white font-semibold rounded-full hover:bg-primary-hover hover:shadow-lg transition-all">
+                        <span data-translate="subscribe">Đăng ký</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+</th:block>
+</body>
+</html>

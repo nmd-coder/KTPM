@@ -1,0 +1,203 @@
+/* Staff Portal Styles */
+
+/* Custom Scrollbar */
+.staff-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.staff-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.staff-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 3px;
+}
+
+.staff-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Badge Animations */
+@keyframes pulse-badge {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.pulse-badge {
+    animation: pulse-badge 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Notification Dot Animation */
+@keyframes ping {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+.animate-ping {
+    animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Card Hover Effects */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Check-in Button Styles */
+.check-in-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+}
+
+.check-in-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+}
+
+.check-out-button {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    transition: all 0.3s ease;
+}
+
+.check-out-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 20px rgba(245, 87, 108, 0.4);
+}
+
+/* Status Indicators */
+.status-online {
+    position: relative;
+}
+
+.status-online::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    background-color: #10b981;
+    border: 2px solid white;
+    border-radius: 50%;
+}
+
+.status-busy::after {
+    background-color: #ef4444;
+}
+
+.status-away::after {
+    background-color: #f59e0b;
+}
+
+/* Gradient Text */
+.gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #ec4899;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Timesheet Calendar */
+.calendar-day {
+    aspect-ratio: 1;
+    transition: all 0.2s ease;
+}
+
+.calendar-day:hover {
+    background-color: #fce7f3;
+    transform: scale(1.05);
+}
+
+.calendar-day.today {
+    border: 2px solid #ec4899;
+    font-weight: bold;
+}
+
+.calendar-day.worked {
+    background-color: #d1fae5;
+}
+
+.calendar-day.worked:hover {
+    background-color: #a7f3d0;
+}
+
+/* Stat Card Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+/* Quick Action Buttons */
+.quick-action {
+    transition: all 0.3s ease;
+}
+
+.quick-action:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar-mobile {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease-in-out;
+    }
+    
+    .sidebar-mobile.open {
+        transform: translateX(0);
+    }
+}
+
+/* Print Styles for Timesheet */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+    
+    body {
+        font-size: 12px;
+    }
+    
+    .print-table {
+        page-break-inside: avoid;
+    }
+}
+

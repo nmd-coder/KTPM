@@ -1,0 +1,42 @@
+spring:
+  profiles:
+    active: dev
+  servlet:
+    session:
+      cookie:
+        name: JSESSIONID
+        http-only: false
+        secure: false
+        same-site: lax
+        max-age: 3600
+
+
+# Swagger/OpenAPI UI common settings (non-sensitive)
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    filter: true
+    display-request-duration: true
+    groups-order: DESC
+    show-extensions: true
+    show-common-extensions: true
+    default-models-expand-depth: 2
+
+# SockJS client library URL
+sockjs:
+  client:
+    library:
+      url: https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js
+
+# Common non-sensitive Gemini settings
+gemini:
+  temperature: 0.5
+  max-tokens: 8192
+  timeout-seconds: 30

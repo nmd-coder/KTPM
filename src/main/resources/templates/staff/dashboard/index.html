@@ -1,0 +1,284 @@
+<!-- Staff Dashboard Content -->
+<div class="space-y-6" x-data="staffDashboard()">
+    
+    <!-- Welcome Section -->
+    <div class="bg-gradient-to-r from-primary-500 to-pink-600 rounded-lg shadow-lg p-6 text-white">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold mb-2">
+                    Xin chào, <span th:text="${dashboard.staffName}">Staff</span>!
+                </h1>
+                <p class="text-primary-100">
+                    <span th:text="${dashboard.position}">Nhân viên</span> - 
+                    Mã NV: <span th:text="${dashboard.staffCode}">EMP001</span>
+                </p>
+            </div>
+            <div class="text-right">
+                <div class="text-sm text-primary-100">Trạng thái ca làm</div>
+                <div class="text-xl font-bold mt-1" x-text="shiftStatus">
+                    <span th:text="${dashboard.shiftStatus}">Chưa check-in</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Active Conversations -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Hội thoại đang xử lý</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" x-text="stats.activeConversations">
+                        <span th:text="${dashboard.activeConversations}">0</span>
+                    </p>
+                </div>
+                <div class="bg-blue-100 rounded-full p-3">
+                    <i class="fas fa-comments text-blue-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unread Messages -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Tin nhắn chưa đọc</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" x-text="stats.unreadMessages">
+                        <span th:text="${dashboard.unreadMessages}">0</span>
+                    </p>
+                </div>
+                <div class="bg-red-100 rounded-full p-3">
+                    <i class="fas fa-envelope text-red-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Today's Hours -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Giờ làm hôm nay</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" x-text="stats.todayHours">
+                        <span th:text="${dashboard.todayHoursWorked != null ? dashboard.todayHoursWorked : '0.0'}">0.0</span>
+                    </p>
+                </div>
+                <div class="bg-green-100 rounded-full p-3">
+                    <i class="fas fa-clock text-green-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+        
+        <!-- This Week -->
+        <div class="bg-white rounded-lg shadow p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-gray-600">Giờ làm tuần này</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-2" x-text="stats.weekHours">
+                        <span th:text="${dashboard.weekHoursWorked != null ? dashboard.weekHoursWorked : '0.0'}">0.0</span>
+                    </p>
+                </div>
+                <div class="bg-purple-100 rounded-full p-3">
+                    <i class="fas fa-calendar-week text-purple-600 text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Unassigned Conversations Queue -->
+        <div class="lg:col-span-2 bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-inbox text-gray-600 mr-2"></i>
+                    Hàng đợi - Hội thoại chưa được xử lý
+                </h3>
+                <span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-1 rounded-full" 
+                      th:text="${dashboard.unassignedQueue != null ? dashboard.unassignedQueue.size() : 0}">
+                    0
+                </span>
+            </div>
+            <div class="p-6">
+                <div th:if="${dashboard.unassignedQueue != null and !dashboard.unassignedQueue.empty}">
+                    <div class="space-y-3">
+                        <div th:each="conv : ${dashboard.unassignedQueue}" 
+                             class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2 mb-2">
+                                        <h4 class="font-semibold text-gray-900" th:text="${conv.customerName}">Customer Name</h4>
+                                        <span th:if="${conv.priority != null and conv.priority.name() == 'HIGH'}" 
+                                              class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800">
+                                            <i class="fas fa-exclamation-circle mr-1"></i> Cao
+                                        </span>
+                                        <span th:if="${conv.priority != null and conv.priority.name() == 'URGENT'}" 
+                                              class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-exclamation-triangle mr-1"></i> Khẩn cấp
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600" th:text="${conv.lastMessageContent != null ? conv.lastMessageContent : 'Chưa có tin nhắn'}">Last message...</p>
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        <i class="far fa-clock mr-1"></i>
+                                        <span th:text="${conv.createdAt != null ? #temporals.format(conv.createdAt, 'HH:mm dd/MM/yyyy') : 'Chưa có thời gian'}">10:30 11/01/2025</span>
+                                    </p>
+                                </div>
+                                <button th:data-conversation-id="${conv.id}"
+                                        @click="assignConversation($event.target.dataset.conversationId)"
+                                        class="ml-4 inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none transition">
+                                    <i class="fas fa-hand-paper mr-1"></i>
+                                    Nhận
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${dashboard.unassignedQueue == null or dashboard.unassignedQueue.empty}" 
+                     class="text-center py-12">
+                    <i class="fas fa-inbox text-gray-300 text-5xl mb-4"></i>
+                    <p class="text-gray-500">Không có hội thoại nào đang chờ xử lý</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Conversations -->
+        <div class="bg-white rounded-lg shadow">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">
+                    <i class="fas fa-history text-gray-600 mr-2"></i>
+                    Hội thoại gần đây
+                </h3>
+            </div>
+            <div class="p-6">
+                <div th:if="${dashboard.recentConversations != null and !dashboard.recentConversations.empty}">
+                    <div class="space-y-3">
+                        <a th:each="conv : ${dashboard.recentConversations}" 
+                           th:href="@{/staff/chat(conversation=${conv.id})}"
+                           class="block border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors">
+                            <div class="flex items-center justify-between mb-2">
+                                <h5 class="font-medium text-gray-900 text-sm" th:text="${conv.customerName}">Customer</h5>
+                                <span th:if="${conv.unreadCount != null and conv.unreadCount > 0}" 
+                                      class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full"
+                                      th:text="${conv.unreadCount}">
+                                    0
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-600 truncate" th:text="${conv.lastMessageContent != null ? conv.lastMessageContent : 'Chưa có tin nhắn'}">Message...</p>
+                            <p class="text-xs text-gray-400 mt-1" th:text="${conv.lastMessageAt != null ? #temporals.format(conv.lastMessageAt, 'HH:mm dd/MM') : 'Chưa có'}">10:30</p>
+                        </a>
+                    </div>
+                </div>
+                <div th:if="${dashboard.recentConversations == null or dashboard.recentConversations.empty}" 
+                     class="text-center py-8">
+                    <i class="fas fa-comments text-gray-300 text-4xl mb-3"></i>
+                    <p class="text-gray-500 text-sm">Chưa có hội thoại nào</p>
+                </div>
+                <div class="mt-4">
+                    <a href="/staff/chat" class="block text-center text-sm text-primary-600 hover:text-primary-700 font-medium">
+                        Xem tất cả <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-bolt text-yellow-500 mr-2"></i>
+            Thao tác nhanh
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <a href="/staff/chat" class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all">
+                <i class="fas fa-comments text-primary-600 text-2xl mb-2"></i>
+                <span class="text-sm font-medium text-gray-700">Hỗ trợ khách hàng</span>
+            </a>
+            <a href="/staff/timesheet" class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all">
+                <i class="fas fa-calendar text-primary-600 text-2xl mb-2"></i>
+                <span class="text-sm font-medium text-gray-700">Xem bảng chấm công</span>
+            </a>
+            <a href="/staff/profile" class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all">
+                <i class="fas fa-user text-primary-600 text-2xl mb-2"></i>
+                <span class="text-sm font-medium text-gray-700">Thông tin cá nhân</span>
+            </a>
+            <a href="/home" class="flex flex-col items-center justify-center p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-all">
+                <i class="fas fa-home text-primary-600 text-2xl mb-2"></i>
+                <span class="text-sm font-medium text-gray-700">Về trang chủ</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+function staffDashboard() {
+    return {
+        stats: {
+            activeConversations: /*[[${dashboard.activeConversations}]]*/ 0,
+            unreadMessages: /*[[${dashboard.unreadMessages}]]*/ 0,
+            todayHours: /*[[${dashboard.todayHoursWorked}]]*/ 0,
+            weekHours: /*[[${dashboard.weekHoursWorked}]]*/ 0
+        },
+        shiftStatus: /*[[${dashboard.shiftStatus}]]*/ 'Chưa check-in',
+        
+        init() {
+            // Initial refresh to ensure we have latest data
+            this.refreshStats();
+            
+            // Refresh stats every 30 seconds
+            setInterval(() => {
+                this.refreshStats();
+            }, 30000);
+        },
+        
+        async refreshStats() {
+            try {
+                const response = await fetch('/api/staff/dashboard', {
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+                if (data.success && data.data) {
+                    this.stats = {
+                        activeConversations: data.data.activeConversations || 0,
+                        unreadMessages: data.data.unreadMessages || 0,
+                        todayHours: data.data.todayHoursWorked || 0,
+                        weekHours: data.data.weekHoursWorked || 0
+                    };
+                    this.shiftStatus = data.data.shiftStatus || 'Chưa check-in';
+                    
+                    // Also update DOM elements directly for immediate visual feedback
+                    const shiftStatusElement = document.querySelector('[x-text="shiftStatus"]');
+                    if (shiftStatusElement) {
+                        shiftStatusElement.textContent = this.shiftStatus;
+                    }
+                }
+            } catch (error) {
+                console.error('Error refreshing stats:', error);
+            }
+        },
+        
+        async assignConversation(conversationId) {
+            try {
+                const response = await fetch(`/api/staff/conversations/${conversationId}/assign`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    // Redirect to chat page
+                    window.location.href = `/staff/chat?conversation=${conversationId}`;
+                } else {
+                    showToast('Không thể nhận cuộc hội thoại: ' + data.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error assigning conversation:', error);
+                showToast('Đã xảy ra lỗi khi nhận cuộc hội thoại', 'error');
+            }
+        }
+    }
+}
+</script>
+

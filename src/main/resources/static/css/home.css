@@ -1,0 +1,98 @@
+/* ================================
+   HOME PAGE CSS - Tailwind Migration Complete
+   Only essential custom animations and utilities remain
+   ================================ */
+
+/* Custom floating animations for hero section decorative elements */
+@keyframes float-slow {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+@keyframes float-medium {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(270deg); }
+}
+
+@keyframes float-fast {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-40px) rotate(360deg); }
+}
+
+.animate-float-slow {
+    animation: float-slow 8s ease-in-out infinite;
+}
+
+.animate-float-medium {
+    animation: float-medium 6s ease-in-out infinite;
+}
+
+.animate-float-fast {
+    animation: float-fast 4s ease-in-out infinite;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .animate-float-slow,
+    .animate-float-medium,
+    .animate-float-fast {
+        animation: none;
+    }
+}
+
+/* Ad Popup animations */
+.ad-overlay {
+    display: none; /* default hidden; toggled via JS */
+}
+
+.ad-overlay.show {
+    display: flex;
+    animation: ad-fade-in 220ms ease-out;
+}
+
+.ad-dialog {
+    transform: translateY(10px) scale(0.98);
+    opacity: 0.96;
+    animation: ad-pop-in 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Ensure popup dialog and image scale responsively across browsers */
+#ad-popup .ad-dialog {
+    max-width: min(88vw, 820px);
+    width: 100%;
+}
+
+#ad-popup img {
+    display: block;
+    max-width: 100%;
+    max-height: 70vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Ensure inner content never exceeds viewport */
+#ad-popup .ad-content {
+    max-height: 72vh;
+    padding: 0;
+}
+
+@media (max-width: 640px) {
+    #ad-popup .ad-dialog { max-width: 92vw; }
+    #ad-popup img { max-height: 62vh; }
+    #ad-popup .ad-content { max-height: 64vh; }
+}
+
+/* Hardening visibility if Tailwind classes conflict */
+.ad-overlay.show { visibility: visible !important; opacity: 1 !important; }
+.ad-overlay.hidden { display: none !important; }
+
+@keyframes ad-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes ad-pop-in {
+    from { transform: translateY(12px) scale(0.96); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}

@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Settings Management -->
+    <div class="space-y-6">
+        
+        <!-- Header Actions -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">Cài đặt Hệ thống</h2>
+                <p class="mt-1 text-sm text-gray-500">Quản lý cấu hình và thiết lập hệ thống</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                    <i class="fas fa-history mr-2"></i>
+                    Lịch sử thay đổi
+                </button>
+                <button class="inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-primary-700 transition-colors duration-200">
+                    <i class="fas fa-save mr-2"></i>
+                    Lưu tất cả
+                </button>
+            </div>
+        </div>
+        
+        <!-- Settings Categories -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Settings Navigation -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-sm p-4">
+                    <nav class="space-y-2">
+                        <a href="#general" class="flex items-center px-3 py-2 text-sm font-medium text-primary-700 bg-primary-50 rounded-lg">
+                            <i class="fas fa-cog mr-3"></i>
+                            Cài đặt chung
+                        </a>
+                        <a href="#payment" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-credit-card mr-3"></i>
+                            Thanh toán
+                        </a>
+                        <a href="#shipping" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-shipping-fast mr-3"></i>
+                            Vận chuyển
+                        </a>
+                        <a href="#email" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-envelope mr-3"></i>
+                            Email & SMS
+                        </a>
+                        <a href="#security" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-shield-alt mr-3"></i>
+                            Bảo mật
+                        </a>
+                        <a href="#backup" class="flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200">
+                            <i class="fas fa-database mr-3"></i>
+                            Sao lưu
+                        </a>
+                    </nav>
+                </div>
+            </div>
+            
+            <!-- Settings Content -->
+            <div class="lg:col-span-3 space-y-6">
+                
+                <!-- General Settings -->
+                <div id="general" class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Cài đặt chung</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tên cửa hàng</label>
+                            <input type="text" value="StarShop - Cửa hàng hoa tươi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Slogan</label>
+                            <input type="text" value="Hoa tươi mỗi ngày" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email liên hệ</label>
+                            <input type="email" value="contact@starshop.vn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Số điện thoại</label>
+                            <input type="tel" value="1900 1234" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Địa chỉ</label>
+                            <textarea rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">123 Đường ABC, Phường XYZ, Quận 1, TP.HCM</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Múi giờ</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="Asia/Ho_Chi_Minh" selected>GMT+7 (Việt Nam)</option>
+                                <option value="Asia/Bangkok">GMT+7 (Bangkok)</option>
+                                <option value="Asia/Singapore">GMT+8 (Singapore)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Đơn vị tiền tệ</label>
+                            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                <option value="VND" selected>VND (₫)</option>
+                                <option value="USD">USD ($)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payment Settings -->
+                <div id="payment" class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Cài đặt Thanh toán</h3>
+                    <div class="space-y-6">
+                        <!-- MoMo Settings -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://via.placeholder.com/40x40/ec4899/ffffff?text=M" alt="MoMo" class="w-10 h-10 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">MoMo</h4>
+                                        <p class="text-sm text-gray-500">Ví điện tử MoMo</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Partner Code</label>
+                                    <input type="text" value="MOMO123456" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Access Key</label>
+                                    <input type="password" value="••••••••••••" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- VNPay Settings -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://via.placeholder.com/40x40/ec4899/ffffff?text=V" alt="VNPay" class="w-10 h-10 rounded-lg">
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">VNPay</h4>
+                                        <p class="text-sm text-gray-500">Cổng thanh toán VNPay</p>
+                                    </div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">TMN Code</label>
+                                    <input type="text" placeholder="Nhập TMN Code" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Hash Secret</label>
+                                    <input type="password" placeholder="Nhập Hash Secret" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Shipping Settings -->
+                <div id="shipping" class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Cài đặt Vận chuyển</h3>
+                    <div class="space-y-6">
+                        <!-- GHN Settings -->
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-shipping-fast text-green-600"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900">Giao Hàng Nhanh (GHN)</h4>
+                                        <p class="text-sm text-gray-500">Dịch vụ giao hàng GHN</p>
+                                    </div>
+                                </div>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    Đã kết nối
+                                </span>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Shop ID</label>
+                                    <input type="text" value="4983244" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Token</label>
+                                    <input type="password" value="••••••••••••" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Shipping Zones -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-4">Khu vực giao hàng</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-900">TP.HCM</div>
+                                        <div class="text-sm text-gray-500">Miễn phí giao hàng đơn từ 500,000₫</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-medium text-gray-900">25,000₫</div>
+                                        <div class="text-sm text-gray-500">Phí cơ bản</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Miền Nam</div>
+                                        <div class="text-sm text-gray-500">Miễn phí giao hàng đơn từ 800,000₫</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-medium text-gray-900">35,000₫</div>
+                                        <div class="text-sm text-gray-500">Phí cơ bản</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Toàn quốc</div>
+                                        <div class="text-sm text-gray-500">Miễn phí giao hàng đơn từ 1,000,000₫</div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-medium text-gray-900">50,000₫</div>
+                                        <div class="text-sm text-gray-500">Phí cơ bản</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Email & SMS Settings -->
+                <div id="email" class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Cài đặt Email & SMS</h3>
+                    <div class="space-y-6">
+                        <!-- Email Settings -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-4">Cấu hình Email</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">SMTP Host</label>
+                                    <input type="text" value="smtp.gmail.com" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">SMTP Port</label>
+                                    <input type="number" value="587" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                                    <input type="email" value="noreply@starshop.vn" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                                    <input type="password" value="••••••••••••" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Email Templates -->
+                        <div>
+                            <h4 class="font-medium text-gray-900 mb-4">Mẫu Email</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Email xác nhận đơn hàng</div>
+                                        <div class="text-sm text-gray-500">Gửi khi khách hàng đặt hàng thành công</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                                
+                                <div class="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Email thông báo giao hàng</div>
+                                        <div class="text-sm text-gray-500">Gửi khi đơn hàng được giao thành công</div>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer">
+                                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Security Settings -->
+                <div id="security" class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Cài đặt Bảo mật</h3>
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Thời gian hết hạn phiên</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    <option value="30">30 phút</option>
+                                    <option value="60" selected>1 giờ</option>
+                                    <option value="120">2 giờ</option>
+                                    <option value="480">8 giờ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Số lần đăng nhập sai tối đa</label>
+                                <input type="number" value="5" min="3" max="10" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                <div>
+                                    <div class="font-medium text-gray-900">Xác thực 2 bước</div>
+                                    <div class="text-sm text-gray-500">Bắt buộc xác thực qua SMS hoặc email</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                            
+                            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                                <div>
+                                    <div class="font-medium text-gray-900">Ghi log hoạt động</div>
+                                    <div class="text-sm text-gray-500">Lưu lại tất cả hoạt động của admin</div>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Backup Settings -->
+                <div id="backup" class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-6">Cài đặt Sao lưu</h3>
+                    <div class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tần suất sao lưu tự động</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    <option value="daily" selected>Hàng ngày</option>
+                                    <option value="weekly">Hàng tuần</option>
+                                    <option value="monthly">Hàng tháng</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Giữ lại bản sao lưu</label>
+                                <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                                    <option value="7">7 ngày</option>
+                                    <option value="30" selected>30 ngày</option>
+                                    <option value="90">90 ngày</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="border border-gray-200 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h4 class="font-medium text-gray-900">Sao lưu thủ công</h4>
+                                    <p class="text-sm text-gray-500">Tạo bản sao lưu ngay bây giờ</p>
+                                </div>
+                                <button class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200">
+                                    <i class="fas fa-download mr-2"></i>
+                                    Tạo sao lưu
+                                </button>
+                            </div>
+                            <div class="text-sm text-gray-500">
+                                Bản sao lưu gần nhất: 15/12/2024 - 02:00 AM (Thành công)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

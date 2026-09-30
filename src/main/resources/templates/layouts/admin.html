@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle != null ? pageTitle + ' - StarShop Admin' : 'StarShop Admin'}">StarShop Admin</title>
+    
+    <!-- CSRF Token -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SweetAlert2 - MUST load before notifications.js -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Notifications Utility - Centralized notification system -->
+    <script th:src="@{/js/notifications.js}"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fdf2f8',
+                            100: '#fce7f3',
+                            200: '#fbcfe8',
+                            300: '#f9a8d4',
+                            400: '#f472b6',
+                            500: '#ec4899',
+                            600: '#db2777',
+                            700: '#be185d',
+                            800: '#9d174d',
+                            900: '#831843'
+                        },
+                        sidebar: {
+                            bg: '#1e293b',
+                            hover: '#334155',
+                            active: '#0f172a'
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-10px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .sidebar-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-track {
+            background: #f9fafb;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 2px;
+        }
+        .sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        
+        .sidebar-white {
+            background-color: #ffffff;
+            border-right: 1px solid #e5e7eb;
+        }
+        
+        .sidebar-text {
+            color: #374151;
+        }
+        
+        .sidebar-text-hover:hover {
+            color: #1f2937;
+            background-color: #f3f4f6;
+        }
+        
+        .sidebar-active {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+    <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: false, profileDropdown: false }">
+        
+        <!-- Sidebar -->
+        <div class="hidden lg:flex lg:flex-shrink-0">
+            <div class="flex flex-col w-64">
+                <div class="flex flex-col flex-grow sidebar-white overflow-y-auto sidebar-scrollbar">
+                    <!-- Logo -->
+                    <div class="flex items-center flex-shrink-0 px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <span class="text-2xl">🌸</span>
+                            </div>
+                            <div class="ml-3">
+                                <h1 class="text-xl font-bold text-gray-800">StarShop</h1>
+                                <p class="text-sm text-gray-500">Admin Panel</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Navigation -->
+                    <nav class="mt-6 flex-1 px-3 space-y-1">
+                        <!-- Dashboard -->
+                        <a href="/admin/dashboard" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/dashboard') or currentPath == '/admin' or currentPath == '/admin/' ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-tachometer-alt mr-3 text-lg"></i>
+                            Dashboard
+                        </a>
+                        
+                        <!-- Quản lý Đơn hàng -->
+                        <a href="/admin/orders" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/orders') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-shopping-cart mr-3 text-lg"></i>
+                            Quản lý Đơn hàng
+                        </a>
+                        
+                        <!-- Quản lý Sản phẩm -->
+                        <a href="/admin/products" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/products') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-box mr-3 text-lg"></i>
+                            Quản lý Sản phẩm
+                        </a>
+                        
+                        <!-- Quản lý Danh mục -->
+                        <a href="/admin/catalogs" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/catalogs') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-tags mr-3 text-lg"></i>
+                            Quản lý Danh mục
+                        </a>
+                        
+                        <!-- Quản lý Voucher -->
+                        <a href="/admin/vouchers" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/vouchers') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-ticket-alt mr-3 text-lg"></i>
+                            Quản lý Voucher
+                        </a>
+                        
+                        <!-- Quản lý Nhân viên -->
+                        <a href="/admin/employees" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/employees') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-user-tie mr-3 text-lg"></i>
+                            Quản lý Nhân viên
+                        </a>
+                        
+                        <!-- Lương & Chấm Công -->
+                        <a href="/admin/payroll" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/payroll') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-money-check-alt mr-3 text-lg"></i>
+                            Lương & Chấm Công
+                        </a>
+                        
+                        <!-- Quản lý Người dùng -->
+                        <a href="/admin/users" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/users') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-users mr-3 text-lg"></i>
+                            Quản lý Người dùng
+                        </a>
+                        
+                        <!-- Quản lý Nội dung -->
+                        <a href="/admin/content" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/content') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-file-alt mr-3 text-lg"></i>
+                            Quản lý Nội dung
+                        </a>
+                        
+                        <!-- Quản lý Đánh giá -->
+                        <a href="/admin/reviews" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/reviews') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-star mr-3 text-lg"></i>
+                            Quản lý Đánh giá
+                        </a>
+                        
+                        <!-- Cài đặt Hệ thống -->
+                        <a href="/admin/settings" 
+                           th:classappend="${#strings.contains(currentPath, '/admin/settings') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                           class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                            <i class="fas fa-cog mr-3 text-lg"></i>
+                            Cài đặt Hệ thống
+                        </a>
+                    </nav>
+                    
+                    <!-- Bottom section -->
+                    <div class="flex-shrink-0 p-4 border-t border-gray-200">
+                        <a href="/home" class="group flex items-center px-3 py-2 text-sm font-medium sidebar-text sidebar-text-hover rounded-lg transition-colors duration-200">
+                            <i class="fas fa-arrow-left mr-3 text-lg"></i>
+                            Về trang chủ
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile sidebar -->
+        <div class="lg:hidden" x-show="sidebarOpen" x-transition:enter="transition-opacity ease-linear duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity ease-linear duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+            <div class="fixed inset-0 flex z-40">
+                <div class="fixed inset-0 bg-gray-600 bg-opacity-75" @click="sidebarOpen = false"></div>
+                <div class="relative flex-1 flex flex-col max-w-xs w-full bg-sidebar-bg">
+                    <div class="absolute top-0 right-0 -mr-12 pt-2">
+                        <button type="button" class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="sidebarOpen = false">
+                            <i class="fas fa-times text-white text-lg"></i>
+                        </button>
+                    </div>
+                    <!-- Mobile sidebar content (same as desktop) -->
+                    <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto sidebar-scrollbar">
+                        <div class="flex-shrink-0 flex items-center px-4 mb-6">
+                            <span class="text-2xl">🌸</span>
+                            <h1 class="ml-3 text-xl font-bold sidebar-text">StarShop Admin</h1>
+                        </div>
+                        <nav class="mt-5 px-3 space-y-1">
+                            <!-- Dashboard -->
+                            <a href="/admin/dashboard" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/dashboard') or currentPath == '/admin' or currentPath == '/admin/' ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-tachometer-alt mr-3 text-lg"></i>
+                                Dashboard
+                            </a>
+                            
+                            <!-- Quản lý Đơn hàng -->
+                            <a href="/admin/orders" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/orders') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-shopping-cart mr-3 text-lg"></i>
+                                Quản lý Đơn hàng
+                            </a>
+                            
+                            <!-- Quản lý Sản phẩm -->
+                            <a href="/admin/products" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/products') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-box mr-3 text-lg"></i>
+                                Quản lý Sản phẩm
+                            </a>
+                            
+                            <!-- Quản lý Danh mục -->
+                            <a href="/admin/catalogs" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/catalogs') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-tags mr-3 text-lg"></i>
+                                Quản lý Danh mục
+                            </a>
+                            
+                            <!-- Quản lý Voucher -->
+                            <a href="/admin/vouchers" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/vouchers') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-ticket-alt mr-3 text-lg"></i>
+                                Quản lý Voucher
+                            </a>
+                            
+                            <!-- Quản lý Nhân viên -->
+                            <a href="/admin/employees" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/employees') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-user-tie mr-3 text-lg"></i>
+                                Quản lý Nhân viên
+                            </a>
+                            
+                            <!-- Lương & Chấm Công -->
+                            <a href="/admin/payroll" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/payroll') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-money-check-alt mr-3 text-lg"></i>
+                                Lương & Chấm Công
+                            </a>
+                            
+                            <!-- Quản lý Người dùng -->
+                            <a href="/admin/users" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/users') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-users mr-3 text-lg"></i>
+                                Quản lý Người dùng
+                            </a>
+                            
+                            <!-- Quản lý Nội dung -->
+                            <a href="/admin/content" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/content') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-file-alt mr-3 text-lg"></i>
+                                Quản lý Nội dung
+                            </a>
+                            
+                            <!-- Quản lý Đánh giá -->
+                            <a href="/admin/reviews" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/reviews') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-star mr-3 text-lg"></i>
+                                Quản lý Đánh giá
+                            </a>
+                            
+                            <!-- Cài đặt Hệ thống -->
+                            <a href="/admin/settings" 
+                               th:classappend="${#strings.contains(currentPath, '/admin/settings') ? 'sidebar-active' : 'sidebar-text sidebar-text-hover'}"
+                               class="group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200">
+                                <i class="fas fa-cog mr-3 text-lg"></i>
+                                Cài đặt Hệ thống
+                            </a>
+                            
+                            <!-- Về trang chủ -->
+                            <a href="/home" class="group flex items-center px-3 py-2 text-sm font-medium sidebar-text sidebar-text-hover rounded-lg transition-colors duration-200 mt-4 border-t border-gray-200 pt-4">
+                                <i class="fas fa-arrow-left mr-3 text-lg"></i>
+                                Về trang chủ
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="flex flex-col w-0 flex-1 overflow-hidden">
+            <!-- Top header -->
+            <div class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow-sm border-b border-gray-200">
+                <!-- Mobile menu button -->
+                <button type="button" class="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 lg:hidden" @click="sidebarOpen = true">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+                
+                <!-- Breadcrumb -->
+                <div class="flex-1 px-4 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <nav class="flex" aria-label="Breadcrumb" th:if="${breadcrumbs != null}">
+                            <ol class="flex items-center space-x-2">
+                                <li th:each="breadcrumb, iterStat : ${breadcrumbs}" class="flex items-center">
+                                    <span th:if="${iterStat.index > 0}" class="text-gray-400 mx-2">/</span>
+                                    <a th:if="${!iterStat.last}" 
+                                       th:href="${breadcrumb.url}" 
+                                       th:text="${breadcrumb.title}"
+                                       class="text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors duration-200">
+                                    </a>
+                                    <span th:if="${iterStat.last}" 
+                                          th:text="${breadcrumb.title}"
+                                          class="text-sm font-medium text-gray-900">
+                                    </span>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                    
+                    <!-- Right side -->
+                    <div class="ml-4 flex items-center md:ml-6 space-x-4">
+                        <!-- Notifications -->
+                        <button type="button" class="bg-white p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+                            <i class="fas fa-bell text-lg"></i>
+                        </button>
+                        
+                        <!-- Profile dropdown -->
+                        <div class="ml-3 relative" x-data="{ open: false }">
+                            <div>
+                                <button type="button" class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200" @click="open = !open">
+                                    <img th:if="${userObject != null and userObject.avatar != null}" 
+                                         th:src="${userObject.avatar}" 
+                                         alt="Avatar" 
+                                         class="h-8 w-8 rounded-full object-cover"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <div th:if="${userObject == null or userObject.avatar == null}" 
+                                         class="h-8 w-8 rounded-full bg-primary-500 flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                    <div class="ml-2 hidden md:block">
+                                        <p class="text-sm font-medium text-gray-700" th:text="${userObject != null ? userObject.fullName : 'Admin'}">Admin</p>
+                                        <p class="text-xs text-gray-500">Quản trị viên</p>
+                                    </div>
+                                    <i class="fas fa-chevron-down ml-2 text-gray-400 text-xs"></i>
+                                </button>
+                            </div>
+                            
+                            <div x-show="open" 
+                                 x-transition:enter="transition ease-out duration-100" 
+                                 x-transition:enter-start="transform opacity-0 scale-95" 
+                                 x-transition:enter-end="transform opacity-100 scale-100" 
+                                 x-transition:leave="transition ease-in duration-75" 
+                                 x-transition:leave-start="transform opacity-100 scale-100" 
+                                 x-transition:leave-end="transform opacity-0 scale-95" 
+                                 @click.away="open = false"
+                                 class="origin-top-right absolute right-0 mt-2 w-48 rounded-lg shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+                                <a href="/account/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">
+                                    <i class="fas fa-user mr-2"></i>Thông tin cá nhân
+                                </a>
+                                <div class="border-t border-gray-100"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors duration-200" onclick="handleLogout(event)">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>Đăng xuất
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Page content -->
+            <main class="flex-1 relative overflow-y-auto focus:outline-none">
+                <div class="py-6">
+                    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <!-- Page header -->
+                        <div class="mb-8">
+                            <h1 class="text-2xl font-bold text-gray-900" th:text="${pageTitle}">Dashboard</h1>
+                        </div>
+                        
+                        <!-- Dynamic content -->
+                        <div th:replace="~{${contentTemplate}}"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Logout Handler -->
+    <script>
+        async function handleLogout(event) {
+            event.preventDefault();
+            
+            const confirmed = await confirmAction(
+                'Xác nhận đăng xuất?',
+                'Bạn có chắc muốn đăng xuất khỏi hệ thống?'
+            );
+            
+            if (confirmed) {
+                window.location.href = '/logout';
+            }
+        }
+    </script>
+</body>
+</html>

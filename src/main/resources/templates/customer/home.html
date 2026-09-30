@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:replace="~{layouts/main :: layout('Trang chủ', 
+          'StarShop - Cửa hàng hoa tươi đẹp, chất lượng cao. Giao hàng nhanh chóng toàn quốc. Hoa sinh nhật, hoa tình yêu, hoa cưới, quà tặng đặc biệt.',
+          ~{::link},
+          ~{::content})}">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/home.css}" />
+    <link rel="stylesheet" th:href="@{/css/home-tailwind.css}" />
+</head>
+
+<body>
+<th:block th:fragment="content">
+    <!-- Hero Section - Tailwind -->
+        <!-- Hero Section - Improved & Professional -->
+        <section class="relative min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-5">
+                <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23F06292\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+            </div>
+            
+            <!-- Floating petals animation -->
+            <div class="absolute inset-0 pointer-events-none overflow-hidden">
+                <div class="animate-float-slow absolute top-20 left-10 w-6 h-6 bg-gradient-to-br from-pink-400 to-rose-400 rounded-full opacity-40 blur-sm"></div>
+                <div class="animate-float-medium absolute top-40 right-20 w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-30 blur-sm"></div>
+                <div class="animate-float-fast absolute bottom-32 left-1/4 w-10 h-10 bg-gradient-to-br from-rose-300 to-pink-300 rounded-full opacity-25 blur-sm"></div>
+                <div class="animate-float-slow absolute bottom-20 right-1/3 w-7 h-7 bg-gradient-to-br from-pink-300 to-purple-300 rounded-full opacity-35 blur-sm"></div>
+                <div class="animate-float-medium absolute top-1/2 left-1/3 w-5 h-5 bg-gradient-to-br from-rose-400 to-pink-400 rounded-full opacity-30 blur-sm"></div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-20">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Left Content -->
+                    <div class="space-y-8" data-aos="fade-right" data-aos-duration="1000">
+                        <!-- Badge -->
+                        <div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-full shadow-soft border border-pink-100">
+                            <span class="relative flex h-3 w-3">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
+                            </span>
+                            <span class="text-sm font-semibold text-gray-700" data-translate="fresh-daily">Hoa tươi mỗi ngày</span>
+                        </div>
+                        
+                        <!-- Main Heading -->
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight">
+                            <span class="relative inline-block">
+                                <span class="bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 bg-clip-text text-transparent" data-translate="hero-title-part1">Mang</span>
+                                <svg class="absolute -bottom-2 left-0 w-full" height="12" viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 10C50 2 150 2 198 10" stroke="url(#gradient)" stroke-width="3" stroke-linecap="round"/>
+                                    <defs>
+                                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" style="stop-color:#ec4899;stop-opacity:1" />
+                                            <stop offset="50%" style="stop-color:#f43f5e;stop-opacity:1" />
+                                            <stop offset="100%" style="stop-color:#9333ea;stop-opacity:1" />
+                                        </linearGradient>
+                                    </defs>
+                                </svg>
+                            </span>
+                            <br>
+                            <span class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight" data-translate="hero-title-part2">hoa đến</span>
+                            <br>
+                            <span class="text-5xl md:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight" data-translate="hero-title-part3">niềm vui của bạn</span>
+                        </h1>
+                        
+                        <!-- Description -->
+                        <p class="text-xl text-gray-600 leading-relaxed max-w-xl" data-translate="hero-description">
+                            Khám phá bộ sưu tập hoa tươi tuyệt đẹp tại StarShop. 
+                            Chúng tôi mang đến những bó hoa tinh tế, được thiết kế đặc biệt cho mọi khoảnh khắc đáng nhớ của bạn.
+                        </p>
+                        
+                        <!-- Stats -->
+                        <div class="flex flex-wrap gap-8 pt-4">
+                            <div class="space-y-1">
+                                <div class="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent" data-translate="stat-1">5000+</div>
+                                <div class="text-sm text-gray-600 font-medium" data-translate="stat-1-desc">Khách hàng hài lòng</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent" data-translate="stat-2">500+</div>
+                                <div class="text-sm text-gray-600 font-medium" data-translate="stat-2-desc">Mẫu hoa độc đáo</div>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="text-3xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent" data-translate="stat-3">24/7</div>
+                                <div class="text-sm text-gray-600 font-medium" data-translate="stat-3-desc">Hỗ trợ khách hàng</div>
+                            </div>
+                        </div>
+                        
+                        <!-- CTA Buttons -->
+                        <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                            <a href="/products" class="group relative inline-flex items-center justify-center gap-2 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 text-white px-8 py-4 rounded-2xl font-semibold overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-pink-500/50 hover:scale-105">
+                                <span class="relative z-10" data-translate="explore-now">Khám phá ngay</span>
+                                <svg class="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                                <div class="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                            </a>
+                            <a href="/categories" class="inline-flex items-center justify-center gap-2 bg-white text-gray-700 px-8 py-4 rounded-2xl font-semibold border-2 border-gray-200 hover:border-pink-500 hover:text-pink-500 hover:shadow-lg transition-all duration-300 hover:scale-105">
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M3.196 12.87l-.825.483a.75.75 0 0 0 0 1.294l7.25 4.25a.75.75 0 0 0 .758 0l7.25-4.25a.75.75 0 0 0 0-1.294l-.825-.484-5.666 3.322a2.25 2.25 0 0 1-2.276 0L3.196 12.87Z" />
+                                    <path d="M3.196 8.87l-.825.483a.75.75 0 0 0 0 1.294l7.25 4.25a.75.75 0 0 0 .758 0l7.25-4.25a.75.75 0 0 0 0-1.294l-.825-.484-5.666 3.322a2.25 2.25 0 0 1-2.276 0L3.196 8.87Z" />
+                                    <path d="M10.38 1.103a.75.75 0 0 0-.76 0l-7.25 4.25a.75.75 0 0 0 0 1.294l7.25 4.25a.75.75 0 0 0 .76 0l7.25-4.25a.75.75 0 0 0 0-1.294l-7.25-4.25Z" />
+                                </svg>
+                                <span data-translate="view-categories">Xem danh mục</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Image -->
+                    <div class="relative lg:h-[600px] h-[400px]" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <!-- Decorative circles -->
+                            <div class="absolute top-0 right-0 w-72 h-72 bg-gradient-to-br from-pink-300 to-purple-300 rounded-full opacity-20 blur-3xl animate-pulse"></div>
+                            <div class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-rose-300 to-pink-300 rounded-full opacity-20 blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+                            
+                            <!-- Image Card -->
+                            <div class="relative z-10 group">
+                                <div class="absolute -inset-4 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 rounded-3xl opacity-75 blur-xl group-hover:opacity-100 transition-opacity duration-300"></div>
+                                <div class="relative bg-white p-3 rounded-3xl shadow-2xl transform group-hover:scale-105 transition-transform duration-500">
+                                    <img src="https://images.unsplash.com/photo-1563241527-3004b7be0ffd?w=600&h=800&fit=crop" 
+                                         alt="Beautiful Flowers" 
+                                         class="w-full h-[500px] object-cover rounded-2xl">
+                                    <!-- Floating Badge -->
+                                    <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-2xl p-4 animate-bounce" style="animation-duration: 3s;">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center">
+                                                <svg class="w-6 h-6 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="text-2xl font-bold text-gray-900" data-translate="rating">4.9</div>
+                                                <div class="text-xs text-gray-600" data-translate="rating-desc">Đánh giá</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    
+    
+
+    <!-- Why StarShop Section - Tailwind -->
+    <section class="py-16 lg:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up" data-aos-duration="800">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4" data-translate="why-starshop">Tại sao chọn StarShop?</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto" data-translate="why-starshop-desc">
+                    Chúng tôi cam kết mang đến trải nghiệm tuyệt vời nhất
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center group" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+                    <div class="w-16 h-16 bg-gradient-to-br from-primary-light to-primary rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2a6 6 0 0 0-6 6c0 1.887-.454 3.665-1.257 5.234a.75.75 0 0 0 .515 1.076 32.91 32.91 0 0 0 3.256.508 3.5 3.5 0 0 0 6.972 0 32.903 32.903 0 0 0 3.256-.508.75.75 0 0 0 .515-1.076A11.448 11.448 0 0 1 16 8a6 6 0 0 0-6-6ZM8.05 14.943a33.54 33.54 0 0 0 3.9 0 2 2 0 0 1-3.9 0Z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="fresh-flowers">Hoa tươi 100%</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed" data-translate="fresh-desc">
+                        Nhập khẩu trực tiếp từ nông trại, đảm bảo độ tươi mới cao nhất
+                    </p>
+                </div>
+                
+                <div class="text-center group" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+                    <div class="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6.5 3c-1.051 0-2.093.04-3.125.117A1.49 1.49 0 0 0 2.25 4.75v10.5c0 .546.285 1.03.75 1.303A3.5 3.5 0 0 1 6.5 12.5a3.5 3.5 0 0 1 3.25 2.25H16.5a1.5 1.5 0 0 0 1.5-1.5V9a1.5 1.5 0 0 0-1.5-1.5h-3.25a2.25 2.25 0 0 1-2.14-1.543l-.5-1.543A1.5 1.5 0 0 0 9.17 5H6.5ZM18 10v3.75a3 3 0 0 1-3 3H6.5a1 1 0 1 0 0-2H15V10h3Z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="fast-delivery">Giao hàng nhanh</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed" data-translate="fast-desc">
+                        Giao trong 2 giờ nội thành, 24 giờ toàn quốc
+                    </p>
+                </div>
+                
+                <div class="text-center group" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
+                    <div class="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="professional-design">Thiết kế chuyên nghiệp</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed" data-translate="design-desc">
+                        Đội ngũ florist giàu kinh nghiệm, thiết kế độc đáo
+                    </p>
+                </div>
+                
+                <div class="text-center group" data-aos="fade-up" data-aos-duration="600" data-aos-delay="400">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-8 h-8 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.767l-.933.267c-.41.117-.643.555-.48.95a11.542 11.542 0 0 0 6.254 6.254c.395.163.833-.07.95-.48l.267-.933a1.5 1.5 0 0 1 1.767-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-1.149 0-2.263-.15-3.326-.43A13.022 13.022 0 0 1 2.43 8.326 13.019 13.019 0 0 1 2 5V3.5Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2" data-translate="support-247">Hỗ trợ 24/7</h3>
+                    <p class="text-gray-600 text-sm leading-relaxed" data-translate="support-desc">
+                        Đội ngũ tư vấn nhiệt tình, sẵn sàng hỗ trợ mọi lúc
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Categories Section - Tailwind -->
+    <section class="py-16 lg:py-24 bg-gradient-to-br from-pink-50 to-purple-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4" data-translate="featured-categories">Danh mục nổi bật</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto" data-translate="featured-categories-desc">
+                    Tìm kiếm bó hoa hoàn hảo cho mọi dịp đặc biệt
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" th:if="${catalogs != null}">
+                <div th:each="catalog, iterStat : ${catalogs}"
+                     class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300" 
+                     data-aos="zoom-in" 
+                     data-aos-duration="600" 
+                     th:data-aos-delay="${iterStat.index * 100 + 100}">
+                    <div class="relative h-64 overflow-hidden bg-gray-100 bg-cover bg-center bg-no-repeat group-hover:scale-105 transition-all duration-500"
+                         th:style="'background-image: url(' + (${catalog.image != null ? catalog.image : '/images/categories/default-category.jpg'}) + ');'"
+                         th:title="${catalog.value}"
+                         role="img"
+                         th:aria-label="${catalog.value}">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                        <div class="absolute inset-0 flex flex-col justify-end p-6 text-white">
+                            <div class="text-3xl mb-2" data-translate="category-icon">🌸</div>
+                            <h3 class="text-xl font-bold mb-1 text-white" th:text="${catalog.value}">Tên danh mục</h3>
+                            <p class="text-sm text-white/90 mb-4" data-translate="explore-collection">Khám phá bộ sưu tập</p>
+                            <a th:href="@{/products(categoryId=${catalog.id})}"
+                               class="inline-flex items-center gap-2 text-white font-semibold hover:text-pink-200 transition-colors duration-300">
+                                <span data-translate="explore">Khám phá</span>
+                                <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12" data-aos="fade-up" data-aos-duration="600" data-aos-delay="700">
+                <a href="/categories" class="inline-flex items-center gap-2 border-2 border-rose-500 text-rose-500 px-8 py-3 rounded-full font-semibold hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-105">
+                    <span data-translate="view-all-categories">Xem tất cả danh mục</span>
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products Section - Tailwind -->
+    <section class="py-16 lg:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12" data-aos="fade-up" data-aos-duration="800">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4" data-translate="featured-products">Sản phẩm nổi bật</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto" data-translate="featured-products-desc">
+                    Những bó hoa được yêu thích nhất tại StarShop
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" th:if="${featuredProducts != null}">
+                <div th:each="product, iterStat : ${featuredProducts}"
+                     class="group bg-white rounded-2xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                     data-aos="fade-up"
+                     data-aos-duration="600"
+                     th:data-aos-delay="${iterStat.index * 100}">
+                    
+                    <!-- Product Image Container với aspect ratio cố định -->
+                    <div class="relative overflow-hidden bg-gray-100" style="aspect-ratio: 1;">
+                        <a th:href="@{/products/{id}(id=${product.id})}" class="block w-full h-full">
+                            <img th:src="${product.image != null ? product.image : '/images/products/default-flower.jpg'}"
+                                 th:alt="${product.name}"
+                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                 loading="lazy" />
+                        </a>
+                        
+                        <!-- Out of Stock Overlay -->
+                        <div th:if="${product.stockQuantity != null and product.stockQuantity == 0}" 
+                             class="absolute inset-0 bg-gray-900 bg-opacity-60 flex items-center justify-center z-10">
+                            <div class="text-center">
+                                <p class="text-white text-2xl font-bold" data-translate="out-of-stock">HẾT HÀNG</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Wishlist Button (chỉ hiện khi đăng nhập) -->
+                        <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" sec:authorize="isAuthenticated()">
+                            <button class="w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md hover:bg-white hover:scale-110 transition-all duration-300 btn-wishlist"
+                                    th:data-product-id="${product.id}"
+                                    th:classappend="${#sets.contains(wishlistProductIds, product.id)} ? ' active'"
+                                    title="Thêm vào yêu thích">
+                                <!-- Heroicons: Solid heart when active -->
+                                <svg th:if="${#sets.contains(wishlistProductIds, product.id)}" class="w-5 h-5 text-rose-500" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"/>
+                                </svg>
+                                <!-- Heroicons: Outline heart when inactive -->
+                                <svg th:unless="${#sets.contains(wishlistProductIds, product.id)}" class="w-5 h-5 text-gray-600 hover:text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Badges -->
+                        <div th:if="${product.stockQuantity != null and product.stockQuantity == 0}" 
+                             class="absolute top-3 left-3 bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            <span data-translate="out-of-stock-badge">Hết hàng</span>
+                        </div>
+                        <div th:if="${product.stockQuantity != null and product.stockQuantity > 0 and product.stockQuantity < 10}" 
+                             class="absolute top-3 left-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span data-translate="low-stock-badge">Sắp hết</span>
+                        </div>
+                        <div th:if="${product.stockQuantity == null or product.stockQuantity >= 10}" 
+                             class="absolute top-3 left-3 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            <span data-translate="featured-badge">Nổi bật</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Content -->
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-2 line-clamp-2 group-hover:text-rose-500 transition-colors duration-300">
+                            <a th:href="@{/products/{id}(id=${product.id})}"
+                               th:text="${product.name}">Tên sản phẩm</a>
+                        </h3>
+                        
+                        <!-- Product Price -->
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-xl font-bold text-rose-500">
+                                    <span th:text="${#numbers.formatCurrency(product.price)}">0₫</span>
+                                </div>
+                                <div th:if="${product.stockQuantity != null and product.stockQuantity > 0 and product.stockQuantity < 10}" 
+                                     class="text-xs text-orange-600 mt-1">
+                                    <span data-translate="remaining">Còn</span> <span th:text="${product.stockQuantity}">0</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Out of Stock Button -->
+                            <button th:if="${product.stockQuantity != null and product.stockQuantity == 0}"
+                                    class="opacity-50 cursor-not-allowed bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                                    disabled
+                                    title="Hết hàng">
+                                <i class="fa-solid fa-ban mr-1"></i>
+                                <span data-translate="out-of-stock-btn">Hết hàng</span>
+                            </button>
+                            
+                            <!-- Quick Add to Cart Button (chỉ hiện khi đăng nhập và còn hàng) -->
+                            <button th:if="${(product.stockQuantity == null or product.stockQuantity > 0)}"
+                                    class="opacity-0 group-hover:opacity-100 bg-gradient-to-r from-rose-500 to-pink-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:from-rose-600 hover:to-pink-600 transition-all duration-300 btn-add-to-cart"
+                                    th:data-product-id="${product.id}"
+                                    sec:authorize="isAuthenticated()"
+                                    title="Thêm vào giỏ hàng">
+                                <i class="fa-solid fa-cart-plus mr-1"></i>
+                                <span data-translate="add-to-cart">Thêm</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12" data-aos="fade-up" data-aos-duration="600" data-aos-delay="500">
+                <a href="/products" class="inline-flex items-center gap-2 border-2 border-rose-500 text-rose-500 px-8 py-3 rounded-full font-semibold hover:bg-rose-500 hover:text-white transition-all duration-300 hover:scale-105">
+                    <span data-translate="view-all-products">Xem tất cả sản phẩm</span>
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Promotion Banner -->
+    <section class="py-16 lg:py-24 bg-gradient-to-br from-pink-50 to-purple-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div 
+                class="relative bg-gradient-to-tr from-primary to-pink-600 rounded-3xl shadow-lg overflow-hidden" 
+                data-aos="zoom-in-up" 
+                data-aos-duration="800">
+                <div class="absolute inset-0 opacity-10">
+                    <svg class="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <svg class="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+    
+                <div class="relative grid md:grid-cols-2 items-center gap-8 md:gap-16 p-8 md:p-12 lg:p-16">
+                    <div class="text-white text-center md:text-left">
+                        <span class="inline-flex items-center gap-2 bg-white/20 text-white px-4 py-1 rounded-full text-sm font-semibold mb-4" data-aos="fade-right" data-aos-delay="200">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                <path d="M10 2a.75.75 0 0 1 .75.75v1.5h3.75a.75.75 0 0 1 0 1.5H10.75v1.5a.75.75 0 0 1-1.5 0v-1.5H5.5a.75.75 0 0 1 0-1.5h3.75v-1.5A.75.75 0 0 1 10 2ZM5.5 6A.5.5 0 0 0 5 6.5v2.25a.75.75 0 0 0 1.5 0V7.25h7V8.75a.75.75 0 0 0 1.5 0V6.5a.5.5 0 0 0-.5-.5h-9Z" />
+                                <path fill-rule="evenodd" d="M3 10.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v6.5a1.5 1.5 0 0 1-1.5 1.5h-10A1.5 1.5 0 0 1 3 17v-6.5Zm1.5 6h10a.5.5 0 0 0 .5-.5v-5.5H4v5.5a.5.5 0 0 0 .5.5Z" clip-rule="evenodd" />
+                            </svg>
+                            <span data-translate="special-offer">Ưu đãi đặc biệt</span>
+                        </span>
+                        <h3 class="text-3xl md:text-4xl font-bold mb-3" data-aos="fade-right" data-aos-delay="300">
+                            <span class="text-yellow-300" data-translate="discount-20">Giảm 20%</span> <span data-translate="first-order">cho đơn hàng đầu tiên</span>
+                        </h3>
+                        <p class="text-white/80 mb-6" data-aos="fade-right" data-aos-delay="400" data-translate="promo-desc">
+                            Chào mừng bạn đến với StarShop! Nhận ngay ưu đãi hấp dẫn khi mua sắm lần đầu.
+                        </p>
+                        <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4" data-aos="fade-right" data-aos-delay="500">
+                            <a href="/products" class="inline-flex items-center gap-2 bg-white text-primary px-6 py-3 rounded-full font-semibold hover:bg-pink-100 transition-all duration-300 hover:scale-105 shadow-md">
+                                <span data-translate="shop-now">Mua sắm ngay</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+                                    <path fill-rule="evenodd" d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z" clip-rule="evenodd" />
+                                </svg>
+                            </a>
+                            <div class="bg-white/20 border-2 border-dashed border-white/50 px-4 py-2 rounded-lg font-mono tracking-widest text-white">
+                                WELCOME20
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="grid grid-cols-2 gap-6 text-white" data-aos="fade-left" data-aos-delay="200">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                    <path d="M3.5 3A1.5 1.5 0 0 0 2 4.5v9A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5v-5.819a1.5 1.5 0 0 0-.7-1.28L11.45 4.14a1.5 1.5 0 0 0-1.9 0l-2.35 1.763A1.5 1.5 0 0 0 6.5 7.681V13.5a.5.5 0 0 1-1 0V4.5a.5.5 0 0 1 .5-.5h1.5a.5.5 0 0 1 .5.5v3.181a1.5 1.5 0 0 0 .7 1.28l2.35 1.763a1.5 1.5 0 0 0 1.9 0L14.2 8.36a1.5 1.5 0 0 0 .7-1.28V4.5A1.5 1.5 0 0 0 13.5 3h-10Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold" data-translate="free-shipping">Miễn phí giao hàng</h4>
+                                <p class="text-sm text-white/80" data-translate="hcm-area">Nội thành TPHCM</p>
+                            </div>
+                        </div>
+                         <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                    <path d="M6.5 3c-1.051 0-2.093.04-3.125.117A1.49 1.49 0 0 0 2.25 4.75v10.5c0 .546.285 1.03.75 1.303A3.5 3.5 0 0 1 6.5 12.5a3.5 3.5 0 0 1 3.25 2.25H16.5a1.5 1.5 0 0 0 1.5-1.5V9a1.5 1.5 0 0 0-1.5-1.5h-3.25a2.25 2.25 0 0 1-2.14-1.543l-.5-1.543A1.5 1.5 0 0 0 9.17 5H6.5ZM18 10v3.75a3 3 0 0 1-3 3H6.5a1 1 0 1 0 0-2H15V10h3Z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold" data-translate="delivery-2h">Giao hàng 2 giờ</h4>
+                                <p class="text-sm text-white/80" data-translate="fast-reliable">Nhanh chóng & tin cậy</p>
+                            </div>
+                        </div>
+                         <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                    <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold" data-translate="fresh-flowers-100">Hoa tươi 100%</h4>
+                                <p class="text-sm text-white/80" data-translate="quality-guaranteed">Đảm bảo chất lượng</p>
+                            </div>
+                        </div>
+                         <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6">
+                                  <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold" data-translate="five-star-rating">Đánh giá 5 sao</h4>
+                                <p class="text-sm text-white/80" data-translate="from-customers">Từ khách hàng</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section - Tailwind -->
+    <section class="py-16 lg:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16" data-aos="fade-up" data-aos-duration="800">
+                <div class="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-semibold mb-4">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM1.49 15.326a.78.78 0 0 1-.358-.442 3 3 0 0 1 4.308-3.516 6.484 6.484 0 0 0-1.905 3.959c-.023.222-.014.442.025.654a4.97 4.97 0 0 1-2.07-.655ZM16.44 15.98a4.97 4.97 0 0 0 2.07-.654.78.78 0 0 0 .357-.442 3 3 0 0 0-4.308-3.517 6.484 6.484 0 0 1 1.907 3.96 2.32 2.32 0 0 1-.026.654ZM18 8a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM5.304 16.19a.844.844 0 0 1-.277-.71 5 5 0 0 1 9.947 0 .843.843 0 0 1-.277.71A6.975 6.975 0 0 1 10 18a6.974 6.974 0 0 1-4.696-1.81Z" />
+                    <span data-translate="customer-reviews">Đánh giá từ khách hàng</span>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4" data-translate="what-customers-say">Khách hàng nói gì về chúng tôi</h2>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto" data-translate="testimonials-desc">
+                    Hàng nghìn khách hàng đã tin tưởng và hài lòng với dịch vụ của StarShop
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 group hover:-translate-y-2" data-aos="fade-up" data-aos-duration="600" data-aos-delay="100">
+                    <div class="flex items-center gap-1 mb-4">
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <svg class="w-10 h-10 text-pink-200 mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.5 10c-.223 0-.437.034-.65.065.069-.232.14-.468.254-.68.114-.308.292-.575.469-.844.148-.291.409-.488.601-.737.201-.242.475-.403.692-.604.213-.21.492-.315.714-.463.232-.133.434-.28.65-.35.208-.086.39-.16.539-.222.302-.125.474-.197.474-.197L9.758 4.03c0 0-.218.052-.597.144C8.97 4.222 8.737 4.278 8.472 4.345c-.271.05-.56.187-.882.312C7.272 4.799 6.904 4.895 6.562 5.123c-.344.218-.741.4-1.091.692C5.132 6.116 4.723 6.377 4.421 6.76c-.33.358-.656.734-.909 1.162C3.219 8.33 3.02 8.778 2.81 9.221c-.19.443-.343.896-.468 1.336-.237.882-.343 1.72-.384 2.437-.034.718-.014 1.315.028 1.747.015.204.043.402.063.539.017.109.025.168.025.168l.026-.006C2.535 17.474 4.338 19 6.5 19c2.485 0 4.5-2.015 4.5-4.5S8.985 10 6.5 10zM17.5 10c-.223 0-.437.034-.65.065.069-.232.14-.468.254-.68.114-.308.292-.575.469-.844.148-.291.409-.488.601-.737.201-.242.475-.403.692-.604.213-.21.492-.315.714-.463.232-.133.434-.28.65-.35.208-.086.39-.16.539-.222.302-.125.474-.197.474-.197L20.758 4.03c0 0-.218.052-.597.144-.191.048-.424.104-.689.171-.271.05-.56.187-.882.312-.317.143-.686.238-1.028.467-.344.218-.741.4-1.091.692-.339.301-.748.562-1.05.944-.33.358-.656.734-.909 1.162C14.219 8.33 14.02 8.778 13.81 9.221c-.19.443-.343.896-.468 1.336-.237.882-.343 1.72-.384 2.437-.034.718-.014 1.315.028 1.747.015.204.043.402.063.539.017.109.025.168.025.168l.026-.006C13.535 17.474 15.338 19 17.5 19c2.485 0 4.5-2.015 4.5-4.5S19.985 10 17.5 10z" />
+                    </svg>
+                    <p class="text-gray-700 leading-relaxed mb-6 italic">
+                        "Hoa rất tươi và đẹp, giao hàng đúng giờ. Người yêu mình rất thích món quà bất ngờ này. Chắc chắn sẽ quay lại StarShop!"
+                    </p>
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                            NA
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900">Nguyễn Văn An</h5>
+                            <p class="text-sm text-gray-500">TP. Hồ Chí Minh</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 group hover:-translate-y-2 border border-blue-100" data-aos="fade-up" data-aos-duration="600" data-aos-delay="200">
+                    <div class="flex items-center gap-1 mb-4">
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <svg class="w-10 h-10 text-blue-200 mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.5 10c-.223 0-.437.034-.65.065.069-.232.14-.468.254-.68.114-.308.292-.575.469-.844.148-.291.409-.488.601-.737.201-.242.475-.403.692-.604.213-.21.492-.315.714-.463.232-.133.434-.28.65-.35.208-.086.39-.16.539-.222.302-.125.474-.197.474-.197L9.758 4.03c0 0-.218.052-.597.144C8.97 4.222 8.737 4.278 8.472 4.345c-.271.05-.56.187-.882.312C7.272 4.799 6.904 4.895 6.562 5.123c-.344.218-.741.4-1.091.692C5.132 6.116 4.723 6.377 4.421 6.76c-.33.358-.656.734-.909 1.162C3.219 8.33 3.02 8.778 2.81 9.221c-.19.443-.343.896-.468 1.336-.237.882-.343 1.72-.384 2.437-.034.718-.014 1.315.028 1.747.015.204.043.402.063.539.017.109.025.168.025.168l.026-.006C2.535 17.474 4.338 19 6.5 19c2.485 0 4.5-2.015 4.5-4.5S8.985 10 6.5 10zM17.5 10c-.223 0-.437.034-.65.065.069-.232.14-.468.254-.68.114-.308.292-.575.469-.844.148-.291.409-.488.601-.737.201-.242.475-.403.692-.604.213-.21.492-.315.714-.463.232-.133.434-.28.65-.35.208-.086.39-.16.539-.222.302-.125.474-.197.474-.197L20.758 4.03c0 0-.218.052-.597.144-.191.048-.424.104-.689.171-.271.05-.56.187-.882.312-.317.143-.686.238-1.028.467-.344.218-.741.4-1.091.692-.339.301-.748.562-1.05.944-.33.358-.656.734-.909 1.162C14.219 8.33 14.02 8.778 13.81 9.221c-.19.443-.343.896-.468 1.336-.237.882-.343 1.72-.384 2.437-.034.718-.014 1.315.028 1.747.015.204.043.402.063.539.017.109.025.168.025.168l.026-.006C13.535 17.474 15.338 19 17.5 19c2.485 0 4.5-2.015 4.5-4.5S19.985 10 17.5 10z" />
+                    </svg>
+                    <p class="text-gray-700 leading-relaxed mb-6 italic">
+                        "Dịch vụ tuyệt vời! Bó hoa sinh nhật cho mẹ được thiết kế rất tinh tế và ý nghĩa. Mẹ mình rất cảm động. Cảm ơn StarShop!"
+                    </p>
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+                            TB
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900">Trần Thị Bình</h5>
+                            <p class="text-sm text-gray-500">Hà Nội</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 group hover:-translate-y-2 border border-green-100" data-aos="fade-up" data-aos-duration="600" data-aos-delay="300">
+                    <div class="flex items-center gap-1 mb-4">
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                        <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <svg class="w-10 h-10 text-green-200 mb-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M6.5 10c-.223 0-.437.034-.65.065.069-.232.14-.468.254-.68.114-.308.292-.575.469-.844.148-.291.409-.488.601-.737.201-.242.475-.403.692-.604.213-.21.492-.315.714-.463.232-.133.434-.28.65-.35.208-.086.39-.16.539-.222.302-.125.474-.197.474-.197L9.758 4.03c0 0-.218.052-.597.144C8.97 4.222 8.737 4.278 8.472 4.345c-.271.05-.56.187-.882.312C7.272 4.799 6.904 4.895 6.562 5.123c-.344.218-.741.4-1.091.692C5.132 6.116 4.723 6.377 4.421 6.76c-.33.358-.656.734-.909 1.162C3.219 8.33 3.02 8.778 2.81 9.221c-.19.443-.343.896-.468 1.336-.237.882-.343 1.72-.384 2.437-.034.718-.014 1.315.028 1.747.015.204.043.402.063.539.017.109.025.168.025.168l.026-.006C2.535 17.474 4.338 19 6.5 19c2.485 0 4.5-2.015 4.5-4.5S8.985 10 6.5 10zM17.5 10c-.223 0-.437.034-.65.065.069-.232.14-.468.254-.68.114-.308.292-.575.469-.844.148-.291.409-.488.601-.737.201-.242.475-.403.692-.604.213-.21.492-.315.714-.463.232-.133.434-.28.65-.35.208-.086.39-.16.539-.222.302-.125.474-.197.474-.197L20.758 4.03c0 0-.218.052-.597.144-.191.048-.424.104-.689.171-.271.05-.56.187-.882.312-.317.143-.686.238-1.028.467-.344.218-.741.4-1.091.692-.339.301-.748.562-1.05.944-.33.358-.656.734-.909 1.162C14.219 8.33 14.02 8.778 13.81 9.221c-.19.443-.343.896-.468 1.336-.237.882-.343 1.72-.384 2.437-.034.718-.014 1.315.028 1.747.015.204.043.402.063.539.017.109.025.168.025.168l.026-.006C13.535 17.474 15.338 19 17.5 19c2.485 0 4.5-2.015 4.5-4.5S19.985 10 17.5 10z" />
+                    </svg>
+                    <p class="text-gray-700 leading-relaxed mb-6 italic">
+                        "Lần đầu đặt hoa online và được trải nghiệm tuyệt vời. Hoa đẹp, gói gọn gàng, giao hàng nhanh. Nhân viên tư vấn rất nhiệt tình!"
+                    </p>
+                    <div class="flex items-center gap-4 pt-4 border-t border-gray-100">
+                        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold text-lg">
+                            LC
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-gray-900">Lê Minh Châu</h5>
+                            <p class="text-sm text-gray-500">Đà Nẵng</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ad Popup: Modern modal using Tailwind utilities -->
+    <div id="ad-popup" class="fixed inset-0 z-[100] hidden items-center justify-center p-4 bg-black/50 backdrop-blur-sm ad-overlay" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="relative z-10 w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden ring-1 ring-black/5 ad-dialog">
+            <button type="button" id="ad-popup-close" aria-label="Đóng quảng cáo"
+                    class="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/95 text-gray-700 shadow hover:bg-white focus:outline-none focus:ring-2 focus:ring-rose-400">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 0 1 1.414 0L10 8.586l4.293-4.293a1 1 0 1 1 1.414 1.414L11.414 10l4.293 4.293a1 1 0 0 1-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L8.586 10 4.293 5.707a1 1 0 0 1 0-1.414Z" clip-rule="evenodd"/></svg>
+            </button>
+            <div class="bg-white flex items-center justify-center ad-content">
+                <img src="/images/ad.png" alt="Ưu đãi StarShop" class="block max-w-full w-auto h-auto object-contain">
+            </div>
+        </div>
+    </div>
+
+    <!-- Home page JS include -->
+    <script src="/js/home.js"></script>
+</th:block>
+
+</body>
+</html>

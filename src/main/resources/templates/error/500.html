@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/main :: layout(~{::title}, 'Lỗi máy chủ - StarShop', ~{::link}, ~{::content})}">
+<head>
+    <title>Lỗi 500 - Lỗi máy chủ</title>
+    <th:block th:fragment="link">
+        <style>
+            .error-template {
+                padding: 40px 15px;
+                text-align: center;
+            }
+            .error-actions {
+                margin-top: 15px;
+                margin-bottom: 15px;
+            }
+            .error-actions .btn {
+                margin-right: 10px;
+            }
+        </style>
+    </th:block>
+</head>
+<body>
+    <div th:fragment="content">
+        <!-- Error Page -->
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 text-center">
+                    <div class="error-template">
+                        <h1 class="display-1 text-danger">500</h1>
+                        <h2 class="mb-4">Lỗi máy chủ</h2>
+                        <div class="error-details mb-4">
+                            <p class="lead" th:if="${errorMessage}" th:text="${errorMessage}">
+                                Có lỗi xảy ra khi xử lý yêu cầu của bạn.
+                            </p>
+                            <p class="lead" th:unless="${errorMessage}">
+                                Có lỗi xảy ra khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.
+                            </p>
+                        </div>
+                        <div class="error-actions">
+                            <a href="/home" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-home me-2"></i>
+                                Về trang chủ
+                            </a>
+                            <a href="/products" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-shopping-bag me-2"></i>
+                                Xem sản phẩm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

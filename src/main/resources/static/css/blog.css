@@ -1,0 +1,20 @@
+/* ================================
+   BLOG PAGE CSS - Tailwind Migration Complete
+   Only essential utilities remain
+   ================================ */
+
+/* Line clamp utility - used in blog cards */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-clamp: 3; /* Standard property for compatibility */
+}
+
+/* Print styles */
+@media print {
+    .no-print {
+        display: none;
+    }
+}

@@ -1,0 +1,1241 @@
+<!-- Admin Products Management Content -->
+<div xmlns:th="http://www.thymeleaf.org">
+        <!-- Breadcrumbs -->
+        <nav class="flex mb-6" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li th:each="breadcrumb : ${breadcrumbs}" class="inline-flex items-center">
+                    <a th:href="${breadcrumb.url}" 
+                       th:text="${breadcrumb.title}"
+                       class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                    </a>
+                    <svg th:unless="${breadcrumbStat.last}" class="w-6 h-6 text-gray-400 ml-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+                <p class="mt-1 text-sm text-gray-500">Quản lý tất cả sản phẩm trong cửa hàng</p>
+            </div>
+            <div class="mt-4 sm:mt-0 flex space-x-3">
+                <button onclick="exportProducts()" class="inline-flex items-center px-5 py-2.5 border-2 border-gray-300 rounded-xl text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow">
+                    <i class="fas fa-download mr-2"></i>
+                    Xuất Excel
+                </button>
+                <button onclick="openCreateModal()" class="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl text-sm font-semibold text-white hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg">
+                    <i class="fas fa-plus mr-2"></i>
+                    Thêm sản phẩm
+                </button>
+            </div>
+        </div>
+        
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-sm p-6 border border-blue-200 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-box text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-xs font-semibold text-blue-700 uppercase tracking-wide">Tổng sản phẩm</p>
+                        <p class="text-3xl font-extrabold text-blue-900 mt-1" th:text="${statistics.totalProducts ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-sm p-6 border border-green-200 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-check-circle text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-xs font-semibold text-green-700 uppercase tracking-wide">Đang bán</p>
+                        <p class="text-3xl font-extrabold text-green-900 mt-1" th:text="${statistics.activeProducts ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-xl shadow-sm p-6 border border-yellow-200 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-yellow-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-xs font-semibold text-yellow-700 uppercase tracking-wide">Sắp hết</p>
+                        <p class="text-3xl font-extrabold text-yellow-900 mt-1" th:text="${statistics.lowStockProducts ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-xl shadow-sm p-6 border border-red-200 hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <div class="w-14 h-14 bg-red-500 rounded-xl flex items-center justify-center shadow-lg">
+                            <i class="fas fa-times-circle text-white text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-xs font-semibold text-red-700 uppercase tracking-wide">Hết hàng</p>
+                        <p class="text-3xl font-extrabold text-red-900 mt-1" th:text="${statistics.outOfStockProducts ?: 0}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filters & Search -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+            <form method="GET" th:action="@{/admin/products}" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                        <select name="status" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Tất cả trạng thái</option>
+                            <option th:each="status : ${productStatuses}" 
+                                    th:value="${status}" 
+                                    th:text="${status.name()}"
+                                    th:selected="${status.name() == param.status}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sắp xếp theo</label>
+                        <select name="sortBy" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="createdAt" th:selected="${sortBy == 'createdAt'}">Ngày tạo</option>
+                            <option value="name" th:selected="${sortBy == 'name'}">Tên sản phẩm</option>
+                            <option value="price" th:selected="${sortBy == 'price'}">Giá</option>
+                            <option value="stockQuantity" th:selected="${sortBy == 'stockQuantity'}">Tồn kho</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Thứ tự</label>
+                        <select name="sortDir" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="desc" th:selected="${sortDir == 'desc'}">Giảm dần</option>
+                            <option value="asc" th:selected="${sortDir == 'asc'}">Tăng dần</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tìm kiếm</label>
+                        <input type="text" name="search" th:value="${search}" 
+                               placeholder="Tên sản phẩm..." 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <a th:href="@{/admin/products}" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors duration-200">
+                        Xóa bộ lọc
+                    </a>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200">
+                        <i class="fas fa-search mr-2"></i>
+                        Tìm kiếm
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Bulk Actions -->
+        <div id="bulkActions" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6" style="display: none;">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-check-circle text-blue-600"></i>
+                    <span class="text-sm font-medium text-blue-900">
+                        Đã chọn <span id="selectedCount">0</span> sản phẩm
+                    </span>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="bulkUpdateStatus()" class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-edit mr-1"></i>
+                        Cập nhật trạng thái
+                    </button>
+                    <button onclick="bulkUpdateStock()" class="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 transition-colors">
+                        <i class="fas fa-boxes mr-1"></i>
+                        Cập nhật tồn kho
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold text-gray-900">Danh sách sản phẩm</h3>
+                    <div class="flex items-center space-x-2 text-sm text-gray-500">
+                        <span>Hiển thị <span th:text="${productsPage.numberOfElements}">0</span> / <span th:text="${productsPage.totalElements}">0</span> sản phẩm</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Table -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sản phẩm</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tồn kho</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trạng thái</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày tạo</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="product : ${productsPage.content}" class="hover:bg-gray-50 transition-colors duration-200">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <input type="checkbox" name="productIds" th:value="${product.id}" onchange="updateBulkActionButtons()" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-12 w-12">
+                                        <img class="h-12 w-12 rounded-lg object-cover" 
+                                             th:src="${product.image != null ? product.image : '/images/placeholder-product.jpg'}" 
+                                             th:alt="${product.name}">
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900" th:text="${product.name}">Tên sản phẩm</div>
+                                        <div class="text-sm text-gray-500">ID: <span th:text="${product.id}">1</span></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-semibold text-gray-900" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900" th:text="${product.stockQuantity ?: 0}">0</div>
+                                <div class="text-xs text-gray-500" th:if="${product.stockQuantity != null and product.stockQuantity > 0 and product.stockQuantity < 10}">
+                                    <i class="fas fa-exclamation-triangle text-yellow-500 mr-1"></i>Sắp hết
+                                </div>
+                                <div class="text-xs text-red-600" th:if="${product.stockQuantity != null and product.stockQuantity == 0}">
+                                    <i class="fas fa-times-circle mr-1"></i>Hết hàng
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:switch="${product.status?.name()}" 
+                                      class="inline-flex px-2 py-1 text-xs font-semibold rounded-full">
+                                    <span th:case="'ACTIVE'" class="bg-green-100 text-green-800">Đang bán</span>
+                                    <span th:case="'INACTIVE'" class="bg-gray-100 text-gray-800">Ngừng bán</span>
+                                    <span th:case="'OUT_OF_STOCK'" class="bg-red-100 text-red-800">Hết hàng</span>
+                                    <span th:case="'DISCONTINUED'" class="bg-yellow-100 text-yellow-800">Ngừng sản xuất</span>
+                                    <span th:case="*" class="bg-gray-100 text-gray-800">Không xác định</span>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div th:text="${#temporals.format(product.createdAt, 'dd/MM/yyyy')}">01/01/2024</div>
+                                <div class="text-xs" th:text="${#temporals.format(product.createdAt, 'HH:mm')}">00:00</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end space-x-2">
+                                    <button onclick="viewProduct(this)" 
+                                            th:data-product-id="${product.id}"
+                                            class="text-blue-600 hover:text-blue-900 p-1 rounded transition-colors duration-200"
+                                            title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button onclick="editProduct(this)" 
+                                            th:data-product-id="${product.id}"
+                                            class="text-green-600 hover:text-green-900 p-1 rounded transition-colors duration-200"
+                                            title="Chỉnh sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="updateStock(this)" 
+                                            th:data-product-id="${product.id}"
+                                            th:data-current-stock="${product.stockQuantity ?: 0}"
+                                            class="text-yellow-600 hover:text-yellow-900 p-1 rounded transition-colors duration-200"
+                                            title="Cập nhật tồn kho">
+                                        <i class="fas fa-boxes"></i>
+                                    </button>
+                                    <button onclick="deleteProduct(this)" 
+                                            th:data-product-id="${product.id}"
+                                            th:data-product-name="${product.name}"
+                                            class="text-red-600 hover:text-red-900 p-1 rounded transition-colors duration-200"
+                                            title="Xóa sản phẩm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Empty State -->
+                        <tr th:if="${productsPage.content.empty}">
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <i class="fas fa-box-open text-4xl text-gray-300 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Không có sản phẩm nào</h3>
+                                    <p class="text-gray-500 mb-4">Chưa có sản phẩm nào được tạo hoặc không tìm thấy kết quả phù hợp.</p>
+                                    <button onclick="openCreateModal()" 
+                                            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-lg text-sm font-medium text-white hover:bg-blue-700 transition-colors duration-200">
+                                        <i class="fas fa-plus mr-2"></i>
+                                        Thêm sản phẩm đầu tiên
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="px-6 py-4 border-t border-gray-200 bg-gray-50" th:if="${productsPage.totalPages > 1}">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-700">
+                        Hiển thị <span th:text="${productsPage.numberOfElements}">0</span> trên tổng số <span th:text="${productsPage.totalElements}">0</span> sản phẩm
+                    </div>
+                    <nav class="flex items-center space-x-2">
+                        <!-- Previous Button -->
+                        <a th:if="${productsPage.hasPrevious()}" 
+                           th:href="@{/admin/products(page=${productsPage.number - 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, status=${status}, search=${search})}"
+                           class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors duration-200">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        
+                        <!-- Page Numbers -->
+                        <span th:each="pageNum : ${#numbers.sequence(0, productsPage.totalPages - 1)}" 
+                              th:if="${pageNum >= productsPage.number - 2 and pageNum <= productsPage.number + 2}">
+                            <a th:if="${pageNum != productsPage.number}"
+                               th:href="@{/admin/products(page=${pageNum}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, status=${status}, search=${search})}"
+                               th:text="${pageNum + 1}"
+                               class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors duration-200">
+                            </a>
+                            <span th:if="${pageNum == productsPage.number}"
+                                  th:text="${pageNum + 1}"
+                                  class="px-3 py-2 text-sm font-medium text-white bg-blue-600 border border-blue-600 rounded-lg">
+                            </span>
+                        </span>
+                        
+                        <!-- Next Button -->
+                        <a th:if="${productsPage.hasNext()}" 
+                           th:href="@{/admin/products(page=${productsPage.number + 1}, size=${pageSize}, sortBy=${sortBy}, sortDir=${sortDir}, status=${status}, search=${search})}"
+                           class="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 hover:text-gray-700 transition-colors duration-200">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity Sidebar - Removed (feature not implemented yet) -->
+        
+        <!-- JavaScript Functions -->
+        <script>
+            // CSRF Token Helper
+            function getCsrfToken() {
+                const tokenElement = document.querySelector('meta[name="_csrf"]');
+                return tokenElement ? tokenElement.getAttribute('content') : '';
+            }
+            
+            function getCsrfHeader() {
+                const headerElement = document.querySelector('meta[name="_csrf_header"]');
+                return headerElement ? headerElement.getAttribute('content') : 'X-CSRF-TOKEN';
+            }
+            
+            // Edit product
+            function editProduct(button) {
+                const id = button.getAttribute('data-product-id');
+                openFormModal('edit', id);
+            }
+            
+            // Update stock
+            function updateStock(button) {
+                const id = button.getAttribute('data-product-id');
+                const currentStock = button.getAttribute('data-current-stock');
+                const newStock = prompt(`Nhập số lượng tồn kho mới (hiện tại: ${currentStock}):`, currentStock);
+                if (newStock !== null && !isNaN(newStock) && newStock >= 0) {
+                    const headers = {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    };
+                    const csrfToken = getCsrfToken();
+                    if (csrfToken) {
+                        headers[getCsrfHeader()] = csrfToken;
+                    }
+                    
+                    fetch(`/admin/products/api/${id}/stock`, {
+                        method: 'PUT',
+                        headers: headers,
+                        body: `stockQuantity=${newStock}`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            if (typeof showError === 'function') {
+                                showError('Lỗi: ' + data.error);
+                            }
+                        } else {
+                            if (typeof showSuccess === 'function') {
+                                showSuccess('Cập nhật tồn kho thành công!');
+                            }
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if (typeof showError === 'function') {
+                            showError('Có lỗi xảy ra khi cập nhật tồn kho');
+                        }
+                    });
+                }
+            }
+            
+            // Delete product
+            async function deleteProduct(button) {
+                const id = button.getAttribute('data-product-id');
+                const name = button.getAttribute('data-product-name');
+                
+                let confirmed = false;
+                if (typeof confirmDelete === 'function') {
+                    confirmed = await confirmDelete(`Xóa sản phẩm "${name}"?`, 'Hành động này không thể hoàn tác.');
+                } else {
+                    confirmed = confirm(`Bạn có chắc chắn muốn xóa sản phẩm "${name}"?`);
+                }
+                
+                if (confirmed) {
+                    const headers = {};
+                    const csrfToken = getCsrfToken();
+                    if (csrfToken) {
+                        headers[getCsrfHeader()] = csrfToken;
+                    }
+                    
+                    fetch(`/admin/products/api/${id}`, {
+                        method: 'DELETE',
+                        headers: headers
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.error) {
+                            if (typeof showError === 'function') {
+                                showError('Lỗi: ' + data.error);
+                            }
+                        } else {
+                            if (typeof showSuccess === 'function') {
+                                showSuccess('Xóa sản phẩm thành công!');
+                            }
+                            location.reload();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        if (typeof showError === 'function') {
+                            showError('Có lỗi xảy ra khi xóa sản phẩm');
+                        }
+                    });
+                }
+            }
+            
+            // Open create modal
+            function openCreateModal() {
+                openFormModal('create');
+            }
+            
+            // Export products
+            function exportProducts() {
+                const url = new URL(window.location.href);
+                const status = document.getElementById('statusFilter') ? document.getElementById('statusFilter').value : url.searchParams.get('status');
+                const search = document.getElementById('searchInput') ? document.getElementById('searchInput').value : url.searchParams.get('search');
+                const qs = new URLSearchParams();
+                if (status) qs.append('status', status);
+                if (search) qs.append('search', search);
+                window.location.href = '/admin/products/api/export' + (qs.toString() ? ('?' + qs.toString()) : '');
+            }
+
+            // Bulk operations
+            function bulkUpdateStatus() {
+                const selectedIds = getSelectedProductIds();
+                if (selectedIds.length === 0) {
+                    if (typeof showWarning === 'function') {
+                        showWarning('Vui lòng chọn ít nhất một sản phẩm');
+                    }
+                    return;
+                }
+                
+                const newStatus = prompt('Nhập trạng thái mới (ACTIVE, INACTIVE, OUT_OF_STOCK, DISCONTINUED):');
+                if (!newStatus) return;
+                
+                const request = {
+                    productIds: selectedIds,
+                    newStatus: newStatus.toUpperCase(),
+                    reason: 'Bulk update from admin'
+                };
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                const csrfToken = getCsrfToken();
+                if (csrfToken) {
+                    headers[getCsrfHeader()] = csrfToken;
+                }
+                
+                fetch('/admin/products/api/bulk-status', {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(request)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        if (typeof showError === 'function') {
+                            showError('Lỗi: ' + data.error);
+                        }
+                    } else {
+                        if (typeof showSuccess === 'function') {
+                            showSuccess(data.data.message);
+                        }
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showError === 'function') {
+                        showError('Có lỗi xảy ra khi cập nhật trạng thái');
+                    }
+                });
+            }
+
+            function bulkUpdateStock() {
+                const selectedIds = getSelectedProductIds();
+                if (selectedIds.length === 0) {
+                    if (typeof showWarning === 'function') {
+                        showWarning('Vui lòng chọn ít nhất một sản phẩm');
+                    }
+                    return;
+                }
+                
+                const updates = [];
+                for (const id of selectedIds) {
+                    const newStock = prompt(`Nhập số lượng tồn kho mới cho sản phẩm ID ${id}:`);
+                    if (newStock === null) return; // User cancelled
+                    
+                    const stock = parseInt(newStock);
+                    if (isNaN(stock) || stock < 0) {
+                        if (typeof showWarning === 'function') {
+                            showWarning('Số lượng tồn kho phải là số nguyên >= 0');
+                        }
+                        return;
+                    }
+                    
+                    updates.push({ id: id, stock: stock });
+                }
+                
+                const request = { updates: updates };
+                
+                const headers = {
+                    'Content-Type': 'application/json',
+                };
+                const csrfToken = getCsrfToken();
+                if (csrfToken) {
+                    headers[getCsrfHeader()] = csrfToken;
+                }
+                
+                fetch('/admin/products/api/bulk-stock', {
+                    method: 'PUT',
+                    headers: headers,
+                    body: JSON.stringify(request)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        if (typeof showError === 'function') {
+                            showError('Lỗi: ' + data.error);
+                        }
+                    } else {
+                        if (typeof showSuccess === 'function') {
+                            showSuccess(data.data.message);
+                        }
+                        location.reload();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showError === 'function') {
+                        showError('Có lỗi xảy ra khi cập nhật tồn kho');
+                    }
+                });
+            }
+
+            function getSelectedProductIds() {
+                const checkboxes = document.querySelectorAll('input[name="productIds"]:checked');
+                return Array.from(checkboxes).map(cb => parseInt(cb.value));
+            }
+
+            function toggleSelectAll() {
+                const selectAllCheckbox = document.getElementById('selectAll');
+                const productCheckboxes = document.querySelectorAll('input[name="productIds"]');
+                
+                productCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+                
+                updateBulkActionButtons();
+            }
+
+            function updateBulkActionButtons() {
+                const selectedCount = getSelectedProductIds().length;
+                const bulkActions = document.getElementById('bulkActions');
+                
+                if (selectedCount > 0) {
+                    bulkActions.style.display = 'block';
+                    document.getElementById('selectedCount').textContent = selectedCount;
+                } else {
+                    bulkActions.style.display = 'none';
+                }
+            }
+
+            // Analytics and Recent Activity features removed
+            // These are advanced features that can be implemented later
+            // For now, the basic product management is fully functional
+
+            // Initialize page
+            document.addEventListener('DOMContentLoaded', function() {
+                // Add event listeners for checkboxes
+                document.addEventListener('change', function(e) {
+                    if (e.target.name === 'productIds') {
+                        updateBulkActionButtons();
+                    }
+                });
+            });
+        </script>
+
+    <!-- Create/Edit Product Modal -->
+    <div id="productFormModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-10 mx-auto p-5 border w-11/12 max-w-4xl shadow-2xl rounded-xl bg-white mb-10">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+                <h3 id="formModalTitle" class="text-xl font-bold text-gray-900">Thêm sản phẩm mới</h3>
+                <button onclick="closeFormModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <form id="productForm" enctype="multipart/form-data" class="mt-6">
+                <input type="hidden" id="productId" name="productId">
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-4">
+                        <!-- Product Name -->
+                        <div>
+                            <label for="productName" class="block text-sm font-medium text-gray-700 mb-2">
+                                Tên sản phẩm <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="productName" name="name" required
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="Nhập tên sản phẩm">
+                        </div>
+                        
+                        <!-- Price -->
+                        <div>
+                            <label for="productPrice" class="block text-sm font-medium text-gray-700 mb-2">
+                                Giá sản phẩm (₫) <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" id="productPrice" name="price" required min="0" max="99999999" step="1000"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="0">
+                            <p class="mt-1 text-xs text-gray-500">Giá tối đa: 99,999,999₫</p>
+                        </div>
+                        
+                        <!-- Stock Quantity -->
+                        <div>
+                            <label for="productStock" class="block text-sm font-medium text-gray-700 mb-2">
+                                Số lượng tồn kho <span class="text-red-500">*</span>
+                            </label>
+                            <input type="number" id="productStock" name="stockQuantity" required min="0"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="0">
+                        </div>
+                        
+                        <!-- Status -->
+                        <div>
+                            <label for="productStatus" class="block text-sm font-medium text-gray-700 mb-2">
+                                Trạng thái <span class="text-red-500">*</span>
+                            </label>
+                            <select id="productStatus" name="status" required
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="ACTIVE">Đang bán</option>
+                                <option value="INACTIVE">Ngừng bán</option>
+                                <option value="OUT_OF_STOCK">Hết hàng</option>
+                                <option value="DISCONTINUED">Ngừng sản xuất</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Catalog -->
+                        <div>
+                            <label for="productCatalog" class="block text-sm font-medium text-gray-700 mb-2">
+                                Danh mục
+                            </label>
+                            <select id="productCatalog" name="catalogId"
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                <option value="">Chọn danh mục</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Image Upload -->
+                        <div>
+                            <label for="productImage" class="block text-sm font-medium text-gray-700 mb-2">
+                                Hình ảnh sản phẩm
+                            </label>
+                            <input type="file" id="productImage" name="image" accept="image/*"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <p class="mt-1 text-xs text-gray-500">Định dạng: JPG, PNG, GIF. Tối đa 50MB.</p>
+                            <div id="imagePreview" class="mt-3 hidden">
+                                <img id="previewImg" class="h-32 w-32 object-cover rounded-lg border border-gray-300" alt="Preview">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="space-y-4">
+                        <!-- Description -->
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="text-sm font-medium text-gray-700">Mô tả sản phẩm</label>
+                                <button type="button" id="btnGenerateDescription" 
+                                        class="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 
+                                               text-white text-xs rounded-lg hover:from-purple-600 
+                                               hover:to-pink-600 transition-all disabled:opacity-50 
+                                               disabled:cursor-not-allowed">
+                                    <i class="fas fa-sparkles mr-1"></i>Tạo mô tả bằng AI
+                                </button>
+                            </div>
+                            <textarea id="productDescription" name="description" rows="5"
+                                      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                      placeholder="Nhập mô tả chi tiết sản phẩm"></textarea>
+                        </div>
+                        
+                        <!-- AI Keywords Input -->
+                        <div>
+                            <label for="aiKeywords" class="block text-sm font-medium text-gray-700 mb-2">
+                                Từ khóa cho AI
+                            </label>
+                            <input type="text" id="aiKeywords" maxlength="200"
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   placeholder="VD: lãng mạn, nhập khẩu, sang trọng, tươi lâu">
+                            <p class="mt-1 text-xs text-gray-500">Từ khóa giúp AI tạo mô tả phù hợp hơn</p>
+                        </div>
+                        
+                        <!-- Shipping Information -->
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h4 class="text-sm font-semibold text-blue-900 mb-3 flex items-center">
+                                <i class="fas fa-shipping-fast mr-2"></i>
+                                Thông tin vận chuyển (GHN)
+                            </h4>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <!-- Weight -->
+                                <div>
+                                    <label for="productWeight" class="block text-xs font-medium text-gray-700 mb-1">
+                                        Trọng lượng (gram)
+                                    </label>
+                                    <input type="number" id="productWeight" name="weightG" min="1" value="500"
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <!-- Length -->
+                                <div>
+                                    <label for="productLength" class="block text-xs font-medium text-gray-700 mb-1">
+                                        Dài (cm)
+                                    </label>
+                                    <input type="number" id="productLength" name="lengthCm" min="1" value="20"
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <!-- Width -->
+                                <div>
+                                    <label for="productWidth" class="block text-xs font-medium text-gray-700 mb-1">
+                                        Rộng (cm)
+                                    </label>
+                                    <input type="number" id="productWidth" name="widthCm" min="1" value="20"
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                                
+                                <!-- Height -->
+                                <div>
+                                    <label for="productHeight" class="block text-xs font-medium text-gray-700 mb-1">
+                                        Cao (cm)
+                                    </label>
+                                    <input type="number" id="productHeight" name="heightCm" min="1" value="30"
+                                           class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            
+                            <p class="mt-2 text-xs text-blue-600">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Thông tin này sẽ được sử dụng để tính phí vận chuyển GHN
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Form Actions -->
+                <div class="mt-6 flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <button type="button" onclick="closeFormModal()" 
+                            class="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium">
+                        <i class="fas fa-times mr-2"></i>Hủy
+                    </button>
+                    <button type="submit" id="submitBtn"
+                            class="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                        <i class="fas fa-save mr-2"></i>Lưu sản phẩm
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Detail Modal -->
+    <div id="productDetailModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between pb-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-900">Chi tiết sản phẩm</h3>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div id="productDetailContent" class="mt-4">
+                <!-- Loading State -->
+                <div id="modalLoading" class="flex items-center justify-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    <span class="ml-2 text-gray-600">Đang tải...</span>
+                </div>
+                
+                <!-- Product Details Content -->
+                <div id="productDetails" class="hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Product Image -->
+                        <div class="space-y-4">
+                            <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
+                                <img id="modalProductImage" 
+                                     class="w-full h-64 object-center object-cover rounded-lg"
+                                     alt="Product Image">
+                            </div>
+                        </div>
+                        
+                        <!-- Product Information -->
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-900 mb-3">Thông tin cơ bản</h4>
+                                <dl class="grid grid-cols-1 gap-3">
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">ID:</dt>
+                                        <dd id="modalProductId" class="text-sm text-gray-900"></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Tên sản phẩm:</dt>
+                                        <dd id="modalProductName" class="text-sm text-gray-900 font-medium"></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Giá:</dt>
+                                        <dd id="modalProductPrice" class="text-sm text-gray-900 font-semibold text-green-600"></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Số lượng:</dt>
+                                        <dd id="modalProductStock" class="text-sm text-gray-900"></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Trạng thái:</dt>
+                                        <dd id="modalProductStatus" class="text-sm"></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-sm font-medium text-gray-500">Ngày tạo:</dt>
+                                        <dd id="modalProductCreated" class="text-sm text-gray-900"></dd>
+                                    </div>
+                                </dl>
+                            </div>
+                            
+                            <!-- Description -->
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">Mô tả</h4>
+                                <p id="modalProductDescription" class="text-sm text-gray-600 bg-gray-50 p-3 rounded-lg"></p>
+                            </div>
+                            
+                            <!-- Shipping Dimensions -->
+                            <div>
+                                <h4 class="text-lg font-medium text-gray-900 mb-2">Thông tin vận chuyển</h4>
+                                <dl class="grid grid-cols-2 gap-2 text-sm">
+                                    <div class="flex justify-between">
+                                        <dt class="text-gray-500">Trọng lượng:</dt>
+                                        <dd id="modalProductWeight" class="text-gray-900"></dd>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <dt class="text-gray-500">Kích thước:</dt>
+                                        <dd id="modalProductDimensions" class="text-gray-900"></dd>
+                                    </div>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="mt-6 flex justify-end space-x-3 pt-4 border-t">
+                        <button onclick="closeProductModal()" 
+                                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors">
+                            Đóng
+                        </button>
+                        <button onclick="editProductFromModal()" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-edit mr-1"></i> Chỉnh sửa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProductId = null;
+        
+        // View product in modal
+        function viewProduct(button) {
+            const productId = button.getAttribute('data-product-id');
+            currentProductId = productId;
+            
+            // Show modal
+            document.getElementById('productDetailModal').classList.remove('hidden');
+            document.getElementById('modalLoading').classList.remove('hidden');
+            document.getElementById('productDetails').classList.add('hidden');
+            
+            // Fetch product details
+            fetch(`/admin/products/api/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        if (typeof showError === 'function') {
+                            showError('Lỗi: ' + data.error);
+                        }
+                        closeProductModal();
+                    } else {
+                        populateProductModal(data.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showError === 'function') {
+                        showError('Có lỗi xảy ra khi tải thông tin sản phẩm');
+                    }
+                    closeProductModal();
+                });
+        }
+        
+        // Helper functions for status
+        function getStatusText(status) {
+            const statusMap = {
+                'ACTIVE': 'Đang bán',
+                'INACTIVE': 'Không hoạt động',
+                'OUT_OF_STOCK': 'Hết hàng',
+                'DISCONTINUED': 'Ngừng bán'
+            };
+            return statusMap[status] || status;
+        }
+        
+        function getStatusClass(status) {
+            const classMap = {
+                'ACTIVE': 'bg-green-100 text-green-800',
+                'INACTIVE': 'bg-gray-100 text-gray-800',
+                'OUT_OF_STOCK': 'bg-red-100 text-red-800',
+                'DISCONTINUED': 'bg-yellow-100 text-yellow-800'
+            };
+            return classMap[status] || 'bg-gray-100 text-gray-800';
+        }
+
+        // Populate modal with product data
+        function populateProductModal(product) {
+            // Hide loading, show content
+            document.getElementById('modalLoading').classList.add('hidden');
+            document.getElementById('productDetails').classList.remove('hidden');
+            
+            // Populate fields
+            document.getElementById('modalProductId').textContent = product.id;
+            document.getElementById('modalProductName').textContent = product.name;
+            document.getElementById('modalProductPrice').textContent = new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(product.price);
+            document.getElementById('modalProductStock').textContent = product.stockQuantity;
+            document.getElementById('modalProductDescription').textContent = product.description || 'Không có mô tả';
+            
+            // Status with styling
+            const statusElement = document.getElementById('modalProductStatus');
+            const statusText = getStatusText(product.status);
+            const statusClass = getStatusClass(product.status);
+            statusElement.innerHTML = `<span class="px-2 py-1 text-xs font-semibold rounded-full ${statusClass}">${statusText}</span>`;
+            
+            // Dates
+            document.getElementById('modalProductCreated').textContent = new Date(product.createdAt).toLocaleDateString('vi-VN');
+            
+            // Image
+            const imageElement = document.getElementById('modalProductImage');
+            imageElement.src = product.image || '/images/placeholder-product.jpg';
+            imageElement.alt = product.name;
+            
+            // Shipping info
+            document.getElementById('modalProductWeight').textContent = `${product.weightG || 500}g`;
+            document.getElementById('modalProductDimensions').textContent = 
+                `${product.lengthCm || 20} × ${product.widthCm || 20} × ${product.heightCm || 30} cm`;
+        }
+        
+        // Close modal
+        function closeProductModal() {
+            document.getElementById('productDetailModal').classList.add('hidden');
+            currentProductId = null;
+        }
+        
+        // Edit product from modal
+        function editProductFromModal() {
+            if (currentProductId) {
+                closeProductModal();
+                openFormModal('edit', currentProductId);
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('productDetailModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeProductModal();
+            }
+        });
+        
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (!document.getElementById('productDetailModal').classList.contains('hidden')) {
+                closeProductModal();
+                }
+                if (!document.getElementById('productFormModal').classList.contains('hidden')) {
+                    closeFormModal();
+                }
+            }
+        });
+        
+        // ==================== FORM MODAL FUNCTIONS ====================
+        
+        let isEditMode = false;
+        let catalogs = [];
+        
+        // Load catalogs on page load
+        function loadCatalogs() {
+            fetch('/admin/products/api/catalogs')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error loading catalogs:', data.error);
+                        return;
+                    }
+                    catalogs = data.data || [];
+                    populateCatalogDropdown();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        
+        // Populate catalog dropdown
+        function populateCatalogDropdown() {
+            const select = document.getElementById('productCatalog');
+            select.innerHTML = '<option value="">Chọn danh mục</option>';
+            catalogs.forEach(catalog => {
+                const option = document.createElement('option');
+                option.value = catalog.id;
+                option.textContent = catalog.value;
+                option.setAttribute('data-category-name', catalog.value);
+                select.appendChild(option);
+            });
+        }
+        
+        // Open form modal (create or edit)
+        function openFormModal(mode = 'create', productId = null) {
+            isEditMode = mode === 'edit';
+            const modal = document.getElementById('productFormModal');
+            const title = document.getElementById('formModalTitle');
+            const form = document.getElementById('productForm');
+            
+            // Reset form
+            form.reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+            
+            // Set defaults for shipping dimensions
+            document.getElementById('productWeight').value = '500';
+            document.getElementById('productLength').value = '20';
+            document.getElementById('productWidth').value = '20';
+            document.getElementById('productHeight').value = '30';
+            
+            if (isEditMode && productId) {
+                title.textContent = 'Chỉnh sửa sản phẩm';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save mr-2"></i>Cập nhật sản phẩm';
+                loadProductData(productId);
+            } else {
+                title.textContent = 'Thêm sản phẩm mới';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save mr-2"></i>Lưu sản phẩm';
+            }
+            
+            modal.classList.remove('hidden');
+        }
+        
+        // Close form modal
+        function closeFormModal() {
+            document.getElementById('productFormModal').classList.add('hidden');
+            document.getElementById('productForm').reset();
+            isEditMode = false;
+        }
+        
+        // Load product data for editing
+        function loadProductData(productId) {
+            fetch(`/admin/products/api/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        if (typeof showError === 'function') {
+                            showError('Lỗi: ' + data.error);
+                        }
+                        closeFormModal();
+                        return;
+                    }
+                    
+                    const product = data.data;
+                    
+                    // Populate form fields
+                    document.getElementById('productId').value = product.id;
+                    document.getElementById('productName').value = product.name || '';
+                    document.getElementById('productPrice').value = product.price || 0;
+                    document.getElementById('productStock').value = product.stockQuantity || 0;
+                    document.getElementById('productStatus').value = product.status || 'ACTIVE';
+                    document.getElementById('productDescription').value = product.description || '';
+                    document.getElementById('productWeight').value = product.weightG || 500;
+                    document.getElementById('productLength').value = product.lengthCm || 20;
+                    document.getElementById('productWidth').value = product.widthCm || 20;
+                    document.getElementById('productHeight').value = product.heightCm || 30;
+                    
+                    // Set catalog if exists
+                    if (product.catalogId) {
+                        document.getElementById('productCatalog').value = product.catalogId;
+                    }
+                    
+                    // Show image preview if exists
+                    if (product.image) {
+                        document.getElementById('previewImg').src = product.image;
+                        document.getElementById('imagePreview').classList.remove('hidden');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (typeof showError === 'function') {
+                        showError('Có lỗi xảy ra khi tải thông tin sản phẩm');
+                    }
+                    closeFormModal();
+                });
+        }
+        
+        // Handle image preview
+        document.getElementById('productImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Handle form submission
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const productId = document.getElementById('productId').value;
+            
+            // Determine URL and method
+            let url, method;
+            if (isEditMode && productId) {
+                url = `/admin/products/api/${productId}`;
+                method = 'PUT';
+            } else {
+                url = '/admin/products/api/create';
+                method = 'POST';
+            }
+            
+            // Show loading state
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang xử lý...';
+            
+            // Add CSRF token to headers (for multipart/form-data, we need to add it to FormData)
+            const csrfToken = getCsrfToken();
+            if (csrfToken) {
+                formData.append('_csrf', csrfToken);
+            }
+            
+            // Send request
+            fetch(url, {
+                method: method,
+                body: formData
+                // Note: Don't set Content-Type header for FormData, browser will set it with boundary
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    // Handle authentication error
+                    if (typeof showError === 'function') {
+                        showError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    }
+                    // Redirect to login after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/login?error=session_expired';
+                    }, 2000);
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.error) {
+                    if (typeof showError === 'function') {
+                        showError('Lỗi: ' + data.error);
+                    }
+                } else if (data && data.success) {
+                    if (typeof showSuccess === 'function') {
+                        showSuccess(isEditMode ? 'Cập nhật sản phẩm thành công!' : 'Thêm sản phẩm thành công!');
+                    }
+                    closeFormModal();
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (typeof showError === 'function') {
+                    showError('Có lỗi xảy ra khi lưu sản phẩm');
+                }
+            })
+            .finally(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            });
+        });
+        
+        // Load catalogs on page load
+        loadCatalogs();
+        
+    </script>
+    
+    <!-- AI Product Description Generator Script -->
+    <script src="/js/admin-product-ai.js"></script>
+    <script>
+        // Ensure setup runs after script loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof setupAiDescriptionGenerator === 'function') {
+                setupAiDescriptionGenerator();
+            }
+        });
+    </script>
+</div>

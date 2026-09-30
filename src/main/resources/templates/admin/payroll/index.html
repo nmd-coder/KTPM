@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{admin/layout}">
+<head>
+    <title>Quản Lý Lương & Chấm Công</title>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div x-data="payrollManagement()" x-init="init()">
+        
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">
+                <i class="fas fa-money-check-alt text-green-600 mr-3"></i>
+                Quản Lý Lương & Chấm Công
+            </h1>
+            <p class="text-gray-600">Quản lý lương, chấm công và tính toán tự động cho nhân viên</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-lg shadow-sm mb-6">
+            <div class="border-b border-gray-200">
+                <nav class="flex space-x-8 px-6" aria-label="Tabs">
+                    <button @click="activeTab = 'salary'; loadSalaries()" 
+                            :class="activeTab === 'salary' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                        <i class="fas fa-dollar-sign mr-2"></i>
+                        Bảng Lương
+                    </button>
+                    <button @click="activeTab = 'timesheet'; loadTimesheets()" 
+                            :class="activeTab === 'timesheet' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                        <i class="fas fa-clock mr-2"></i>
+                        Chấm Công
+                    </button>
+                    <button @click="activeTab = 'auto'" 
+                            :class="activeTab === 'auto' ? 'border-blue-500 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+                            class="py-4 px-1 border-b-2 font-medium text-sm transition-colors">
+                        <i class="fas fa-robot mr-2"></i>
+                        Tính Lương Tự Động
+                    </button>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Tab Content: Bảng Lương -->
+        <div x-show="activeTab === 'salary'" x-cloak>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900">Bảng Lương Nhân Viên</h2>
+                    <div class="flex items-center space-x-3">
+                        <select x-model="selectedMonth" @change="loadSalaries()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="1">Tháng 1</option>
+                            <option value="2">Tháng 2</option>
+                            <option value="3">Tháng 3</option>
+                            <option value="4">Tháng 4</option>
+                            <option value="5">Tháng 5</option>
+                            <option value="6">Tháng 6</option>
+                            <option value="7">Tháng 7</option>
+                            <option value="8">Tháng 8</option>
+                            <option value="9">Tháng 9</option>
+                            <option value="10">Tháng 10</option>
+                            <option value="11">Tháng 11</option>
+                            <option value="12">Tháng 12</option>
+                        </select>
+                        <select x-model="selectedYear" @change="loadSalaries()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div x-show="loadingSalaries" class="text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+
+                <!-- Salary Table -->
+                <div x-show="!loadingSalaries" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nhân viên</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mã NV</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lương/giờ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Giờ làm</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng lương</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <template x-if="salaries.length === 0">
+                                <tr>
+                                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                                        <i class="fas fa-inbox text-gray-300 text-4xl mb-3"></i>
+                                        <p>Chưa có dữ liệu lương tháng này</p>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-for="salary in salaries" :key="salary.id">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white font-semibold">
+                                                    <span x-text="salary.userName ? salary.userName.charAt(0) : 'U'"></span>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900" x-text="salary.userName || 'Unknown'"></div>
+                                                <div class="text-sm text-gray-500" x-text="salary.userEmail || ''"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="salary.employeeCode || '-'"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="formatCurrency(salary.baseSalary)"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600" x-text="salary.workingTime + 'h'"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600" x-text="formatCurrency(salary.totalSalary)"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span :class="{
+                                            'bg-yellow-100 text-yellow-800': salary.status === 'PENDING',
+                                            'bg-green-100 text-green-800': salary.status === 'PAID',
+                                            'bg-red-100 text-red-800': salary.status === 'OVERDUE'
+                                        }" class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full">
+                                            <span x-text="getStatusText(salary.status)"></span>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <button @click="markAsPaid(salary.id)" 
+                                                x-show="salary.status === 'PENDING'"
+                                                class="inline-flex items-center px-3 py-1 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors">
+                                            <i class="fas fa-check-circle mr-1"></i> Đánh dấu đã trả
+                                        </button>
+                                        <span x-show="salary.status === 'PAID'" class="text-gray-500 text-sm">
+                                            <i class="fas fa-check-circle text-green-600 mr-1"></i> Đã thanh toán
+                                        </span>
+                                        <span x-show="salary.status === 'OVERDUE'" class="text-red-600 text-sm">
+                                            <i class="fas fa-exclamation-circle mr-1"></i> Quá hạn
+                                        </span>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Chấm Công -->
+        <div x-show="activeTab === 'timesheet'" x-cloak>
+            <div class="bg-white rounded-lg shadow-sm p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-900">Bảng Chấm Công</h2>
+                    <div class="flex items-center space-x-3">
+                        <select x-model="timesheetMonth" @change="loadTimesheets()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="1">Tháng 1</option>
+                            <option value="2">Tháng 2</option>
+                            <option value="3">Tháng 3</option>
+                            <option value="4">Tháng 4</option>
+                            <option value="5">Tháng 5</option>
+                            <option value="6">Tháng 6</option>
+                            <option value="7">Tháng 7</option>
+                            <option value="8">Tháng 8</option>
+                            <option value="9">Tháng 9</option>
+                            <option value="10">Tháng 10</option>
+                            <option value="11">Tháng 11</option>
+                            <option value="12">Tháng 12</option>
+                        </select>
+                        <select x-model="timesheetYear" @change="loadTimesheets()" 
+                                class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            <option value="2024">2024</option>
+                            <option value="2025">2025</option>
+                            <option value="2026">2026</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 font-medium">Tổng nhân viên</p>
+                                <p class="text-3xl font-bold text-blue-600" x-text="timesheetStats.totalStaff"></p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-users text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 font-medium">Tổng giờ làm</p>
+                                <p class="text-3xl font-bold text-green-600" x-text="timesheetStats.totalHours + 'h'"></p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-clock text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border border-purple-100">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 font-medium">Trung bình/người</p>
+                                <p class="text-3xl font-bold text-purple-600" x-text="timesheetStats.avgHours + 'h'"></p>
+                            </div>
+                            <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-chart-line text-white text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div x-show="loadingTimesheets" class="text-center py-12">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                </div>
+
+                <!-- Timesheet Table -->
+                <div x-show="!loadingTimesheets" class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nhân viên</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số ngày làm</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tổng giờ</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trung bình/ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            <template x-if="timesheetSummary.length === 0">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-12 text-center text-gray-500">
+                                        <i class="fas fa-inbox text-gray-300 text-4xl mb-3"></i>
+                                        <p>Chưa có dữ liệu chấm công tháng này</p>
+                                    </td>
+                                </tr>
+                            </template>
+                            <template x-for="item in timesheetSummary" :key="item.staffId">
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                <div class="h-10 w-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-600 flex items-center justify-center text-white font-semibold">
+                                                    <span x-text="item.staffName.charAt(0)"></span>
+                                                </div>
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="text-sm font-medium text-gray-900" x-text="item.staffName"></div>
+                                                <div class="text-sm text-gray-500" x-text="item.employeeCode"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-blue-600" x-text="item.totalDays + ' ngày'"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600" x-text="item.totalHours + 'h'"></td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900" x-text="item.avgHours + 'h'"></td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: Tính Lương Tự Động -->
+        <div x-show="activeTab === 'auto'" x-cloak>
+            <div class="max-w-4xl mx-auto">
+                <!-- Auto Salary Card -->
+                <div class="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl shadow-xl p-8 text-white mb-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-3xl font-bold mb-2">Tính Lương Tự Động</h2>
+                            <p class="text-white/80">Hệ thống tự động tính lương vào 23:00 ngày cuối mỗi tháng</p>
+                        </div>
+                        <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+                            <i class="fas fa-robot text-5xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manual Trigger -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
+                        <i class="fas fa-hand-pointer text-blue-600 mr-2"></i>
+                        Tính Lương Thủ Công
+                    </h3>
+                    <p class="text-gray-600 mb-4">Chọn tháng/năm để tính lương cho tất cả nhân viên</p>
+                    
+                    <div class="flex items-end space-x-4">
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tháng</label>
+                            <select x-model="autoMonth" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="1">Tháng 1</option>
+                                <option value="2">Tháng 2</option>
+                                <option value="3">Tháng 3</option>
+                                <option value="4">Tháng 4</option>
+                                <option value="5">Tháng 5</option>
+                                <option value="6">Tháng 6</option>
+                                <option value="7">Tháng 7</option>
+                                <option value="8">Tháng 8</option>
+                                <option value="9">Tháng 9</option>
+                                <option value="10">Tháng 10</option>
+                                <option value="11">Tháng 11</option>
+                                <option value="12">Tháng 12</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Năm</label>
+                            <select x-model="autoYear" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                            </select>
+                        </div>
+                        <button @click="generateSalaries()" 
+                                :disabled="generating"
+                                class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
+                            <i class="fas fa-calculator mr-2"></i>
+                            <span x-text="generating ? 'Đang tính...' : 'Tính Lương'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Info Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+                        <h4 class="font-semibold text-gray-900 mb-3">
+                            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
+                            Cách hoạt động
+                        </h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Tự động chạy 23:00 ngày cuối tháng</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Tính dựa trên dữ liệu chấm công</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Công thức: Lương/giờ × Tổng giờ làm</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mr-2 mt-1"></i>
+                                <span>Tự động cập nhật nếu đã tồn tại</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
+                        <h4 class="font-semibold text-gray-900 mb-3">
+                            <i class="fas fa-shield-alt text-green-500 mr-2"></i>
+                            Ưu điểm
+                        </h4>
+                        <ul class="space-y-2 text-sm text-gray-600">
+                            <li class="flex items-start">
+                                <i class="fas fa-star text-yellow-500 mr-2 mt-1"></i>
+                                <span>Tiết kiệm thời gian 100%</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-star text-yellow-500 mr-2 mt-1"></i>
+                                <span>Chính xác tuyệt đối</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-star text-yellow-500 mr-2 mt-1"></i>
+                                <span>Không tạo duplicate</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-star text-yellow-500 mr-2 mt-1"></i>
+                                <span>Có thể tính lại bất cứ lúc nào</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- PART 1: Basic JavaScript - Salary Tab Only -->
+<script th:inline="javascript">
+function payrollManagement() {
+    return {
+        activeTab: 'salary',
+        
+        // Salary tab
+        selectedMonth: new Date().getMonth() + 1,
+        selectedYear: new Date().getFullYear(),
+        salaries: [],
+        loadingSalaries: false,
+        
+        // Timesheet tab (placeholder)
+        timesheetMonth: new Date().getMonth() + 1,
+        timesheetYear: new Date().getFullYear(),
+        timesheetSummary: [],
+        loadingTimesheets: false,
+        timesheetStats: { totalStaff: 0, totalHours: 0, avgHours: 0 },
+        
+        // Auto tab (placeholder)
+        autoMonth: new Date().getMonth() + 1,
+        autoYear: new Date().getFullYear(),
+        generating: false,
+        
+        init() {
+            this.loadSalaries();
+        },
+        
+        async loadSalaries() {
+            this.loadingSalaries = true;
+            try {
+                const response = await fetch(`/admin/api/salaries?month=${this.selectedMonth}&year=${this.selectedYear}`);
+                const data = await response.json();
+                if (data.success) {
+                    this.salaries = data.salaries || [];
+                }
+            } catch (error) {
+                console.error('Error loading salaries:', error);
+            } finally {
+                this.loadingSalaries = false;
+            }
+        },
+        
+        async markAsPaid(salaryId) {
+            if (!confirm('Xác nhận đã trả lương?')) return;
+            
+            try {
+                const response = await fetch(`/admin/api/salaries/${salaryId}/mark-paid`, { method: 'POST' });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Đã cập nhật trạng thái');
+                    this.loadSalaries();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        },
+        
+        async loadTimesheets() {
+            this.loadingTimesheets = true;
+            try {
+                const response = await fetch(`/admin/api/timesheets/summary?month=${this.timesheetMonth}&year=${this.timesheetYear}`);
+                const data = await response.json();
+                if (data.success) {
+                    this.timesheetSummary = data.summary || [];
+                    this.timesheetStats = data.stats || {totalStaff: 0, totalHours: 0, avgHours: 0};
+                }
+            } catch (error) {
+                console.error('Error loading timesheets:', error);
+            } finally {
+                this.loadingTimesheets = false;
+            }
+        },
+        
+        async generateSalaries() {
+            if (!confirm(`Xác nhận tính lương cho tháng ${this.autoMonth}/${this.autoYear}?`)) {
+                return;
+            }
+            
+            this.generating = true;
+            try {
+                const response = await fetch(`/admin/api/salaries/generate?month=${this.autoMonth}&year=${this.autoYear}`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert(data.message);
+                    // Reload if same month
+                    if (this.autoMonth == this.selectedMonth && this.autoYear == this.selectedYear) {
+                        this.loadSalaries();
+                    }
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error generating salaries:', error);
+                alert('Lỗi khi tính lương');
+            } finally {
+                this.generating = false;
+            }
+        },
+        
+        formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+        },
+        
+        getStatusText(status) {
+            const map = { 'PENDING': 'Chưa trả', 'PAID': 'Đã trả', 'OVERDUE': 'Quá hạn' };
+            return map[status] || status;
+        }
+    }
+}
+</script>
+
+</body>
+</html>
